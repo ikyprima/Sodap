@@ -9,11 +9,557 @@ class Cpanel_model extends CI_Model
   public $mprogram    = 'mpgrm';
   public $mkegiatan   = 'mkegiatan';
   public $manggaran   = 'matangr';
-  public $tab_pns   = 'tab_pns';
+  public $tab_pns     = 'tab_pns';
   function __construct()
   {
       parent::__construct();
   }
+  //API
+  function adddaftunit($thn){
+    $fp = fsockopen("192.168.10.5", 8080, $errno, $errstr, 10);
+    //if the socket failed it's offline...
+    if (!$fp) {
+        $status = false;
+    }else{
+    $url = 'http://192.168.10.5:8080/daftunit/22384ee59631a5a61ce3386af63c094b/'.$thn;
+    $jsondata = file_get_contents($url);
+    $obj = json_decode($jsondata, true);
+
+
+    $data['responcode']=$obj['ResponseCode'];
+    $data['data']= array();
+    $data['update']= array();
+    $list= array();
+    foreach ($obj['DATA'] as $row) {
+      $unitkey    = $row['UNITKEY'];
+      $nmunit     = $row['NMUNIT'];
+
+      $this->db->where('tahun', $thn);
+      $this->db->where('unitkey', $unitkey);
+      $cek = $this->db->get('daftunit');
+        if (!$cek->num_rows()>0){
+          $data['data'][] = array(
+            "unitkey"  =>  $unitkey,
+            "nmunit"   =>  $nmunit ,
+            "tahun"    =>  $thn
+          );
+        }
+      $data['update'][] = array(
+        "unitkey"  =>  $unitkey,
+        "nmunit"   =>  $nmunit,
+        "tahun"    =>  $thn
+      );
+    }
+
+    if(empty($data['data'])){
+        $status = true;
+    }else{
+      $this->db->trans_start();
+      $this->db->insert_batch('daftunit', $data['data']);
+      $this->db->trans_complete();
+
+      if ($this->db->trans_status() === FALSE){
+        $this->db->trans_rollback();
+        $status = false;
+      }else{
+        $this->db->trans_commit();
+        $status = true;
+      }
+    }
+
+      foreach ($data['update'] as $x => $key ) {
+        $dataup=array(
+          'nmunit'=>$key['nmunit']
+        );
+        $this->db->where('tahun', $key['tahun']);
+        $this->db->where('unitkey', $key['unitkey']);
+        $this->db->update('daftunit',$dataup);
+      }
+
+    }
+    return $status;
+  }
+
+  function addprgrm($thn){
+        $fp = fsockopen("192.168.10.5", 8080, $errno, $errstr, 10);
+        //if the socket failed it's offline...
+        if (!$fp) {
+            $status = false;
+        }else{
+        $url = 'http://192.168.10.5:8080/mpgrm/22384ee59631a5a61ce3386af63c094b/'.$thn;
+        $jsondata = file_get_contents($url);
+        $obj = json_decode($jsondata, true);
+
+
+        $data['responcode']=$obj['ResponseCode'];
+        $data['data']= array();
+        $data['update']= array();
+        $list= array();
+        foreach ($obj['DATA'] as $row) {
+          $idpgrm    = $row['IDPRGRM'];
+          $nmprogram = $row['NMPRGRM'];
+
+          $this->db->where('tahun', $thn);
+          $this->db->where('IDPRGRM', $idpgrm);
+          $cek = $this->db->get('mpgrm');
+            if (!$cek->num_rows()>0){
+              $data['data'][] = array(
+                "IDPRGRM"  =>  $idpgrm,
+                "NMPRGRM"  =>  $nmprogram,
+                "tahun"    =>  $thn
+              );
+            }
+          $data['update'][] = array(
+            "idpgrm"  =>  $idpgrm,
+            "nmpgrm"   =>  $nmprogram,
+            "tahun"    =>  $thn
+          );
+        }
+
+        if(empty($data['data'])){
+            $status = true;
+        }else{
+          $this->db->trans_start();
+          $this->db->insert_batch('mpgrm', $data['data']);
+          $this->db->trans_complete();
+
+          if ($this->db->trans_status() === FALSE){
+            $this->db->trans_rollback();
+            $status = false;
+          }else{
+            $this->db->trans_commit();
+            $status = true;
+          }
+        }
+
+          foreach ($data['update'] as $x => $key ) {
+            $dataup=array(
+              'NMPRGRM'=>$key['nmpgrm']
+            );
+            $this->db->where('tahun', $key['tahun']);
+            $this->db->where('IDPRGRM', $key['idpgrm']);
+            $this->db->update('mpgrm',$dataup);
+          }
+
+        }
+          return $status;
+  }
+
+  function addmkegiatan($thn){
+    $fp = fsockopen("192.168.10.5", 8080, $errno, $errstr, 10);
+    //if the socket failed it's offline...
+    if (!$fp) {
+          $status = false;
+    }else{
+    $url = 'http://192.168.10.5:8080/mkegiatan/22384ee59631a5a61ce3386af63c094b/'.$thn;
+    $jsondata = file_get_contents($url);
+    $obj = json_decode($jsondata, true);
+    $data['responcode']=$obj['ResponseCode'];
+    $data['data']= array();
+    $data['update']= array();
+    $list= array();
+    foreach ($obj['DATA'] as $row) {
+      $idprgrm    = $row['IDPRGRM'];
+      $kdkegunit  = $row['KDKEGUNIT'];
+      $nmkegunit  = $row['NMKEGUNIT'];
+
+      $this->db->where('tahun', $thn);
+      $this->db->where('idprgrm', $idprgrm);
+      $this->db->where('kdkegunit', $kdkegunit);
+      $cek = $this->db->get('mkegiatan');
+        if (!$cek->num_rows()>0){
+          $data['data'][] = array(
+            "idprgrm"    => $idprgrm,
+            "kdkegunit"  => $kdkegunit,
+            "nmkegunit"  => $nmkegunit,
+            "tahun"      => $thn
+          );
+        }
+      $data['update'][] = array(
+        "idprgrm"    => $idprgrm,
+        "kdkegunit"  => $kdkegunit,
+        "nmkegunit"  => $nmkegunit,
+        "tahun"      => $thn
+      );
+    }
+
+    if(empty($data['data'])){
+        $status = true;
+    }else{
+      $this->db->trans_start();
+      $this->db->insert_batch('mkegiatan', $data['data']);
+      $this->db->trans_complete();
+
+      if ($this->db->trans_status() === FALSE){
+        $this->db->trans_rollback();
+        $status = false;
+      }else{
+        $this->db->trans_commit();
+        $status = true;
+      }
+    }
+
+      foreach ($data['update'] as $x => $key ) {
+        $dataup=array(
+          'nmkegunit'=>$key['nmkegunit']
+        );
+        $this->db->where('tahun', $key['tahun']);
+        $this->db->where('idprgrm', $key['idprgrm']);
+        $this->db->where('kdkegunit', $key['kdkegunit']);
+        $this->db->update('mkegiatan',$dataup);
+      }
+
+    }
+    return $status;
+  }
+
+  function addmatangr($thn){
+
+    $fp = fsockopen("192.168.10.5", 8080, $errno, $errstr, 10);
+    //if the socket failed it's offline...
+    if (!$fp) {
+        $status = false;
+    }else{
+    $url = 'http://192.168.10.5:8080/matangr/22384ee59631a5a61ce3386af63c094b/'.$thn;
+    $jsondata = file_get_contents($url);
+    $obj = json_decode($jsondata, true);
+    $data['responcode']=$obj['ResponseCode'];
+    $data['data']= array();
+    $data['update']= array();
+    $list= array();
+    foreach ($obj['DATA'] as $row) {
+
+        $nmper    = $row['NMPER'];
+        $kdper    = $row['KDPER'];
+        $mtgkey   = $row['MTGKEY'];
+        $mtglevel = $row['MTGLEVEL'];
+        $type     = $row['TYPE'];
+
+
+      $this->db->where('tahun', $thn);
+      $this->db->where('mtgkey', $mtgkey);
+      $cek = $this->db->get('matangr');
+        if (!$cek->num_rows()>0){
+          $data['data'][] = array(
+            "mtgkey"    => $mtgkey,
+            "kdper"     => $kdper ,
+            "nmper"     => $nmper,
+            "mtglevel"  => $mtglevel,
+            "type"      => $type,
+            "tahun"     => $thn
+          );
+        }
+      $data['update'][] = array(
+        "mtgkey"    => $mtgkey,
+        "kdper"     => $kdper ,
+        "nmper"     => $nmper,
+        "mtglevel"  => $mtglevel,
+        "type"      => $type,
+        "tahun"     => $thn
+      );
+    }
+
+    if(empty($data['data'])){
+        $status = true;
+    }else{
+      $this->db->trans_start();
+      $this->db->insert_batch('matangr', $data['data']);
+      $this->db->trans_complete();
+
+      if ($this->db->trans_status() === FALSE){
+        $this->db->trans_rollback();
+        $status = false;
+      }else{
+        $this->db->trans_commit();
+        $status = true;
+      }
+    }
+
+      foreach ($data['update'] as $x => $key ) {
+        $dataup=array(
+          'kdper'   => $key['kdper'],
+          'nmper'   => $key['nmper'],
+          'mtglevel'=> $key['mtglevel'],
+          'type'    => $key['type']
+
+        );
+        $this->db->where('tahun', $key['tahun']);
+        $this->db->where('mtgkey', $key['mtgkey']);
+        $this->db->update('matangr',$dataup);
+      }
+
+    }
+  return $status;
+
+  }
+
+  function adddpa22($thn,$unit){
+
+    $fp = fsockopen("192.168.10.5", 8080, $errno, $errstr, 10);
+    //if the socket failed it's offline...
+    if (!$fp) {
+        $status = false;
+    }else{
+    $url = 'http://192.168.10.5:8080/dpa22/22384ee59631a5a61ce3386af63c094b/'.$thn.'/'.$unit;
+    $jsondata = file_get_contents($url);
+    $obj = json_decode($jsondata, true);
+    $data['responcode']=$obj['ResponseCode'];
+    $data['data']= array();
+    $data['update']= array();
+    $list= array();
+    foreach ($obj['DATA'] as $row) {
+
+        $unitkey =  $row['UNITKEY'];
+        $kdkegunit = $row['KDKEGUNIT'];
+        $mtgkey = $row['MTGKEY'];
+        $nilai = $row['NILAI'];
+
+
+      $this->db->where('tahun', $thn);
+      $this->db->where('unitkey', $unitkey);
+      $this->db->where('kdkegunit', $kdkegunit);
+      $this->db->where('mtgkey', $mtgkey);
+      $cek = $this->db->get('dpa22');
+
+        if (!$cek->num_rows()>0){
+          $data['data'][] = array(
+              "unitkey"   =>$unitkey,
+              "kdkegunit" =>$kdkegunit,
+              "mtgkey"    =>$mtgkey,
+              "nilai"     =>$nilai,
+              "tahun"     =>$thn
+          );
+        }
+
+      $data['update'][] = array(
+        "unitkey"   =>$unitkey,
+        "kdkegunit" =>$kdkegunit,
+        "mtgkey"    =>$mtgkey,
+        "nilai"     =>$nilai,
+        "tahun"     =>$thn
+      );
+    }
+
+    if(empty($data['data'])){
+        $status = true;
+    }else{
+      $this->db->trans_start();
+      $this->db->insert_batch('dpa22', $data['data']);
+      $this->db->trans_complete();
+
+      if ($this->db->trans_status() === FALSE){
+        $this->db->trans_rollback();
+        $status = false;
+      }else{
+        $this->db->trans_commit();
+        $status = true;
+      }
+    }
+
+      foreach ($data['update'] as $x => $key ) {
+        $dataup=array(
+          'nilai'   => $key['nilai'],
+        );
+        $this->db->where('tahun',$key['tahun'] );
+        $this->db->where('unitkey', $key['unitkey'] );
+        $this->db->where('kdkegunit',$key['kdkegunit'] );
+        $this->db->where('mtgkey', $key['mtgkey'] );
+        $this->db->update('dpa22',$dataup);
+      }
+
+    }
+    return $status;
+  }
+
+
+
+  function adddpa221($thn,$unit){
+    $fp = fsockopen("192.168.10.5", 8080, $errno, $errstr, 10);
+    //if the socket failed it's offline...
+    if (!$fp) {
+        $status = false;
+    }else{
+    $url = 'http://192.168.10.5:8080/dpa221/22384ee59631a5a61ce3386af63c094b/'.$thn.'/'.$unit;
+    $jsondata = file_get_contents($url);
+    $obj = json_decode($jsondata, true);
+    $data['responcode']=$obj['ResponseCode'];
+    $data['data']= array();
+    $data['update']= array();
+    $list= array();
+    foreach ($obj['DATA'] as $row) {
+      //$row['SUBTOTAL'] tidak di  deklarasikan
+        $satuan    =  $row['SATUAN'];
+        $kdkegunit =  $row['KDKEGUNIT'];
+        $mtgkey    =  $row['MTGKEY'];
+        $jumbyek   =  $row['JUMBYEK'];
+        $unitkey   =  $row['UNITKEY'];
+        $uraian    =  $row['URAIAN'];
+        $tarif     =  $row['TARIF'];
+        $kdjabar   =  $row['KDJABAR'];
+        $type      =  $row['TYPE'];
+
+      $this->db->where('tahun', $thn);
+      $this->db->where('unitkey', $unitkey);
+      $this->db->where('kdkegunit', $kdkegunit);
+      $this->db->where('mtgkey', $mtgkey);
+      $this->db->where('type', $type);
+      $this->db->where('kdjabar', $kdjabar);
+      $cek = $this->db->get('dpa221');
+
+        if (!$cek->num_rows()>0){
+          $data['data'][] = array(
+             "satuan"    =>  $satuan,
+             "kdkegunit" =>  $kdkegunit,
+             "mtgkey"    =>  $mtgkey,
+             "jumbyek"   =>  $jumbyek,
+             "unitkey"   =>  $unitkey,
+             "uraian"    =>  $uraian,
+             "tarif"     =>  $tarif,
+             "kdjabar"   =>  $kdjabar,
+             "type"      =>  $type,
+             "tahun"     =>  $thn
+          );
+        }
+
+      $data['update'][] = array(
+        "satuan"    =>  $satuan,
+        "kdkegunit" =>  $kdkegunit,
+        "mtgkey"    =>  $mtgkey,
+        "jumbyek"   =>  $jumbyek,
+        "unitkey"   =>  $unitkey,
+        "uraian"    =>  $uraian,
+        "tarif"     =>  $tarif,
+        "kdjabar"   =>  $kdjabar,
+        "type"      =>  $type,
+        "tahun"     =>  $thn
+      );
+    }
+
+    if(empty($data['data'])){
+        $status = true;
+    }else{
+      $this->db->trans_start();
+      $this->db->insert_batch('dpa221', $data['data']);
+      $this->db->trans_complete();
+
+      if ($this->db->trans_status() === FALSE){
+        $this->db->trans_rollback();
+        $status = false;
+      }else{
+        $this->db->trans_commit();
+        $status = true;
+      }
+    }
+
+      foreach ($data['update'] as $x => $key ) {
+
+        $dataup=array(
+          'jumbyek'  => $key['jumbyek'],
+          'satuan'   => $key['satuan'],
+          'tarif'    => $key['tarif'],
+          'uraian'   => $key['uraian']
+        );
+
+          $this->db->where('tahun', $key['tahun']);
+          $this->db->where('unitkey', $key['unitkey']);
+          $this->db->where('kdkegunit', $key['kdkegunit']);
+          $this->db->where('mtgkey', $key['mtgkey']);
+          $this->db->where('type', $key['type']);
+          $this->db->where('kdjabar', $key['kdjabar']);
+          $this->db->update('dpa221',$dataup);
+        }
+      }
+    return $status;
+  }
+
+  function addangkas($thn,$unit){
+
+
+  $fp = fsockopen("192.168.10.5", 8080, $errno, $errstr, 10);
+  //if the socket failed it's offline...
+  if (!$fp) {
+      $status = false;
+  }else{
+  $url = 'http://192.168.10.5:8080/angkas/22384ee59631a5a61ce3386af63c094b/'.$thn.'/'.$unit;
+  $jsondata = file_get_contents($url);
+  $obj = json_decode($jsondata, true);
+  $data['responcode']=$obj['ResponseCode'];
+  $data['data']= array();
+  $data['update']= array();
+  $list= array();
+  foreach ($obj['DATA'] as $row) {
+    $unitkey   = $row['UNITKEY'];
+    $kdkegunit = $row['KDKEGUNIT'];
+    $kd_bulan  = $row['KD_BULAN'];
+    $nilai     = $row['NILAI'];
+    $mtgkey    = $row['MTGKEY'];
+
+    $this->db->where('tahun', $thn);
+    $this->db->where('unitkey', $unitkey);
+    $this->db->where('kdkegunit', $kdkegunit);
+    $this->db->where('mtgkey', $mtgkey);
+    $cek = $this->db->get('angkas');
+
+      if (!$cek->num_rows()>0){
+        $data['data'][] = array(
+          "unitkey"     =>  $unitkey,
+          "kdkegunit"   =>  $kdkegunit,
+          "kd_bulan"    =>  $kd_bulan ,
+          "nilai"       =>  $nilai,
+          "mtgkey"      =>  $mtgkey,
+          "tahun"       =>  $thn
+        );
+      }
+
+    $data['update'][] = array(
+      "unitkey"     =>  $unitkey,
+      "kdkegunit"   =>  $kdkegunit,
+      "kd_bulan"    =>  $kd_bulan ,
+      "nilai"       =>  $nilai,
+      "mtgkey"      =>  $mtgkey,
+      "tahun"       =>  $thn
+    );
+  }
+
+  if(empty($data['data'])){
+      $status = true;
+  }else{
+    $this->db->trans_start();
+    $this->db->insert_batch('angkas', $data['data']);
+    $this->db->trans_complete();
+
+    if ($this->db->trans_status() === FALSE){
+      $this->db->trans_rollback();
+      $status = false;
+    }else{
+      $this->db->trans_commit();
+      $status = true;
+    }
+  }
+
+    foreach ($data['update'] as $x => $key ) {
+
+
+      $dataup=array(
+        'kd_bulan'   => $key['kd_bulan'],
+        'nilai'      => $key['nilai']
+      );
+
+      $this->db->where('tahun',$key['tahun'] );
+      $this->db->where('unitkey', $key['unitkey'] );
+      $this->db->where('kdkegunit',$key['kdkegunit'] );
+      $this->db->where('mtgkey', $key['mtgkey'] );
+      $this->db->update('angkas',$dataup);
+    }
+
+  }
+  return $status;
+
+}
+
+  //batas API ryh
+
+
   /*baca*/
     function baca($opd,$tahun){
       $this->db->set('stat', '0');
@@ -171,34 +717,86 @@ FROM
 
         return $this->datatables->generate();
     }
-   function jsonopd()
+   function jsonopd($thn)
     {
-        $this->datatables->select('unitkey,nmunit');
-        $this->datatables->from($this->mopd);
-       // $this->datatables->add_column('action', '<button type="button" rel="tooltip" class="btn btn-info" data-original-title="" title=""><i class="material-icons">launch</i><div class="ripple-container"></div></button>' );
 
+        $this->datatables->select('unitkey,nmunit');
+        $this->datatables->where('tahun', $thn);
+        $this->datatables->from($this->mopd);
+        $this->datatables->add_column('action', '<div class="row" >
+                                                <div class="col-lg-6 col-md-12 col-sm-6">
+                                                    <div class="dropdown" >
+                                                        <button href="javascript:void(0)" class="dropdown-toggle btn btn-primary btn-round btn-block"  data-toggle="dropdown">Sinkron
+                                                            <b class="caret"></b>
+                                                        <div class="ripple-container"></div></button>
+                                                        <ul class="dropdown-menu dropdown-menu-left">
+                                                            <li class="dropdown-header">DATA SIPKD</li>
+                                                            <li class="divider"></li>
+                                                            <li>
+                                                                <a href="javascript:void(0)" class="sdpa22">DPA 2.2.</a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="javascript:void(0)" class="sdpa221">DPA 2.2.1.</a>
+                                                            </li>
+                                                            <li class="divider"></li>
+                                                            <li>
+                                                                <a href="javascript:void(0)" class="sangkas">ALIRAN KAS</a>
+                                                            </li>
+
+
+
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6 col-md-12 col-sm-6">
+                                                    <div class="dropdown">
+                                                        <button href="javascript:void(0)" class="dropdown-toggle btn btn-primary btn-round btn-block" data-toggle="dropdown">Lihat
+                                                            <b class="caret"></b>
+                                                        </button>
+                                                        <ul class="dropdown-menu dropdown-menu-left">
+                                                            <li class="dropdown-header">DATA OPD</li>
+                                                            <li class="divider"></li>
+                                                            <li>
+                                                                <a href="javascript:void(0)" class="ldpa22">DPA 2.2.</a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="javascript:void(0)" class="ldpa221">DPA 2.2.1.</a>
+                                                            </li>
+                                                              <li class="divider"></li>
+                                                            <li>
+                                                                <a href="javascript:void(0)" class="langkas">ALIRAN KAS</a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>' );
         return $this->datatables->generate();
     }
-    function jsonprogram()
+    function jsonprogram($thn)
     {
         $this->datatables->select('IDPRGRM,NMPRGRM');
+        $this->datatables->where('tahun', $thn);
         $this->datatables->from($this->mprogram);
         $this->datatables->add_column('action', '<button type="button" rel="tooltip" class="btn btn-info" data-original-title="" title=""><i class="material-icons">launch</i><div class="ripple-container"></div></button>' );
 
         return $this->datatables->generate();
     }
-    function jsonkegiatan()
+    function jsonkegiatan($thn)
     {
         $this->datatables->select('NMPRGRM,kdkegunit,nmkegunit');
+        $this->datatables->where('mkegiatan.tahun', $thn);
+        $this->datatables->where('mpgrm.tahun', $thn);
         $this->datatables->from($this->mkegiatan);
         $this->datatables->join('mpgrm', 'mpgrm.IDPRGRM = mkegiatan.idprgrm');
 
         return $this->datatables->generate();
     }
-    function jsonanggaran()
+    function jsonanggaran($thn)
     {
         $this->datatables->select('mtgkey,kdper,nmper,tahun');
+        $this->datatables->where('tahun', $thn);
         $this->datatables->from($this->manggaran);
+
 
 
         return $this->datatables->generate();
@@ -276,59 +874,8 @@ FROM
     }
     //agungagung!@$%&^!%
 
-  function addprgrm(){
-    $thn='2018';
-    $json_string = 'http://192.168.10.5:8080/mpgrm/22384ee59631a5a61ce3386af63c094b/'.$thn;
-		$jsondata = file_get_contents($json_string);
-		$obj = json_decode($jsondata, true);
-		foreach ($obj['DATA'] as $row) {
-			$data[] = array(
-	                  "idprgrm"  =>  $row['IDPRGRM'],
-	                  "nmprgrm"    =>  $row['NMPRGRM'],
-                    "tahun" => $thn
-	          );
-		}
-    $this->db->trans_start();
-    $this->db->insert_batch('mpgrm', $data);
-    $this->db->trans_complete();
-    return ($this->db->affected_rows()!=1)?false:true;
 
-  }
-  function adddaftunit(){
-    $thn='2018';
-    $json_string = 'http://192.168.10.5:8080/daftunit/22384ee59631a5a61ce3386af63c094b/2018';
-		$jsondata = file_get_contents($json_string);
-		$obj = json_decode($jsondata, true);
-		foreach ($obj['DATA'] as $row) {
-			$data[] = array(
-	                  "unitkey"  =>  $row['UNITKEY'],
-	                  "nmunit"    =>  $row['NMUNIT'],
-                    "tahun" => $thn
-	          );
-		}
-    $this->db->trans_start();
-    $this->db->insert_batch('daftunit', $data);
-    $this->db->trans_complete();
-    return ($this->db->affected_rows()!=1)?false:true;
-  }
-  function addmkegiatan(){
-    $thn='2018';
-    $json_string = 'http://192.168.10.5:8080/mkegiatan/22384ee59631a5a61ce3386af63c094b/'.$thn;
-		$jsondata = file_get_contents($json_string);
-		$obj = json_decode($jsondata, true);
-		foreach ($obj['DATA'] as $row) {
-			$data[] = array(
-	                  "nmkegunit"  =>  $row['NMKEGUNIT'],
-	                  "kdkegunit"    =>  $row['KDKEGUNIT'],
-					          "idprgrm"    =>  $row['IDPRGRM'],
-                    "tahun" => $thn
-	          );
-		}
-    $this->db->trans_start();
-    $this->db->insert_batch('mkegiatan', $data);
-    $this->db->trans_complete();
-    return ($this->db->affected_rows()!=1)?false:true;
-  }
+
   function adddpa21(){
     $thn='2018';
     $json_string = 'http://192.168.10.5:8080/dpa21/22384ee59631a5a61ce3386af63c094b/'.$thn;
@@ -347,26 +894,7 @@ FROM
     $this->db->trans_complete();
     return ($this->db->affected_rows()!=1)?false:true;
   }
-  function addmatangr(){
-    $thn='2018';
-    $json_string = 'http://192.168.10.5:8080/matangr/22384ee59631a5a61ce3386af63c094b/'.$thn;
-		$jsondata = file_get_contents($json_string);
-		$obj = json_decode($jsondata, true);
-		foreach ($obj['DATA'] as $row) {
-			$data[] = array(
-	                  "nmper"  =>  $row['NMPER'],
-	                  "kdper"    =>  $row['KDPER'],
-					          "mtgkey"    =>  $row['MTGKEY'],
-					          "mtglevel"    =>  $row['MTGLEVEL'],
-					          "type"    =>  $row['TYPE'],
-                    "tahun" => $thn
-	          );
-		}
-    $this->db->trans_start();
-    $this->db->insert_batch('matangr', $data);
-    $this->db->trans_complete();
-    return ($this->db->affected_rows()!=1)?false:true;
-  }
+
   function adddpa211(){
     $thn='2018';
     $json_string = 'http://192.168.10.5:8080/dpa211/22384ee59631a5a61ce3386af63c094b/'.$thn;
@@ -391,26 +919,7 @@ FROM
     $this->db->trans_complete();
     return ($this->db->affected_rows()!=1)?false:true;
   }
-  function adddpa22(){
-    $thn='2018';
-    $json_string = 'http://192.168.10.5:8080/dpa22/22384ee59631a5a61ce3386af63c094b/'.$thn;
-		$jsondata = file_get_contents($json_string);
-		$obj = json_decode($jsondata, true);
-		foreach ($obj['DATA'] as $row) {
-			$data[] = array(
-	                  "nilai"  =>  $row['NILAI'],
-	                  "kdkegunit"    =>  $row['KDKEGUNIT'],
-					  "mtgkey"    =>  $row['MTGKEY'],
-					  "unitkey"    =>  $row['UNITKEY'],
-             "tahun" => $thn
 
-	          );
-		}
-    $this->db->trans_start();
-    $this->db->insert_batch('dpa22', $data);
-    $this->db->trans_complete();
-    return ($this->db->affected_rows()!=1)?false:true;
-  }
 
   function getdaftunit(){
      $this->db->where('unitkey !=', '40_');
@@ -418,59 +927,8 @@ FROM
     return $this->db->get('daftunit')->result();
   }
 
-    function addangkas($key){
-    $thn='2018';
-    $json_string = 'http://192.168.10.5:8080/angkas/22384ee59631a5a61ce3386af63c094b/2018/'.$key;
-    $jsondata = file_get_contents($json_string);
-    $obj = json_decode($jsondata, true);
-    foreach ($obj['DATA'] as $row) {
-      $data[] = array(
-          "unitkey"     =>  $row['UNITKEY'],
-          "kdkegunit"   =>  $row['KDKEGUNIT'],
-          "kd_bulan"    =>  $row['KD_BULAN'],
-          "nilai"       =>  $row['NILAI'],
-          "mtgkey"      =>  $row['MTGKEY'],
-          "tahun"       =>  $thn
-            );
-    }
-    $this->db->trans_start();
-    $this->db->insert_batch('angkas', $data);
-    $this->db->trans_complete();
-    return ($this->db->affected_rows()!=1)?false:true;
-  }
 
 
- function adddpa221($key){
-    $thn='2018';
-    $json_string = 'http://192.168.10.5:8080/dpa221/22384ee59631a5a61ce3386af63c094b/2018/'.$key;
-    $jsondata = file_get_contents($json_string);
-    $obj = json_decode($jsondata, true);
-    $data=array();
-    foreach ($obj['DATA'] as $row) {
-      $subtotal= (int)$row['TARIF'] * (int)$row['JUMBYEK'];
-      $data[] = array(
-           "satuan"    =>  $row['SATUAN'],
-             // "subtotal"  =>  $subtotal,
-           "subtotal"    =>  $row['SUBTOTAL'],
-            "kdkegunit" =>  $row['KDKEGUNIT'],
-            "mtgkey"    =>  $row['MTGKEY'],
-            "jumbyek"   =>  $row['JUMBYEK'],
-            "unitkey"   =>  $row['UNITKEY'],
-            "uraian"    =>  $row['URAIAN'],
-            "tarif"     =>  $row['TARIF'],
-            "kdjabar"   =>  $row['KDJABAR'],
-            "type"      =>  $row['TYPE'],
-            "tahun"     =>  $thn
-
-             );
-    }
-    echo json_encode($data);
-
-    // $this->db->trans_start();
-    // $this->db->insert_batch('dpa221', $data);
-    // $this->db->trans_complete();
-    // return ($this->db->affected_rows()!=1)?false:true;
-  }
 
 
 

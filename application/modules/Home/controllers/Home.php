@@ -24,75 +24,13 @@ class Home extends MX_Controller
             redirect('Home/login', 'refresh');
         }elseif ($this->ion_auth->is_admin()){
             redirect('Cpanel', 'refresh');
-       /* }elseif ($this->ion_auth->is_kasubag()){   
-            redirect('Kasubag', 'refresh');
-        }elseif ($this->ion_auth->is_kasi()){   
-            redirect('Kasi', 'refresh');*/
         }else{
             redirect('User', 'refresh');
         }
 
-        // // jika tidak login
-        // if (!$this->ion_auth->logged_in()) {
-        //     // redirect them to the login page
-        //     redirect('Home/login', 'refresh');
-        // } // jika admin yang login
-        // else{
-        //     $stt = $this->ion_auth->user()->row()->status;
-        //     if($stt==1)
-        //         {
-        //         $this->data['password'] = array(
-        //                     'name'  => 'password',
-        //                     'id'    => 'password',
-        //                     'type'  => 'password',
-        //                     'placeholder' => 'password',
-        //                     'value' => $this->form_validation->set_value('password'),
-        //                     'class'=>'input100',
-        //             );
-        //             $this->data['password_confirm'] = array(
-        //                     'name'  => 'password_confirm',
-        //                     'id'    => 'password_confirm',
-        //                     'type'  => 'password',
-        //                     'placeholder' => 'password konfirmasi',
-        //                     'value' => $this->form_validation->set_value('password_confirm'),
-        //                     'class'=>'input100',
-        //             );
-                  
-        //             $this->_render_page('updatepass',$this->data);
-                  
-
-        //         }
-        //     else
-        //     {
-        //         if($this->ion_auth->is_admin()) // remove this elseif if you want to enable this for non-admins
-        //             {
-        //                 // redirect them to the home page because they must be an administrator to view this
-        //                 $this->data['message'] = (validation_errors()) ? validation_errors() : $this->session->flashdata('message');
-
-        //                 //list the users
-        //                 $this->data['users'] = $this->ion_auth->users()->result();
-        //                 foreach ($this->data['users'] as $k => $user) 
-        //                 {
-        //                     $this->data['users'][$k]->groups = $this->ion_auth->get_users_groups($user->id)->result();
-        //                 }  
-        //                 // $this->template->load('temp_admin', 'v_home', $this->data);
-        //                 redirect('Cpanel', 'refresh');
-        //         } elseif ($this->ion_auth->is_kasi()) {
-
-        //             redirect('Kasi', 'refresh');
-
-        //         } elseif ($this->ion_auth->is_kasubag()) {
-
-        //             redirect('Kasubag', 'refresh');
-        //         } else {
-        //             echo "silahkan cek jabatan ke admin";
-        //         }
-               
-        //     }
-        // }
 
 
-        
+
 
     }
 
@@ -183,23 +121,23 @@ class Home extends MX_Controller
     }
 public function passchange()
     {
-           
+
             $user = $this->ion_auth->user()->row();
             $this->data['user'] = $user;
             $this->data['current_user_menu'] = '';
             $this->load->library('form_validation');
-           
-           
+
+
 
                                 //$group_ids = $this->input->post('groups');
-                                
+
                         $new_data['status'] = 0;
                         if(strlen($this->input->post('password'))>=6) $new_data['password'] = $this->input->post('password');
 
 
 
 
-            
+
 
   if ($this->ion_auth->update($user->id, $new_data))
             {
@@ -396,7 +334,7 @@ public function update()
                                     );
                                     if(strlen($this->input->post('password'))>=6) $new_data['password'] = $this->input->post('password');
 
-                            
+
             }
 
             if ($this->form_validation->run() == true && $this->ion_auth->update($user->id, $new_data))
@@ -498,7 +436,7 @@ public function update()
                             'value' => $this->form_validation->set_value('password_confirm'),
                             'class'=>'form-control',
                     );
-                    
+
                     $this->template->load('temp_user','v_user_profil',$this->data);
 
             }

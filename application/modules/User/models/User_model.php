@@ -10,6 +10,165 @@ class User_model extends CI_Model
         parent::__construct();
 
     }
+  //bagian kasubagprogram
+
+  function ksubpro_listprogram($idopd,$thn){
+    $this->db->select('mpgrm.IDPRGRM, mpgrm.NMPRGRM');
+    $this->db->from('dpa22');
+    $this->db->join('mkegiatan', 'dpa22.kdkegunit = mkegiatan.kdkegunit');
+    $this->db->join('mpgrm', 'mpgrm.IDPRGRM = mkegiatan.idprgrm');
+    $this->db->where('dpa22.unitkey', $idopd);
+    $this->db->where('dpa22.tahun', $thn);
+    $this->db->where('mpgrm.tahun', $thn);
+    $this->db->where('mkegiatan.tahun', $thn);
+    $this->db->group_by('mpgrm.IDPRGRM');
+    return $this->db->get()->result_array();
+  }
+
+  function ksubpro_listkegiatan($idopd,$thn,$prog){
+    $this->db->select('dpa22.kdkegunit,mkegiatan.nmkegunit, sum(dpa22.nilai) as nilai');
+    $this->db->from('dpa22');
+    $this->db->join('mkegiatan', 'dpa22.kdkegunit = mkegiatan.kdkegunit');
+    $this->db->join('mpgrm', 'mpgrm.IDPRGRM = mkegiatan.idprgrm');
+    $this->db->where('dpa22.unitkey', $idopd);
+    $this->db->where('dpa22.tahun', $thn);
+    $this->db->where('mpgrm.tahun', $thn);
+    $this->db->where('mkegiatan.tahun', $thn);
+    $this->db->where('mkegiatan.idprgrm', $prog);
+    $this->db->group_by('dpa22.kdkegunit');
+    return $this->db->get();
+  }
+
+
+
+  function sinkrondpa22($thn,$unit){
+
+    // http://192.168.10.5:8080/dpa22/token/tahun/unitkey/kdkegunit
+    // http://192.168.10.5:8080/dpa22/22384ee59631a5a61ce3386af63c094b/2018/80_/11_
+    $fp = fsockopen("192.168.10.5", 8080, $errno, $errstr, 10);
+    //if the socket failed it's offline...
+    if (!$fp) {
+        echo "$errstr ($errno)<br />\n";
+    }else{
+
+
+
+    $url = 'http://192.168.10.5:8080/dpa22/22384ee59631a5a61ce3386af63c094b/'.$thn.'/'.$unit;
+    $jsondata = file_get_contents($url);
+    $obj = json_decode($jsondata, true);
+
+
+    $data['responcode']=$obj['ResponseCode'];
+    $data['data']= array();
+    $data['update']= array();
+    $list= array();
+    foreach ($obj['DATA'] as $row) {
+          $nilai    = $row['NILAI'];
+          $kdkeg    = $row['KDKEGUNIT'];
+          $mtgkey   = $row['MTGKEY'];
+          $unitkey  = $row['UNITKEY'];
+
+          $this->db->where('tahun', $thn);
+          $this->db->where('unitkey', $unit);
+          $this->db->where('kdkegunit', $kdkeg);
+          $this->db->where('mtgkey', $mtgkey);
+          $cek = $this->db->get('dpa22');
+      if (!$cek->num_rows()>0){
+        $data['data'][] = array(
+          "nilai"       =>  $nilai,
+          "kdkegunit"   =>  $kdkeg ,
+          "mtgkey"      =>  $mtgkey ,
+          "unitkey"     =>  $unitkey ,
+          "tahun"       =>  $thn
+        );
+      }
+      $data['update'][] = array(
+        "nilai"       =>  $nilai,
+        "kdkegunit"   =>  $kdkeg ,
+        "mtgkey"      =>  $mtgkey ,
+        "unitkey"     =>  $unitkey ,
+        "tahun"       =>  $thn
+      );
+
+    }
+
+    // $dataa = array(
+    //    array(
+    //      'tahun' => '2018',
+    //      'mtgkey' => '1132_' ,
+    //      'nilai' => '888'
+    //    ),
+    //    array(
+    //       'tahun' => '2018',
+    //       'mtgkey' => '1093_' ,
+    //       'nilai' => '777'
+    //
+    //    )
+    // );
+    // $this->db->update_batch('dpa22', $dataa, 'mtgkey, tahun');
+    //update batch kantau
+  //  echo json_encode($data['update']);
+
+
+
+    if(empty($data['data'])){
+        $status = true;
+    }else{
+      $this->db->trans_start();
+      $this->db->insert_batch('dpa22', $data['data']);
+      $this->db->trans_complete();
+
+      if ($this->db->trans_status() === FALSE){
+        $this->db->trans_rollback();
+        $status = false;
+      }else{
+        $this->db->trans_commit();
+        $status = true;
+      }
+    }
+
+        foreach ($data['update'] as $x => $key ) {
+          $dataup=array(
+              'nilai'=>$key['nilai']
+          );
+          $this->db->where('tahun', $key['tahun']);
+          $this->db->where('unitkey', $key['unitkey']);
+          $this->db->where('kdkegunit', $key['kdkegunit']);
+          $this->db->where('mtgkey', $key['mtgkey']);
+          $this->db->update('dpa22',$dataup);
+
+        }
+
+
+        return $status;
+    }
+  }
+
+  function ksubpro_listprogram_dpa($idopd,$thn){
+    $this->db->select('mpgrm.IDPRGRM, mpgrm.NMPRGRM');
+    $this->db->from('dpa221');
+    $this->db->join('mkegiatan', 'dpa221.kdkegunit = mkegiatan.kdkegunit');
+    $this->db->join('mpgrm', 'mpgrm.IDPRGRM = mkegiatan.idprgrm');
+    $this->db->where('dpa221.unitkey', $idopd);
+    $this->db->where('dpa221.tahun', $thn);
+    $this->db->group_by('mpgrm.IDPRGRM');
+    return $this->db->get()->result_array();
+  }
+  function ksubpro_listkegiatan_dpa($idopd,$thn,$prog){
+    $this->db->select('dpa221.kdkegunit,mkegiatan.nmkegunit,SUM(`dpa221`.`jumbyek` *`dpa221`.`tarif`) as nilai');
+    $this->db->from('dpa221');
+    $this->db->join('mkegiatan', 'dpa221.kdkegunit = mkegiatan.kdkegunit');
+    $this->db->join('mpgrm', 'mpgrm.IDPRGRM = mkegiatan.idprgrm');
+    $this->db->where('dpa221.unitkey', $idopd);
+    $this->db->where('dpa221.tahun', $thn);
+    $this->db->where('mkegiatan.idprgrm', $prog);
+    $this->db->group_by('dpa221.kdkegunit');
+    return $this->db->get();
+  }
+
+
+  //akhir kasubagprogram
+
 
     function cekstrukturopd($opd){
       $this->db->where('id_unit', $opd);
@@ -53,6 +212,7 @@ class User_model extends CI_Model
     }
     function updatestruktur($data,$id)
     {
+
         $this->db->where('id', $id);
         $upstrukt = $this->db->update('tab_struktur', $data);
         if($upstrukt)
@@ -1885,9 +2045,9 @@ FROM
     $blnsdskr = $this->db->get()->row_array();
 
     $nilai[]=array(
-              'tahun' => $tahun['tahun'],
-               'blnskr'=>$blnskr['blnskr'],
-               'blnsdskr'=>$blnsdskr['blnsdskr']
+      'tahun' => $tahun['tahun'],
+      'blnskr'=> $blnskr['blnskr'],
+      'blnsdskr'=>$blnsdskr['blnsdskr']
               );
 
     return $nilai;

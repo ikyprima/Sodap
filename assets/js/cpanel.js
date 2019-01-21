@@ -1,10 +1,9 @@
-var tb_opd;
+
 var tb_opd_user;
 var tb_opd_user_detail;
 var tb_opd_dpa;
-var tb_program;
-var tb_kegiatan;
-var tb_anggaran;
+
+
 var tb_list_opd_entri;
 
 
@@ -78,239 +77,15 @@ $(document).ready(function(){
   };
   /*Data table untuk opd*/
 
-  tb_opd = $('#tb-opd').DataTable({
-    initComplete: function() {
-      var api = this.api();
-      $('#tb-opd_filter input')
-      .off('.DT')
-      .on('keyup.DT', function(e) {
-        if (e.keyCode == 13) {
-          api.search(this.value).draw();
-        }
-      });
-    },
-    language: {
-        sProcessing: "loading...",
-        search: "_INPUT_",
-        searchPlaceholder: "Cari OPD..."
-    },
-    responsive: true,
-    processing: true,
-    serverSide: true,
-    ajax: {
-
-      "url": base_url+"Cpanel/jsonopd",
-      "type": "POST"
-    },
-    columns: [
-      {
-        "data": "unitkey",
-        "orderable": false
-      },
-      {
-        "data": "nmunit",
-      }
-
-    ],
-    //rowsGroup: [0], //ini untuk colspan atau grouping
-    order: [[1, 'asc']],
-    displayLength: 50,
-    //ini untuk menambahkan kolom no di index 0
-    rowCallback: function(row, data, iDisplayIndex) {
-      var info = this.fnPagingInfo();
-      var page = info.iPage;
-      var length = info.iLength;
-      var index = page * length + (iDisplayIndex + 1);
-      $('td:eq(0)', row).html(index);
-    }
-  });
-
  /*Data table untuk Master program*/
-tb_program = $('#tb-program').DataTable({
-    initComplete: function() {
-      var api = this.api();
-      $('#tb-program_filter input')
-      .off('.DT')
-      .on('keyup.DT', function(e) {
-        if (e.keyCode == 13) {
-          api.search(this.value).draw();
-        }
-      });
-    },
-    language: {
-        sProcessing: "loading...",
-        search: "_INPUT_",
-        searchPlaceholder: "Cari OPD..."
-    },
-    responsive: true,
-    processing: true,
-    serverSide: true,
-    ajax: {
-
-      "url": base_url+"Cpanel/jsonprogram",
-      "type": "POST"
-    },
-    columns: [
-      {
-        "data": "IDPRGRM",
-        "orderable": false
-      },
-      {
-        "data": "NMPRGRM",
-      },
-      {
-        "data" : "action",
-        "orderable": false,
-        "className" : "td-actions text-right"
-      }
-    ],
-    //rowsGroup: [0], //ini untuk colspan atau grouping
-    order: [[1, 'asc']],
-    displayLength: 50,
-    //ini untuk menambahkan kolom no di index 0
-    rowCallback: function(row, data, iDisplayIndex) {
-      var info = this.fnPagingInfo();
-      var page = info.iPage;
-      var length = info.iLength;
-      var index = page * length + (iDisplayIndex + 1);
-      $('td:eq(0)', row).html(index);
-    }
-  });
 
  /*Data table untuk kegiatan*/
 
-  tb_kegiatan = $('#tb-kegiatan').DataTable({
-    initComplete: function() {
-      var api = this.api();
-      $('#tb-kegiatan_filter input')
-      .off('.DT')
-      .on('keyup.DT', function(e) {
-        if (e.keyCode == 13) {
-          api.search(this.value).draw();
-        }
-      });
-    },
-    language: {
-        sProcessing: "loading...",
-        search: "_INPUT_",
-        searchPlaceholder: "Cari Program / kegiatan..."
-    },
-    responsive: true,
-    processing: true,
-    serverSide: true,
-    ajax: {
 
-      "url": base_url+"Cpanel/jsonkegiatan",
-      "type": "POST"
-    },
-    columns: [
-      {
-        "data": "kdkegunit",
-        "orderable": false
-      },
-      {
-        "data": "NMPRGRM",
-        "visible": false, "targets": 1
-
-      },
-      {
-        "data": "nmkegunit",
-      }
-    ],
-    //rowsGroup: [0], //ini untuk colspan atau grouping
-    order: [[2, 'asc']],
-    displayLength: 50,
-    //ini untuk menambahkan kolom no di index 0
-    rowCallback: function(row, data, iDisplayIndex) {
-      var info = this.fnPagingInfo();
-      var page = info.iPage;
-      var length = info.iLength;
-      var index = page * length + (iDisplayIndex + 1);
-      $('td:eq(0)', row).html(index);
-    },
-    drawCallback: function ( settings ) {
-      var api = this.api();
-      var rows = api.rows( {page:'current'} ).nodes();
-      var last=null;
-      api.column(1, {page:'current'} ).data().each( function ( group, i ) {
-        if ( last !== group ) {
-          $(rows).eq( i ).before(
-            '<tr class="group"><td colspan="3"><h4><i class="icon fa fa-th-list"></i> '+group+'</h4></td></tr>'
-          );
-          last = group;
-        }
-      } );
-    }
-  });
 
  /*Data table untuk anggaran*/
 
-  tb_anggaran = $('#tb-anggaran').DataTable({
-    initComplete: function() {
-      var api = this.api();
-      $('#tb-anggaran_filter input')
-      .off('.DT')
-      .on('keyup.DT', function(e) {
-        if (e.keyCode == 13) {
-          api.search(this.value).draw();
-        }
-      });
-    },
-    language: {
-        sProcessing: "loading...",
-        search: "_INPUT_",
-        searchPlaceholder: "Cari Nama / kode rek..."
-    },
-    responsive: true,
-    processing: true,
-    serverSide: true,
-    ajax: {
-
-      "url": base_url+"Cpanel/jsonanggaran",
-      "type": "POST"
-    },
-    columns: [
-      {
-        "data": "mtgkey",
-        "orderable": false
-      },
-      {
-        "data": "tahun",
-        "visible": false, "targets": 1
-
-      },
-      {
-        "data": "kdper",
-      },
-      {
-        "data": "nmper",
-      }
-    ],
-    //rowsGroup: [0], //ini untuk colspan atau grouping
-    order: [[2, 'asc']],
-    displayLength: 50,
-    //ini untuk menambahkan kolom no di index 0
-    rowCallback: function(row, data, iDisplayIndex) {
-      var info = this.fnPagingInfo();
-      var page = info.iPage;
-      var length = info.iLength;
-      var index = page * length + (iDisplayIndex + 1);
-      $('td:eq(0)', row).html(index);
-    },
-    drawCallback: function ( settings ) {
-      var api = this.api();
-      var rows = api.rows( {page:'current'} ).nodes();
-      var last=null;
-      api.column(1, {page:'current'} ).data().each( function ( group, i ) {
-        if ( last !== group ) {
-          $(rows).eq( i ).before(
-            '<tr class="group"><td colspan="3"><h4><i class="icon fa fa-th-list"></i> '+group+'</h4></td></tr>'
-          );
-          last = group;
-        }
-      } );
-    }
-  });
+  
   /*Data table untuk OPD pada DPA 2.2*/
 tb_opd_dpa = $('#tb-opd-dpa').DataTable({
     initComplete: function() {

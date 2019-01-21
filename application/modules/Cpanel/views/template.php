@@ -47,9 +47,15 @@
    <link rel="stylesheet" href="<?php echo base_url('assets/orgchart/css/jquery.orgchart.css')?>">
   <link rel="stylesheet" href="<?php echo base_url('assets/orgchart/css/style.css')?>">
   <style type="text/css">
+  table.dataTable tbody td {
+  vertical-align: center;
+}
+
   .row{
-    margin-top:40px;
+    margin-top:10px;
+    margin-bottom:10px;
     padding: 0 10px;
+
   }
   .secondpanel {
       margin-left: 45px

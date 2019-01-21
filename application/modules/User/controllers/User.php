@@ -1,6 +1,5 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-
 class User extends MX_Controller
 {
     //function admingeneral= kasubag
@@ -11,10 +10,19 @@ class User extends MX_Controller
     {
         parent::__construct();
       //  $this->tahunskr =$this->tahunskr;
-        $this->tahunskr ='2018';
+        $this->tahunskr ='2019';
         $this->load->model(array('User_model'));
         $this->load->library(array('ion_auth','upload'));
     }
+
+    function gettoken(){
+      $arr['data'][]= array(
+          'token' => $this->security->get_csrf_hash()
+      );
+      header('Content-Type: application/json');
+      echo json_encode($arr);
+    }
+
     public function index(){
     	if (!$this->ion_auth->logged_in()){
             redirect('Home/login', 'refresh');
@@ -24,24 +32,46 @@ class User extends MX_Controller
             redirect('Cpanel', 'refresh');
         }elseif ($this->ion_auth->is_kasubag()){
             redirect('User/admingeneral', 'refresh');
+        }elseif ($this->ion_auth->is_kasubprogram()){
+          // redirect('User/admingeneral', 'refresh');
+
+          redirect('User/kasubprogram', 'refresh');
         }else{
             redirect('User/general', 'refresh');
         }
     }
-    function gettoken(){
-      $arr['data'][]= array(
 
-          'token' => $this->security->get_csrf_hash()
-      );
-      header('Content-Type: application/json');
-      echo json_encode($arr);
+    function kasubprogram(){
+      if (!$this->ion_auth->logged_in()){
+            redirect('Home/login', 'refresh');
+      }elseif (!$this->ion_auth->is_kasubprogram()){
+          redirect('User', 'refresh');
+      }else{
+        $nip=$this->ion_auth->user()->row()->username;
+        // $rowunit=$this->User_model->getpns($nip);
+        // $idunit=$rowunit->unitkey;
+        $getopd = $this->User_model->getnamaopd($nip);
+        $idopd =$getopd->unitkey;
+        $namaopd=$getopd->nmunit;
+        $this->data= array(
+
+            'nmopd'     => $namaopd,
+            'tahun'     => $this->tahunskr,
+            'idopd'     =>  $idopd
+        );
+        $this->template->load('templatenew','dasboard_kasubprogram',$this->data);
+      }
 
     }
+
     function admingeneral(){
     	if (!$this->ion_auth->logged_in()){
             redirect('Home/login', 'refresh');
         }elseif ($this->ion_auth->is_admin()){
             redirect('Cpanel', 'refresh');
+        }elseif ($this->ion_auth->is_kasubprogram()){
+          // redirect('User/admingeneral', 'refresh');
+            redirect('User/kasubprogram', 'refresh');
         }elseif ($this->ion_auth->is_kasubag()){
         	// Dari kontroller ini , pertama cek tb_struktur (struktur organisasi) pada OPD atau unit terkait
         	// jika belum ada struktur , entri struktur organisasi terlebih dahulu(penting)
@@ -64,17 +94,21 @@ class User extends MX_Controller
             redirect('User/general', 'refresh');
         }
     }
-    function tessss($opd){
-      $keg = $this->User_model->getallkegiatan($opd);
-      $real = $this->User_model->getdatarealisasi_by(2);
-      echo json_encode($real);
-    }
+
+    // function tessss($opd){
+    //   $keg = $this->User_model->getallkegiatan($opd);
+    //   $real = $this->User_model->getdatarealisasi_by(2);
+    //   echo json_encode($real);
+    // }
 
     function general(){
     	if (!$this->ion_auth->logged_in()){
             redirect('Home/login', 'refresh');
         }elseif ($this->ion_auth->is_admin()){
             redirect('Cpanel', 'refresh');
+        }elseif ($this->ion_auth->is_kasubprogram()){
+          // redirect('User/admingeneral', 'refresh');
+          echo 'kasubag program';
         }elseif ($this->ion_auth->is_kasubag()){
             redirect('User/admingeneral', 'refresh');
         }else{
@@ -250,6 +284,154 @@ class User extends MX_Controller
 
         }
     }
+
+    //kasubagprogram
+    function ksubprolistprogram (){
+      if (!$this->ion_auth->logged_in()){
+            redirect('Home/login', 'refresh');
+      }elseif (!$this->ion_auth->is_kasubprogram()){
+          redirect('User', 'refresh');
+      }else{
+        $nip=$this->ion_auth->user()->row()->username;
+        // $rowunit=$this->User_model->getpns($nip);
+        // $idunit=$rowunit->unitkey;
+        $getopd = $this->User_model->getnamaopd($nip);
+        $idopd =$getopd->unitkey;
+        $namaopd=$getopd->nmunit;
+        $listprogram =  $this->User_model->ksubpro_listprogram($idopd,$this->tahunskr);
+        if(!$listprogram ){
+            $prog[]=array();
+        }else{
+          foreach ($listprogram as $key) {
+
+            $keg= array();
+            $idprog =  $key['IDPRGRM'];
+            $nmprog =  $key['NMPRGRM'];
+
+            $listkegiatan = $this->User_model->ksubpro_listkegiatan($idopd,$this->tahunskr,$idprog);
+
+            foreach ($listkegiatan->result_array() as $xkey ) {
+              $kdkeg = $xkey['kdkegunit'];
+              $nmkeg = $xkey['nmkegunit'];
+              $nilai = $xkey['nilai'];
+              $keg[] = array(
+                  'kdkeg'   => $kdkeg,
+                  'nmkeg'   => $nmkeg,
+                  'nilai'   => $this->template->rupiah($nilai)
+              );
+            }
+
+            $prog[] = array(
+                'idprog'   => $idprog,
+                'nmprog'   => $nmprog,
+                'jumkeg'   => $listkegiatan->num_rows(),
+                'detkeg'   => $keg
+            );
+          }
+
+        }
+
+        $this->data= array(
+            'nmopd'     => $namaopd,
+            'tahun'     => $this->tahunskr,
+            'idopd'     => $idopd,
+            'program'   => $prog
+        );
+
+     //echo json_encode($this->data); exit;
+      $this->template->load('templatenew','v_kasubpro_program',$this->data);
+
+      }
+
+
+    }
+    function ksubprodpa (){
+
+      if (!$this->ion_auth->logged_in()){
+            redirect('Home/login', 'refresh');
+      }elseif (!$this->ion_auth->is_kasubprogram()){
+          redirect('User', 'refresh');
+      }else{
+        $nip=$this->ion_auth->user()->row()->username;
+        // $rowunit=$this->User_model->getpns($nip);
+        // $idunit=$rowunit->unitkey;
+        $getopd = $this->User_model->getnamaopd($nip);
+        $idopd =$getopd->unitkey;
+        $namaopd=$getopd->nmunit;
+        $listprogramdpa =  $this->User_model->ksubpro_listprogram_dpa($idopd,$this->tahunskr);
+        if(!$listprogramdpa ){
+            $dpa[]=array();
+        }else{
+
+          foreach ($listprogramdpa as $key) {
+
+            $keg= array();
+            $idprog =  $key['IDPRGRM'];
+            $nmprog =  $key['NMPRGRM'];
+
+            $listkegiatandpa = $this->User_model->ksubpro_listkegiatan_dpa($idopd,$this->tahunskr,$idprog);
+
+            foreach ($listkegiatandpa->result_array() as $xkey ) {
+              $kdkeg = $xkey['kdkegunit'];
+              $nmkeg = $xkey['nmkegunit'];
+              $nilai = $xkey['nilai'];
+              $keg[] = array(
+                  'kdkeg'   => $kdkeg,
+                  'nmkeg'   => $nmkeg,
+                  'nilai'   => $this->template->rupiah($nilai)
+              );
+            }
+
+            $dpa[] = array(
+                'idprog'   => $idprog,
+                'nmprog'   => $nmprog,
+                'jumkeg'   => $listkegiatandpa->num_rows(),
+                'detkeg'   => $keg
+            );
+          }
+
+        }
+
+
+        $this->data= array(
+            'nmopd'     => $namaopd,
+            'tahun'     => $this->tahunskr,
+            'idopd'     => $idopd,
+            'dpa'       => $dpa
+        );
+
+     echo json_encode($this->data); exit;
+      $this->template->load('templatenew','v_kasubpro_dpa',$this->data);
+
+      }
+
+
+    }
+
+    function sinkrondpa22(){
+      //metode sinkron
+      //cek tambahan data baru
+      //update semua data
+      if (!$this->ion_auth->logged_in()){
+            redirect('Home/login', 'refresh');
+      }elseif (!$this->ion_auth->is_kasubprogram()){
+          redirect('User', 'refresh');
+      }else{
+       $unit = $this->input->post('unit');
+        //$unit = '80_';
+        $dpa22 = $this->User_model->sinkrondpa22($this->tahunskr,$unit);
+        $data['data'][] = array(
+
+          'status'   =>  $dpa22
+
+        );
+
+         echo json_encode($data);
+
+      }
+
+    }
+    //batas kasubagprogram
 //ini untuk struktur OPD / Unit
     function struktur(){
         if (!$this->ion_auth->is_kasubag()){
