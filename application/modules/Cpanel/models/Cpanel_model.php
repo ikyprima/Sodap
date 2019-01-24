@@ -498,6 +498,7 @@ class Cpanel_model extends CI_Model
     $this->db->where('unitkey', $unitkey);
     $this->db->where('kdkegunit', $kdkegunit);
     $this->db->where('mtgkey', $mtgkey);
+    $this->db->where('kd_bulan', $kd_bulan );
     $cek = $this->db->get('angkas');
 
       if (!$cek->num_rows()>0){
@@ -541,7 +542,7 @@ class Cpanel_model extends CI_Model
 
 
       $dataup=array(
-        'kd_bulan'   => $key['kd_bulan'],
+
         'nilai'      => $key['nilai']
       );
 
@@ -549,6 +550,7 @@ class Cpanel_model extends CI_Model
       $this->db->where('unitkey', $key['unitkey'] );
       $this->db->where('kdkegunit',$key['kdkegunit'] );
       $this->db->where('mtgkey', $key['mtgkey'] );
+      $this->db->where('kd_bulan', $key['kd_bulan'] );
       $this->db->update('angkas',$dataup);
     }
 

@@ -10,7 +10,8 @@
   $(".btnkak").click(function() {
     // jQuery("#listkegiatan").fadeOut("slow");
     // jQuery("#targetfisik").fadein("slow");
-    //ajaxtoken();
+    ajaxtoken();
+
   /****AGUNGAGUNGAGUNGAGUNGAGUNGAGUNGAGUNGAGUNGAGUNGAGUNGAGUNGAGUNG*/
    if ($(this).hasClass('lihat')) {
     var row = $(this).closest("tr");    // Find the row
@@ -29,8 +30,10 @@
         },
         dataType: "JSON",
         complete: function(data){
+
           ajaxtoken();
           var jsonData = JSON.parse(data.responseText);
+
             if(jsonData.uri[0].status==true){
               //KAK Kegiatan Sudah di entri sementra Target belanja Modal Masih belum
               var unit = jsonData.uri[0].unit;
@@ -172,8 +175,10 @@
         },
       dataType: "JSON",
       complete: function(data){
+
         ajaxtoken();
         var jsonData = JSON.parse(data.responseText);
+        
         if(jsonData.uri[0].status==true && jsonData.uri[0].edit==true ){
         //KAK Kegiatan Sudah di entri sementra Target belanja Modal Masih belum
           var unit = jsonData.uri[0].unit;

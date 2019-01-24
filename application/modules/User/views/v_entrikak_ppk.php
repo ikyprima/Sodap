@@ -11,8 +11,8 @@
  var year=date.getFullYear();
  var month=date.getMonth();
  var awalbln=0;
- var akhirbln=0; 
- 
+ var akhirbln=0;
+
 
  var bulan = {'January':'0','February':'1','March':'2','April':'3','May':'4','June':'5','July':'6','August':'7','September':'8','October':'9','November':'10','December':'11'};
 
@@ -79,11 +79,11 @@
   startDate: new Date(year, '0', '01'),
   endDate: new Date(year, '11', '31')
 }).on("input change", function (e) {
-    // string jadi array 
+    // string jadi array
 
     var namabln =this.value;
-    var convert = namabln.split(" ");  
-    // console.log(awalbln); 
+    var convert = namabln.split(" ");
+    // console.log(awalbln);
     $('#akhirkeg').datepicker('setDate', null);
     $('#akhirkeg').datepicker('destroy');
       //var $dates = $('#from, #to').datepicker();
@@ -102,7 +102,7 @@
       }).on("input change", function (e) {
 
         var namabln =this.value;
-        var convert = namabln.split(" ");  
+        var convert = namabln.split(" ");
         itemuraian=0;
         akhirbln=0;
         akhirbln = bulan[convert[0]];
@@ -118,7 +118,7 @@
 
     //Initialize tooltips
     $('.nav-tabs > li a[title]').tooltip();
-    
+
     //Wizard
     $('a[data-toggle="tab"]').on('show.bs.tab', function (e) {
 
@@ -145,14 +145,14 @@
       //     'Field tujuan Tidak Boleh Kosong',
       //     'info'
       //     );
-      //       return false; 
+      //       return false;
       //   }else if($('#sasaran').val() === ''){
       //     swal(
       //     'info',
       //     'Field sasaran Tidak Boleh Kosong',
       //     'info'
       //     );
-      //       return false; 
+      //       return false;
       //   }else{
       //       var $active = $('.wizard .nav-tabs li.active');
       //   $active.next().removeClass('disabled');
@@ -198,7 +198,7 @@
        }
        swal.close();
      });
-      return false; 
+      return false;
     }else if($('#sasaran').val() === ''){
      swal({
       title: "Info",
@@ -219,7 +219,7 @@
      swal.close();
    });
 
-     return false; 
+     return false;
    }else{
 
     $('html, body').animate({
@@ -277,7 +277,7 @@
        swal.close();
      });
 
-      return false; 
+      return false;
     }else if($('#outcome').val() === ''){
      swal({
       title: "Info",
@@ -298,7 +298,7 @@
      swal.close();
    });
 
-     return false; 
+     return false;
    }else{
     $('html, body').animate({
       scrollTop: $(".wizard").offset().top
@@ -345,7 +345,7 @@
         cancelButtonText: "",
         closeOnConfirm: false,
         closeOnCancel: false
-      },function(isConfirm){  
+      },function(isConfirm){
         if(isConfirm){
          $('html, body').animate({
           scrollTop: $(".sc-penutup").offset().top
@@ -369,7 +369,7 @@
        //    'Time Schedule Tidak Boleh Kosong',
        //    'info'
        //    );
-       //      return false; 
+       //      return false;
        //  }else{
        //      var $active = $('.wizard .nav-tabs li.active');
        //  $active.next().removeClass('disabled');
@@ -387,7 +387,7 @@
     });
 
 
-    
+
     $(".tambah-uraian").click(function() {
       if($("#awalkeg").datepicker("getDate") === null || $("#akhirkeg").datepicker("getDate") === null ) {
         swal(
@@ -399,9 +399,9 @@
       }else{
         Pace.restart ();
         Pace.track (function (){
-          functambahuraian();  
+          functambahuraian();
         });
-      }  
+      }
     });
 
 
@@ -420,7 +420,7 @@ function prevTab(elem) {
 
 function functambahuraian() {
   var markup="";
-  var dethtml="";      
+  var dethtml="";
   swal({
     title: "Time Schedule",
     text: "Silahkan Masukan Nama Uraian Kegiatan",
@@ -460,8 +460,8 @@ function functambahuraian() {
         for (i=0; i <= 11; i++) {
           y=0;
           for (x = 0 ; x <= 11; x++) {
-            if (arraybln[x] == i ) { 
-              y=1;         
+            if (arraybln[x] == i ) {
+              y=1;
             }
           }
           if (y!=1){
@@ -475,10 +475,10 @@ function functambahuraian() {
             <td class='enable "+i+"' style='min-width:2px; font-size: 10px'><p hidden>"+i+"_3</p></td>\
             <td class='enable "+i+"' style='min-width:2px; font-size: 10px'><p hidden>"+i+"_4</p></td>"
           }
-        }         
+        }
         markup+=dethtml;
         markup += "</tr>";
-        $(".tabel-schedule tbody").append(markup);          
+        $(".tabel-schedule tbody").append(markup);
         markup="";
         arsiran();
         swal.close();
@@ -532,56 +532,56 @@ $(function () {
         'Field tujuan Tidak Boleh Kosong',
         'info'
         );
-      return false; 
+      return false;
     }else if($('#sasaran').val() === ''){
       swal(
         'info',
         'Field sasaran Tidak Boleh Kosong',
         'info'
         );
-      return false; 
+      return false;
     }else if($('#input').val() === ''){
       swal(
         'info',
         'Field Masukan Tidak Boleh Kosong',
         'info'
         );
-      return false; 
+      return false;
     }else if($('#output').val() === ''){
       swal(
         'info',
         'Field Keluaran Tidak Boleh Kosong',
         'info'
         );
-      return false; 
+      return false;
     }else if($('#outcome').val() === ''){
       swal(
         'info',
         'Field Hasil Tidak Boleh Kosong',
         'info'
         );
-      return false; 
+      return false;
     }else if($('#pplasana').val() === ''){
       swal(
         'info',
         'Field Proses Pelaksanaan Tidak Boleh Kosong',
         'info'
         );
-      return false; 
+      return false;
     }else if($('#penutup').val() === ''){
       swal(
         'info',
         'Field Penutup Tidak Boleh Kosong',
         'info'
         );
-      return false; 
+      return false;
     }else if( itemuraian == '0'){
       swal(
         'info',
         'Time Schedule Tidak Boleh Kosong',
         'info'
         );
-      return false; 
+      return false;
     }else{
 
      swal({
@@ -625,7 +625,7 @@ $(function () {
             light.push($(this).text());
           });
           var result = {};
-          for (var i = 0; i < light.length; i++){          
+          for (var i = 0; i < light.length; i++){
             if (light[i].indexOf('_') < 0){
               console.log("No prefix detected in '" + light[i] + "'.");
               continue;
@@ -633,17 +633,17 @@ $(function () {
             var prefix = light[i].split('_')[0];
             if (!result[prefix])
               result[prefix] = [];
-            list[prefix].push(light[i].split('_')[1]);        
+            list[prefix].push(light[i].split('_')[1]);
           }
           myArray.push(list);
-        });  
+        });
         var date1 = $('#awalkeg').datepicker('getDate'),
-        day1  = date1.getDate(),  
-        month1 = date1.getMonth() + 1,              
+        day1  = date1.getDate(),
+        month1 = date1.getMonth() + 1,
         year1 =  date1.getFullYear();
         var date2 = $('#akhirkeg').datepicker('getDate'),
-        day2  = date2.getDate(),  
-        month2 = date2.getMonth() + 1,              
+        day2  = date2.getDate(),
+        month2 = date2.getMonth() + 1,
         year2 =  date2.getFullYear();
         var idtab = $('#idtabpptk').html();
         var idopd = $('#kdunit').html();
@@ -675,11 +675,11 @@ $(function () {
             akk : akk,
             pplasana : pplasana,
             pnt : pnt,
-            tms : myArray   
+            tms : myArray
           },
           dataType: "JSON",
           success: function(result){
-            var resstatus =result.data[0].status; 
+            var resstatus =result.data[0].status;
             console.log(resstatus);
             if (result.data[0].status == false){
               swal(
@@ -724,9 +724,9 @@ $(function () {
                           var kegiatan = result.uri[0].keg;
                           var tab = result.uri[0].tab;
                           window.location.href = base_url+"User/entritblnjmodal?unit="+unit+"&keg="+kegiatan+"&tab="+tab;
-                       
+
                       }else{
-                        window.location.href = base_url+"User/kakppk";   
+                        window.location.href = base_url+"User/kakppk";
                       }
                     },
                     error: function(jqXHR, textStatus, errorThrown){
@@ -741,8 +741,8 @@ $(function () {
                     }
                   });
                   });
-                
-                 
+
+
                 }
               });
 
@@ -793,14 +793,14 @@ $(function () {
   </h1>
   <ol class="breadcrumb">
     <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-    
+
   </ol>
 </section>
 <section class="content">
 
 
 
-  <div class="callout callout-info">
+  <div class="callout bg-blue">
     <div class="row">
       <div class="col-xs-12 col-md-12 col-md-offset-1">
        <br>
@@ -832,9 +832,9 @@ $(function () {
 <div class="row">
 
   <div class="col-md-3 col-sm-6 col-xs-12">
-    <a class="btn btn-block btn-social btn-success" id="btn-kembali">
-      <i class="fa fa-arrow-left"></i> Kembali 
-    </a> 
+    <a class="btn btn-block btn-social btn-success btn-flat" id="btn-kembali">
+      <i class="fa fa-arrow-left"></i> Kembali
+    </a>
   </div>
   <div class="col-md-3 col-sm-6 col-xs-12">
   </div>
@@ -861,31 +861,31 @@ $(function () {
 </div>
 <div class="box-body">
   <div class="row">
-    <div class="col-md-2 col-sm-2 col-xs-12">  
+    <div class="col-md-2 col-sm-2 col-xs-12">
     </div>
     <div class="col-md-8 col-sm-8 col-xs-12">
      <h2 class="text-center">KERANGKA ACUAN KERJA</h2>
    </div>
    <div class="col-md-2 col-sm-2 col-xs-12">
-   </div> 
+   </div>
  </div>
  <div class="row">
-  <div class="col-md-2 col-sm-2 col-xs-12">  
+  <div class="col-md-2 col-sm-2 col-xs-12">
   </div>
   <div class="col-md-8 col-sm-8 col-xs-12">
    <h3 class="text-center"><?php echo $prog ?></h3>
  </div>
  <div class="col-md-2 col-sm-2 col-xs-12">
- </div> 
+ </div>
 </div>
 <hr>
 <div class="row">
-  <div class="col-md-1 col-sm-1 col-xs-12">        
+  <div class="col-md-1 col-sm-1 col-xs-12">
   </div>
-  <div class="col-md-1 col-sm-1 col-xs-12">  
+  <div class="col-md-1 col-sm-1 col-xs-12">
    <h4 class="text-left text-muted">Kegiatan</h4>
  </div>
- <div class="col-md-1 col-sm-1 col-xs-12">  
+ <div class="col-md-1 col-sm-1 col-xs-12">
   <h4 class="text-center text-muted">:</h4>
 </div>
 <div class="col-md-6 col-sm-8 col-xs-12">
@@ -894,53 +894,53 @@ $(function () {
   <h4 class="text-left text-muted"><?php echo $keg ?></h4>
 </div>
 <div class="col-md-2 col-sm-2 col-xs-12">
-</div> 
+</div>
 </div>
 <div class="row">
-  <div class="col-md-1 col-sm-1 col-xs-12">  
+  <div class="col-md-1 col-sm-1 col-xs-12">
 
   </div>
-  <div class="col-md-1 col-sm-1 col-xs-12">  
+  <div class="col-md-1 col-sm-1 col-xs-12">
    <h4 class="text-left text-muted">Nilai</h4>
  </div>
- <div class="col-md-1 col-sm-1 col-xs-12">  
+ <div class="col-md-1 col-sm-1 col-xs-12">
   <h4 class="text-center text-muted">:</h4>
 </div>
 <div class="col-md-6 col-sm-8 col-xs-12">
  <h4 class="text-left text-muted"><?php echo $this->template->rupiah($nl) ?></h4>
 </div>
 <div class="col-md-2 col-sm-2 col-xs-12">
-</div> 
+</div>
 </div>
 <div class="row">
-  <div class="col-md-1 col-sm-1 col-xs-12">        
+  <div class="col-md-1 col-sm-1 col-xs-12">
   </div>
-  <div class="col-md-1 col-sm-1 col-xs-12">  
+  <div class="col-md-1 col-sm-1 col-xs-12">
    <h4 class="text-left text-muted">PPTK</h4>
  </div>
- <div class="col-md-1 col-sm-1 col-xs-12">  
+ <div class="col-md-1 col-sm-1 col-xs-12">
   <h4 class="text-center text-muted">:</h4>
 </div>
 <div class="col-md-6 col-sm-8 col-xs-12">
  <h4 class="text-left text-muted"><?php echo $pptk ?></h4>
 </div>
 <div class="col-md-2 col-sm-2 col-xs-12">
-</div> 
+</div>
 </div>
 <div class="row">
-  <div class="col-md-1 col-sm-1 col-xs-12">        
+  <div class="col-md-1 col-sm-1 col-xs-12">
   </div>
-  <div class="col-md-1 col-sm-1 col-xs-12">  
+  <div class="col-md-1 col-sm-1 col-xs-12">
    <h4 class="text-left text-muted">PPK</h4>
  </div>
- <div class="col-md-1 col-sm-1 col-xs-12">  
+ <div class="col-md-1 col-sm-1 col-xs-12">
   <h4 class="text-center text-muted">:</h4>
 </div>
 <div class="col-md-6 col-sm-8 col-xs-12">
  <h4 class="text-left text-muted"><?php echo $ppk ?></h4>
 </div>
 <div class="col-md-2 col-sm-2 col-xs-12">
-</div> 
+</div>
 </div>
 <hr>
 
@@ -986,9 +986,9 @@ $(function () {
     <div class="tab-content">
       <div class="tab-pane active" role="tabpanel" id="step1">
         <div class="row latar-blakang">
-          <div class="col-md-1 col-sm-1 col-xs-12">        
+          <div class="col-md-1 col-sm-1 col-xs-12">
           </div>
-          <div class="col-md-5 col-sm-5 col-xs-12">  
+          <div class="col-md-5 col-sm-5 col-xs-12">
            <h4 class="text-left text-muted"><b>I. PENDAHULUAN</b></h4>
 
          </div>
@@ -996,19 +996,19 @@ $(function () {
 
        </div>
        <div class="row ">
-        <div class="col-md-1 col-sm-1 col-xs-12">        
+        <div class="col-md-1 col-sm-1 col-xs-12">
         </div>
-        <div class="col-md-2 col-sm-2 col-xs-12">  
+        <div class="col-md-2 col-sm-2 col-xs-12">
          <h5 class="text-left text-muted">&nbsp&nbsp&nbsp&nbsp&nbsp<b>A. LATAR BELAKANG</b></h5>
 
        </div>
      </div>
      <div class="row">
-      <div class="col-md-1 col-sm-1 col-xs-12">        
+      <div class="col-md-1 col-sm-1 col-xs-12">
       </div>
-      <div class="col-md-10 col-sm-10 col-xs-12">  
+      <div class="col-md-10 col-sm-10 col-xs-12">
                             <!--  <textarea id="ltrblk">
-                               
+
                             </textarea> -->
                             <!--  <textarea id="ltrblk" name="ltrblk" rows="15" cols="80" style="width: 80%" class="tinymce"></textarea> -->
                             <textarea class="textarea" id="ltrblk" name="ltrblk"  placeholder="Isikan Latar Belakang *harus"
@@ -1016,27 +1016,27 @@ $(function () {
                           </div>
                         </div>
                         <div class="row">
-                          <div class="col-md-1 col-sm-1 col-xs-12">        
+                          <div class="col-md-1 col-sm-1 col-xs-12">
                           </div>
-                          <div class="col-md-3 col-sm-3 col-xs-12">  
+                          <div class="col-md-3 col-sm-3 col-xs-12">
                            <h5 class="text-left text-muted">&nbsp&nbsp&nbsp&nbsp&nbsp<b>B. TUJUAN DAN SASARAN</b></h5>
 
                          </div>
                        </div>
                        <div class="row sc-tujuan">
-                        <div class="col-md-1 col-sm-1 col-xs-12">        
+                        <div class="col-md-1 col-sm-1 col-xs-12">
                         </div>
-                        <div class="col-md-2 col-sm-2 col-xs-12">  
+                        <div class="col-md-2 col-sm-2 col-xs-12">
                          <h5 class="text-left text-muted">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<b>1. TUJUAN</b></h5>
 
                        </div>
                      </div>
                      <div class="row">
-                      <div class="col-md-1 col-sm-1 col-xs-12">        
+                      <div class="col-md-1 col-sm-1 col-xs-12">
                       </div>
-                      <div class="col-md-10 col-sm-10 col-xs-12">  
+                      <div class="col-md-10 col-sm-10 col-xs-12">
                             <!--  <textarea id="tujuan">
-                               
+
                             </textarea> -->
                             <!-- <textarea id="tujuan" name="tujuan" rows="15" cols="80" style="width: 80%" class="tinymce"></textarea> -->
                             <textarea class="textarea" id="tujuan" name="tujuan"  placeholder="Isikan Tujuan *harus"
@@ -1044,19 +1044,19 @@ $(function () {
                           </div>
                         </div>
                         <div class="row sc-sasaran">
-                          <div class="col-md-1 col-sm-1 col-xs-12">        
+                          <div class="col-md-1 col-sm-1 col-xs-12">
                           </div>
-                          <div class="col-md-2 col-sm-2 col-xs-12">  
+                          <div class="col-md-2 col-sm-2 col-xs-12">
                            <h5 class="text-left text-muted">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<b>2. SASARAN</b></h5>
 
                          </div>
                        </div>
                        <div class="row">
-                        <div class="col-md-1 col-sm-1 col-xs-12">        
+                        <div class="col-md-1 col-sm-1 col-xs-12">
                         </div>
-                        <div class="col-md-10 col-sm-10 col-xs-12">  
+                        <div class="col-md-10 col-sm-10 col-xs-12">
                              <!-- <textarea id="sasaran">
-                               
+
                              </textarea> -->
                              <!-- <textarea id="sasaran" name="sasaran" rows="15" cols="80" style="width: 80%" class="tinymce"></textarea> -->
                              <textarea class="textarea" id="sasaran" name="sasaran"  placeholder="Isikan Sasaran *harus"
@@ -1064,33 +1064,57 @@ $(function () {
                            </div>
                          </div>
                          <br>
-                         <ul class="list-inline pull-right">
-                          <li><button type="button" class="btn btn-primary next-step-lb">Lanjut</button></li>
-                        </ul>
+                         <!-- <ul class="list-inline pull-right">
+                          <li><button type="button" class="btn btn-primary ">Lanjut</button></li>
+                        </ul> -->
+                        <div class="row">
+                          <div class="col-md-1 col-sm-6 col-xs-12">
+                            </div>
+                              <div class="col-md-3 col-sm-6 col-xs-12">
+
+                              </div>
+                              <div class="col-md-2 col-sm-6 col-xs-12">
+                                </div>
+                                <div class="col-md-2 col-sm-6 col-xs-12">
+
+                                </div>
+
+                                <div class="col-md-3 col-sm-6 col-xs-12">
+
+                                  <a class="btn btn-block btn-primary btn-flat next-step-lb" >
+                                   Lanjut  <i class="fa fa-arrow-right"></i>
+                                  </a>
+                                </div>
+                                <div class="col-md-1 col-sm-6 col-xs-12">
+                                  </div>
+
+
+
+                        </div>
                       </div>
                       <div class="tab-pane" role="tabpanel" id="step2">
                        <div class="row">
-                        <div class="col-md-1 col-sm-1 col-xs-12">        
+                        <div class="col-md-1 col-sm-1 col-xs-12">
                         </div>
-                        <div class="col-md-2 col-sm-2 col-xs-12">  
+                        <div class="col-md-2 col-sm-2 col-xs-12">
                          <h5 class="text-left text-muted">&nbsp&nbsp&nbsp&nbsp&nbsp<b>C. INDIKATOR KINERJA</b></h5>
 
                        </div>
                      </div>
                      <div class="row sc-masukan">
-                      <div class="col-md-1 col-sm-1 col-xs-12">        
+                      <div class="col-md-1 col-sm-1 col-xs-12">
                       </div>
-                      <div class="col-md-3 col-sm-3 col-xs-12">  
+                      <div class="col-md-3 col-sm-3 col-xs-12">
                        <h5 class="text-left text-muted">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<b>1. INPUT (MASUKAN)</b></h5>
 
                      </div>
                    </div>
                    <div class="row">
-                    <div class="col-md-1 col-sm-1 col-xs-12">        
+                    <div class="col-md-1 col-sm-1 col-xs-12">
                     </div>
-                    <div class="col-md-10 col-sm-10 col-xs-12">  
+                    <div class="col-md-10 col-sm-10 col-xs-12">
                             <!--  <textarea id="input">
-                               
+
                             </textarea> -->
                             <!--  <textarea id="input" name="input" rows="15" cols="80" style="width: 80%" class="tinymce"></textarea> -->
                             <textarea class="textarea" id="input" name="input"  placeholder="Isikan Masukan *harus"
@@ -1098,19 +1122,19 @@ $(function () {
                           </div>
                         </div>
                         <div class="row sc-keluaran">
-                          <div class="col-md-1 col-sm-1 col-xs-12">        
+                          <div class="col-md-1 col-sm-1 col-xs-12">
                           </div>
-                          <div class="col-md-3 col-sm-3 col-xs-12">  
+                          <div class="col-md-3 col-sm-3 col-xs-12">
                            <h5 class="text-left text-muted">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<b>2. OUTPUT (KELUARAN)</b></h5>
 
                          </div>
                        </div>
                        <div class="row">
-                        <div class="col-md-1 col-sm-1 col-xs-12">        
+                        <div class="col-md-1 col-sm-1 col-xs-12">
                         </div>
-                        <div class="col-md-10 col-sm-10 col-xs-12">  
+                        <div class="col-md-10 col-sm-10 col-xs-12">
                              <!-- <textarea id="output">
-                               
+
                              </textarea> -->
                              <!--  <textarea id="output" name="output" rows="15" cols="80" style="width: 80%" class="tinymce"></textarea> -->
                              <textarea class="textarea" id="output" name="output"  placeholder="Isikan Keluaran *harus"
@@ -1118,19 +1142,19 @@ $(function () {
                            </div>
                          </div>
                          <div class="row sc-hasil">
-                          <div class="col-md-1 col-sm-1 col-xs-12">        
+                          <div class="col-md-1 col-sm-1 col-xs-12">
                           </div>
-                          <div class="col-md-3 col-sm-3 col-xs-12">  
+                          <div class="col-md-3 col-sm-3 col-xs-12">
                            <h5 class="text-left text-muted">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<b>2. OUTCOME (HASIL)</b></h5>
 
                          </div>
                        </div>
                        <div class="row">
-                        <div class="col-md-1 col-sm-1 col-xs-12">        
+                        <div class="col-md-1 col-sm-1 col-xs-12">
                         </div>
-                        <div class="col-md-10 col-sm-10 col-xs-12">  
+                        <div class="col-md-10 col-sm-10 col-xs-12">
                           <!--    <textarea id="outcome">
-                               
+
                           </textarea> -->
                           <!-- <textarea id="outcome" name="outcome" rows="15" cols="80" style="width: 80%" class="tinymce"></textarea> -->
                           <textarea class="textarea" id="outcome" name="outcome"  placeholder="Isikan Hasil *harus"
@@ -1138,16 +1162,42 @@ $(function () {
                         </div>
                       </div>
                       <br>
-                      <ul class="list-inline pull-right">
+                      <!-- <ul class="list-inline pull-right">
                         <li><button type="button" class="btn btn-default prev-step">Kembali</button></li>
                         <li><button type="button" class="btn btn-primary next-step-ik">Lanjut</button></li>
-                      </ul>
+                      </ul> -->
+                      <div class="row">
+                        <div class="col-md-1 col-sm-6 col-xs-12">
+                          </div>
+                            <div class="col-md-3 col-sm-6 col-xs-12">
+                              <a class="btn btn-block btn-warning btn-flat prev-step" >
+                               <i class="fa fa-arrow-left"></i> Kembali
+                              </a>
+                            </div>
+                            <div class="col-md-2 col-sm-6 col-xs-12">
+                              </div>
+                              <div class="col-md-2 col-sm-6 col-xs-12">
+
+                              </div>
+
+                              <div class="col-md-3 col-sm-6 col-xs-12">
+
+                                <a class="btn btn-block btn-primary btn-flat next-step-ik" >
+                                 Lanjut  <i class="fa fa-arrow-right"></i>
+                                </a>
+                              </div>
+                              <div class="col-md-1 col-sm-6 col-xs-12">
+                                </div>
+
+
+
+                      </div>
                     </div>
                     <div class="tab-pane" role="tabpanel" id="step3">
                       <div class="row sc-proses-pelaksanaan">
-                        <div class="col-md-1 col-sm-1 col-xs-12">        
+                        <div class="col-md-1 col-sm-1 col-xs-12">
                         </div>
-                        <div class="col-md-5 col-sm-5 col-xs-12">  
+                        <div class="col-md-5 col-sm-5 col-xs-12">
                          <h4 class="text-left text-muted"><b>II. PROSES PELAKSANAAN</b></h4>
 
                        </div>
@@ -1155,9 +1205,9 @@ $(function () {
 
                      </div>
                      <div class="row">
-                      <div class="col-md-1 col-sm-1 col-xs-12">        
+                      <div class="col-md-1 col-sm-1 col-xs-12">
                       </div>
-                      <div class="col-md-10 col-sm-10 col-xs-12">  
+                      <div class="col-md-10 col-sm-10 col-xs-12">
 
 
                        <!--  <textarea id="pplasana" name="pplasana" rows="15" cols="80" style="width: 80%" class="tinymce"></textarea> -->
@@ -1166,19 +1216,19 @@ $(function () {
                      </div>
                    </div>
                    <div class="row sc-penutup">
-                    <div class="col-md-1 col-sm-1 col-xs-12">        
+                    <div class="col-md-1 col-sm-1 col-xs-12">
                     </div>
-                    <div class="col-md-3 col-sm-3 col-xs-12">  
+                    <div class="col-md-3 col-sm-3 col-xs-12">
                      <h5 class="text-left text-muted">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<b>III. PENUTUP</b></h5>
 
                    </div>
                  </div>
                  <div class="row">
-                  <div class="col-md-1 col-sm-1 col-xs-12">        
+                  <div class="col-md-1 col-sm-1 col-xs-12">
                   </div>
-                  <div class="col-md-10 col-sm-10 col-xs-12">  
+                  <div class="col-md-10 col-sm-10 col-xs-12">
                            <!--   <textarea id="penutup">
-                               
+
                            </textarea> -->
                            <!-- <textarea id="penutup" name="penutup" rows="15" cols="80" style="width: 80%" class="tinymce"></textarea> -->
                            <textarea class="textarea" id="penutup" name="penutup"  placeholder="Isikan Penutup *harus"
@@ -1186,19 +1236,45 @@ $(function () {
                          </div>
                        </div>
 
-                       <br> 
+                       <br>
 
-                       <ul class="list-inline pull-right">
+                       <!-- <ul class="list-inline pull-right">
                         <li><button type="button" class="btn btn-default prev-step">Kembali</button></li>
 
                         <li><button type="button" class="btn btn-primary btn-info-full next-step-pp">Lanjut</button></li>
-                      </ul>
+                      </ul> -->
+                      <div class="row">
+                        <div class="col-md-1 col-sm-6 col-xs-12">
+                          </div>
+                            <div class="col-md-3 col-sm-6 col-xs-12">
+                              <a class="btn btn-block btn-warning btn-flat prev-step" >
+                               <i class="fa fa-arrow-left"></i> Kembali
+                              </a>
+                            </div>
+                            <div class="col-md-2 col-sm-6 col-xs-12">
+                              </div>
+                              <div class="col-md-2 col-sm-6 col-xs-12">
+
+                              </div>
+
+                              <div class="col-md-3 col-sm-6 col-xs-12">
+
+                                <a class="btn btn-block btn-primary btn-flat next-step-pp" >
+                                 Lanjut  <i class="fa fa-arrow-right"></i>
+                                </a>
+                              </div>
+                              <div class="col-md-1 col-sm-6 col-xs-12">
+                                </div>
+
+
+
+                      </div>
                     </div>
                     <div class="tab-pane" role="tabpanel" id="complete">
                      <div class="row">
-                      <div class="col-md-1 col-sm-1 col-xs-12">        
+                      <div class="col-md-1 col-sm-1 col-xs-12">
                       </div>
-                      <div class="col-md-5 col-sm-5 col-xs-12">  
+                      <div class="col-md-5 col-sm-5 col-xs-12">
                         <div class="form-group">
                          <label class="text-left text-muted" for="awalkeg"><b>AWAL KEGIATAN</b></label>
 
@@ -1211,7 +1287,7 @@ $(function () {
                         <!-- /.input group -->
                       </div>
                       <!--    <div class="form-group">
-                          
+
                             <label class="text-left text-muted" for="awalkeg"><b>AWAL KEGIATAN</b></label>
                             <input type="text" class="form-control" id="awalkeg" placeholder="Awal Kegiatan">
                           </div> -->
@@ -1220,9 +1296,9 @@ $(function () {
 
                       </div>
                       <div class="row">
-                        <div class="col-md-1 col-sm-1 col-xs-12">        
+                        <div class="col-md-1 col-sm-1 col-xs-12">
                         </div>
-                        <div class="col-md-5 col-sm-5 col-xs-12">  
+                        <div class="col-md-5 col-sm-5 col-xs-12">
 
                          <div class="form-group">
                            <label class="text-left text-muted" for="awalkeg"><b>AKHIR KEGIATAN</b></label>
@@ -1239,10 +1315,11 @@ $(function () {
 
 
                     </div>
+                    <br>
                     <div class="row">
 
-                      <div class="col-md-12 col-sm-12 col-xs-12">  
-                        <div class="box box-info">
+                      <div class="col-md-12 col-sm-12 col-xs-12">
+                        <div class="box box-primary">
                           <div class="box-header">
                             <i class="fa fa-clock-o"></i>
 
@@ -1256,7 +1333,7 @@ $(function () {
                             </div>
                             <!-- /. tools -->
                           </div>
-                          <div class="box-body">
+                          <div class="box-body no-padding">
                            <div class="table-responsive">
                             <table class="table table-bordered tabel-schedule" style="width: 100%" id="tb-uraian">
                               <thead>
@@ -1331,7 +1408,7 @@ $(function () {
 
                                 </tr>
                               </thead>
-                              <tbody id="tbodyid">  
+                              <tbody id="tbodyid">
                               </tbody>
                             </table>
                           </div>
@@ -1346,18 +1423,43 @@ $(function () {
 
                   </div>
                   <br>
-                  <ul class="list-inline pull-right">
+                  <!-- <ul class="list-inline pull-right">
                     <li><button type="button" class="btn btn-default prev-step">Kembali</button></li>
 
                     <li><button type="submit" class="btn btn-primary btn-info-full next-step-pp">Simpan</button></li>
-                  </ul>
+                  </ul> -->
+                  <div class="row">
+
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                          <a class="btn btn-block btn-warning btn-flat prev-step" >
+                           <i class="fa fa-arrow-left"></i> Kembali
+                          </a>
+                        </div>
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                          </div>
+                          <div class="col-md-3 col-sm-6 col-xs-12">
+
+                          </div>
+
+                          <div class="col-md-3 col-sm-6 col-xs-12">
+
+                            <!-- <a class="btn btn-block btn-primary btn-flat next-step-pp" >
+                             Lanjut  <i class="fa fa-arrow-right"></i>
+                            </a> -->
+                            <button type="submit" class="btn btn-block btn-primary btn-flat next-step-pp">Simpan <i class="fa fa-save"></i></button>
+                          </div>
+
+
+
+
+                  </div>
                 </div>
 
                 <div class="clearfix"></div>
               </div>
 
             </form>
-          </div> 
+          </div>
 
         </div>
         <!-- /.box-body -->
@@ -1370,5 +1472,3 @@ $(function () {
       <!-- /.box -->
 
     </section>
-
-
