@@ -16,11 +16,16 @@ class User extends MX_Controller
     }
 
     function gettoken(){
-      $arr['data'][]= array(
-          'token' => $this->security->get_csrf_hash()
-      );
-      header('Content-Type: application/json');
-      echo json_encode($arr);
+      if (!$this->ion_auth->logged_in()){
+            redirect('Home/login', 'refresh');
+        }else{
+          $arr['data'][]= array(
+              'token' => $this->security->get_csrf_hash()
+          );
+          header('Content-Type: application/json');
+          echo json_encode($arr);  
+        }
+
     }
 
     public function index(){
@@ -59,7 +64,7 @@ class User extends MX_Controller
             'tahun'     => $this->tahunskr,
             'idopd'     =>  $idopd
         );
-        $this->template->load('templatenew','dasboard_kasubprogram',$this->data);
+        $this->template->load('templatenew','dashboard_kasubprogram',$this->data);
       }
 
     }
@@ -502,12 +507,7 @@ class User extends MX_Controller
                  $nmper = $ykey['nmper'];
                  $type = $ykey['type'];
                  $mtglevel = $ykey['mtglevel'];
-
-
-
-
-
-                $modeldpa221 = $this->User_model->jsondpa221($unitkey,$idkeg,$mtgkey,$this->tahunskr);
+                 $modeldpa221 = $this->User_model->jsondpa221($unitkey,$idkeg,$mtgkey,$this->tahunskr);
 
                 foreach ($modeldpa221 as $xykey ) {
                   $uraian = $xykey['uraian'];
@@ -575,6 +575,150 @@ class User extends MX_Controller
 
 
     }
+
+    function ksubproangkas (){
+      if (!$this->ion_auth->logged_in()){
+            redirect('Home/login', 'refresh');
+      }elseif (!$this->ion_auth->is_kasubprogram()){
+          redirect('User', 'refresh');
+      }else{
+        $nip=$this->ion_auth->user()->row()->username;
+        // $rowunit=$this->User_model->getpns($nip);
+        // $idunit=$rowunit->unitkey;
+        $getopd = $this->User_model->getnamaopd($nip);
+        $idopd =$getopd->unitkey;
+        $namaopd=$getopd->nmunit;
+        $listprogramdpa =  $this->User_model->ksubpro_listprogram_dpa($idopd,$this->tahunskr);
+        if(!$listprogramdpa ){
+            $dpa[]=array();
+        }else{
+
+          foreach ($listprogramdpa as $key) {
+
+            $keg= array();
+            $idprog =  $key['IDPRGRM'];
+            $nmprog =  $key['NMPRGRM'];
+
+            $listkegiatandpa = $this->User_model->ksubpro_listkegiatan_dpa($idopd,$this->tahunskr,$idprog);
+
+            foreach ($listkegiatandpa->result_array() as $xkey ) {
+              $kdkeg = $xkey['kdkegunit'];
+              $nmkeg = $xkey['nmkegunit'];
+              $nilai = $xkey['nilai'];
+              $keg[] = array(
+                  'kdkeg'   => $kdkeg,
+                  'nmkeg'   => $nmkeg
+                //  'nilai'   => $this->template->rupiah($nilai)
+              );
+            }
+
+            $dpa[] = array(
+                'idprog'   => $idprog,
+                'nmprog'   => $nmprog,
+                'jumkeg'   => $listkegiatandpa->num_rows(),
+                'detkeg'   => $keg
+            );
+          }
+
+        }
+
+
+        $this->data= array(
+            'nmopd'     => $namaopd,
+            'tahun'     => $this->tahunskr,
+            'idopd'     => $idopd,
+            'dpa'       => $dpa
+        );
+
+  //   echo json_encode($this->data); exit;
+      $this->template->load('templatenew','v_kasubpro_angkas',$this->data);
+
+      }
+
+
+    }
+
+    function sinkronangkas(){
+
+    //metode sinkron
+    //cek tambahan data baru
+    //update semua data
+    // fetch program dan kegiatan terlebih dahulu
+      if (!$this->ion_auth->logged_in()){
+        redirect('Home/login', 'refresh');
+      }elseif (!$this->ion_auth->is_kasubprogram()){
+        redirect('User', 'refresh');
+      }else{
+        $unit = $this->input->post('unit');
+        //$unit = '80_';
+        $mprgrm = $this->User_model->addprgrm($this->tahunskr);
+        $mkegiatan = $this->User_model->addmkegiatan($this->tahunskr);
+        $angkas = $this->User_model->sinkronangkas($this->tahunskr,$unit);
+        $data['data'][] = array(
+          'status'   =>  $angkas
+        );
+        echo json_encode($data);
+      }
+    }
+
+    function jsonangkas(){
+
+      if (!$this->ion_auth->logged_in()){
+        redirect('Home/login', 'refresh');
+      }elseif (!$this->ion_auth->is_kasubprogram()){
+        redirect('User', 'refresh');
+      }else{
+        $unitkey = $this->input->post('unitkey');
+        $nmunit  = $this->input->post('nmunit');
+        $idkeg   = $this->input->post('idkeg');
+        $nmkeg   = $this->input->post('nmkeg');
+        // $unitkey='80_';
+        // $nmunit='Dinas Komunikasi dan Informatika';
+        // $idkeg='11338_';
+        // $nmkeg='';
+        $rperbulan = $this->User_model->kegperbulan($idkeg,$unitkey,$this->tahunskr);
+        foreach ($rperbulan as $key ) {
+
+          $bulan=$key['kd_bulan'];
+          $nilai= $key['nilai'];
+          $maskingbulan=tglm($bulan);
+          $maskingnilai=$this->template->nominal($nilai);
+          $rangkasrek = $this->User_model->angkasrek_by($idkeg,$unitkey,$bulan,$this->tahunskr);
+          $det=array();
+          foreach ($rangkasrek as $rkey ) {
+             $det[] = array(
+                 'mtgkey'   => $rkey['mtgkey'],
+                 'nilai'    => $rkey['nilai'],
+                 'msknilai' => $this->template->nominal($rkey['nilai']),
+                 'nmper'    => $rkey['nmper'],
+                 'kdper'    => $rkey['kdper'],
+                 'tahun'    => $rkey['tahun']
+             );
+         }
+         $angkas[] = array(
+             'bln'      =>  $bulan,
+             'mskbln'   =>  $maskingbulan,
+             'nl'       =>  $nilai,
+             'msknilai' =>  $maskingnilai,
+             'det'      =>  $det
+         );
+
+
+
+
+        }
+        $data['data'][] = array(
+          'idunit' => $unitkey,//id unit
+          'nmunit' => $nmunit,//nama unit
+          'idkeg' => $idkeg,//id kegiatan
+          'nmkeg' => $nmkeg,//nama kegiatan
+          'bulan'  => $angkas
+        );
+
+        echo json_encode($data);
+      }
+    }
+
     //batas kasubagprogram
 //ini untuk struktur OPD / Unit
     function struktur(){
@@ -1117,7 +1261,7 @@ function dafkeg(){
 function jsontargetkeu(){
     $idkeg=$this->input->post('idkeg');
     $unitkey=$this->input->post('unitkey');
-        //  $idkeg='11142_';
+        // $idkeg='11338_';
         // $unitkey='80_';
     $nip=$this->ion_auth->user()->row()->username;
     $lskeg = $this->User_model->getdetlistkegiatan($nip,$idkeg,$this->tahunskr);

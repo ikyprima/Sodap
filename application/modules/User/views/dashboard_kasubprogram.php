@@ -12,6 +12,12 @@
               window.location.href = base_url + "User/ksubprodpa";
             });
         });
+        $("#ksubpro-angkas").click(function () {
+            Pace.restart();
+            Pace.track(function () {
+              window.location.href = base_url + "User/ksubproangkas";
+            });
+        });
 
     });
 
@@ -92,7 +98,7 @@
                 <div class="icon">
                     <i class="fa ion-clipboard"></i>
                 </div>
-                <a class="btn btn-block btn-social btn-success" id="ksubpro-dpa">
+                <a class="btn btn-block btn-social btn-success" id="ksubpro-angkas">
                     <i class="fa fa-bars"></i> proses
                 </a>
             </div>

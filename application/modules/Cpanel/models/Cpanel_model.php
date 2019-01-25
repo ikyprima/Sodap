@@ -473,8 +473,6 @@ class Cpanel_model extends CI_Model
   }
 
   function addangkas($thn,$unit){
-
-
   $fp = fsockopen("192.168.10.5", 8080, $errno, $errstr, 10);
   //if the socket failed it's offline...
   if (!$fp) {
@@ -642,8 +640,8 @@ class Cpanel_model extends CI_Model
   //   $this->datatables->select('`daftunit`.`unitkey`
   //   , `daftunit`.`nmunit`
   //   , `tab_pptk_master`.`stat`');
-  //   $this->datatables->from('`db_sodap`.`tab_pptk_master`');
-  //   $this->datatables->join('`db_sodap`.`daftunit`', '`tab_pptk_master`.`unitkey` = `daftunit`.`unitkey` and `tab_pptk_master`.`tahun`="'.$thn.'"','right');
+  //   $this->datatables->from('`tab_pptk_master`');
+  //   $this->datatables->join('`daftunit`', '`tab_pptk_master`.`unitkey` = `daftunit`.`unitkey` and `tab_pptk_master`.`tahun`="'.$thn.'"','right');
   //   $this->datatables->where('`daftunit`.`tahun`', $thn);
   //   $this->db->order_by('`daftunit`.`nmunit`', 'ASC');
   //   $this->datatables->add_column('action', '<button class="entriact btn btn-social btn-fill btn-twitter">
@@ -677,11 +675,11 @@ class Cpanel_model extends CI_Model
         , `tab_pangkat`.`nama_pangkat`
         , `tab_pangkat`.`golongan`
         , `users`.`active`');
-        $this->datatables->from('`db_sodap`.`users`');
-        $this->datatables->join('`db_sodap`.`tab_pns`', '`users`.`username` = `tab_pns`.`nip`','right');
-        $this->datatables->join('`db_sodap`.`tab_jabatan`', '`tab_pns`.`id_jabatan` = `tab_jabatan`.`id_jabatan`');
-        $this->datatables->join('`db_sodap`.`tab_eselon`', '`tab_jabatan`.`id_eselon` = `tab_eselon`.`id`');
-        $this->datatables->join('`db_sodap`.`tab_pangkat`', '`tab_pns`.`id_pangkat` = `tab_pangkat`.`id_pangkat`');
+        $this->datatables->from('`users`');
+        $this->datatables->join('`tab_pns`', '`users`.`username` = `tab_pns`.`nip`','right');
+        $this->datatables->join('`tab_jabatan`', '`tab_pns`.`id_jabatan` = `tab_jabatan`.`id_jabatan`');
+        $this->datatables->join('`tab_eselon`', '`tab_jabatan`.`id_eselon` = `tab_eselon`.`id`');
+        $this->datatables->join('`tab_pangkat`', '`tab_pns`.`id_pangkat` = `tab_pangkat`.`id_pangkat`');
         $this->datatables->where('`tab_pns`.`unitkey`', $opd);
         $this->datatables->where('`tab_pns`.`status`', '1');
         $this->datatables->where('`tab_pns`.`asn`', '1');
@@ -701,14 +699,14 @@ class Cpanel_model extends CI_Model
     , `tab_pangkat`.`golongan`
     , `users`.`active`
 FROM
-    `db_sodap`.`users`
-    RIGHT JOIN `db_sodap`.`tab_pns`
+    `users`
+    RIGHT JOIN `tab_pns`
         ON (`users`.`username` = `tab_pns`.`nip`)
-    INNER JOIN `db_sodap`.`tab_jabatan`
+    INNER JOIN `tab_jabatan`
         ON (`tab_pns`.`id_jabatan` = `tab_jabatan`.`id_jabatan`)
-    INNER JOIN `db_sodap`.`tab_eselon`
+    INNER JOIN `tab_eselon`
         ON (`tab_jabatan`.`id_eselon` = `tab_eselon`.`id`)
-    INNER JOIN `db_sodap`.`tab_pangkat`
+    INNER JOIN `tab_pangkat`
         ON (`tab_pns`.`id_pangkat` = `tab_pangkat`.`id_pangkat`);*/
     }
   function jsonuseropd()
@@ -841,10 +839,10 @@ FROM
 //     , `mpgrm`.`IDPRGRM`
 //     , `mpgrm`.`NMPRGRM`
 // FROM
-//     `db_sodap`.`mkegiatan`
-//     INNER JOIN `db_sodap`.`mpgrm`
+//     `mkegiatan`
+//     INNER JOIN `mpgrm`
 //         ON (`mkegiatan`.`idprgrm` = `mpgrm`.`IDPRGRM`)
-//     INNER JOIN `db_sodap`.`dpa22`
+//     INNER JOIN `dpa22`
 //         ON (`dpa22`.`kdkegunit` = `mkegiatan`.`kdkegunit`) WHERE `dpa22`.`tahun`='2018' AND `dpa22`.`unitkey`='80_' GROUP BY `mpgrm`.`IDPRGRM`;
     }
 

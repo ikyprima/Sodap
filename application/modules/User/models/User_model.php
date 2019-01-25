@@ -481,6 +481,93 @@ class User_model extends CI_Model
     return $this->db->get('dpa221')->result_array();
 
   }
+
+  function sinkronangkas($thn,$unit){
+
+  $fp = fsockopen("192.168.10.5", 8080, $errno, $errstr, 10);
+  //if the socket failed it's offline...
+  if (!$fp) {
+      $status = false;
+  }else{
+  $url = 'http://192.168.10.5:8080/angkas/22384ee59631a5a61ce3386af63c094b/'.$thn.'/'.$unit;
+  $jsondata = file_get_contents($url);
+  $obj = json_decode($jsondata, true);
+  $data['responcode']=$obj['ResponseCode'];
+  $data['data']= array();
+  $data['update']= array();
+  $list= array();
+  foreach ($obj['DATA'] as $row) {
+    $unitkey   = $row['UNITKEY'];
+    $kdkegunit = $row['KDKEGUNIT'];
+    $kd_bulan  = $row['KD_BULAN'];
+    $nilai     = $row['NILAI'];
+    $mtgkey    = $row['MTGKEY'];
+
+    $this->db->where('tahun', $thn);
+    $this->db->where('unitkey', $unitkey);
+    $this->db->where('kdkegunit', $kdkegunit);
+    $this->db->where('mtgkey', $mtgkey);
+    $this->db->where('kd_bulan', $kd_bulan );
+    $cek = $this->db->get('angkas');
+
+      if (!$cek->num_rows()>0){
+        $data['data'][] = array(
+          "unitkey"     =>  $unitkey,
+          "kdkegunit"   =>  $kdkegunit,
+          "kd_bulan"    =>  $kd_bulan ,
+          "nilai"       =>  $nilai,
+          "mtgkey"      =>  $mtgkey,
+          "tahun"       =>  $thn
+        );
+      }
+
+    $data['update'][] = array(
+      "unitkey"     =>  $unitkey,
+      "kdkegunit"   =>  $kdkegunit,
+      "kd_bulan"    =>  $kd_bulan ,
+      "nilai"       =>  $nilai,
+      "mtgkey"      =>  $mtgkey,
+      "tahun"       =>  $thn
+    );
+  }
+
+  if(empty($data['data'])){
+      $status = true;
+  }else{
+    $this->db->trans_start();
+    $this->db->insert_batch('angkas', $data['data']);
+    $this->db->trans_complete();
+
+    if ($this->db->trans_status() === FALSE){
+      $this->db->trans_rollback();
+      $status = false;
+    }else{
+      $this->db->trans_commit();
+      $status = true;
+    }
+  }
+
+    foreach ($data['update'] as $x => $key ) {
+
+
+      $dataup=array(
+
+        'nilai'      => $key['nilai']
+      );
+
+      $this->db->where('tahun',$key['tahun'] );
+      $this->db->where('unitkey', $key['unitkey'] );
+      $this->db->where('kdkegunit',$key['kdkegunit'] );
+      $this->db->where('mtgkey', $key['mtgkey'] );
+      $this->db->where('kd_bulan', $key['kd_bulan'] );
+      $this->db->update('angkas',$dataup);
+    }
+
+  }
+  return $status;
+
+  }
+
   //akhir kasubagprogram
 
 
@@ -768,9 +855,7 @@ function getttdkak($idtabpptk){
       $this->db->where('angkas.kdkegunit', $idkeg);
       $this->db->where('angkas.unitkey', $unitkey);
       $this->db->where('angkas.kd_bulan', $bulan);
-
-
-
+      $this->db->order_by('matangr.kdper','asc');
       return $this->db->get()->result_array();
       }
 

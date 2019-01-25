@@ -88,6 +88,7 @@
           },
           dataType: "JSON",
           complete: function(data){
+            ajaxtoken();
             var jsonData = JSON.parse(data.responseText);
             html += ' <div class="row">\
                       <div class="col-md-1 col-sm-1 col-xs-12">\
