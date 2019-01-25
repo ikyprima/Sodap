@@ -334,8 +334,7 @@
           'autoReset': true
 
         })
-        .set(
-          {
+        .set({
             'startMaximized':true,
           })
         .setContent('<a class="media" href='+base_url+'assets/dokumen/'+pathid+'></a>')

@@ -505,13 +505,13 @@ class Ion_auth
 
 		return $this->in_group($kasubag_group, $id);
 	}
-	public function is_kasi($id=false)
+	public function is_kasubprogram($id=false)
 	{
 		$this->ion_auth_model->trigger_events('is_kasi');
 
-		$kasi_group = $this->config->item('kasi_group', 'ion_auth');
+		$kasubprogram_group = $this->config->item('kasubagprogram_group', 'ion_auth');
 
-		return $this->in_group($kasi_group, $id);
+		return $this->in_group($kasubprogram_group, $id);
 	}
 	/**
 	 * @param int|string|array $check_group group(s) to check

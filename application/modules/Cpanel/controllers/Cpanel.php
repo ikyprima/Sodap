@@ -5,11 +5,12 @@ class Cpanel extends MX_Controller {
 	public $data;
   public $blnskr;
 	public $tahunskr;
+
 	public function __construct()
 	{
 		parent::__construct();
 		$this->blnskr =date('n');
-		$this->tahunskr ='2018';
+		$this->tahunskr ='2019';
 		// $this->blnskr =1;
 		$this->load->model(array('Cpanel_model'));
 		$this->load->library(array('ion_auth', 'form_validation'));
@@ -165,9 +166,11 @@ class Cpanel extends MX_Controller {
 
 	/*opd*/
 	function jsonopd(){
+
     	header('Content-Type: application/json');
-    	echo $this->Cpanel_model->jsonopd();
+    	echo $this->Cpanel_model->jsonopd($this->tahunskr);
   	}
+
 	function opd(){
 
 		if (!$this->ion_auth->logged_in()) {
@@ -184,7 +187,7 @@ class Cpanel extends MX_Controller {
 	/*Program*/
 	function jsonprogram(){
     	header('Content-Type: application/json');
-    	echo $this->Cpanel_model->jsonprogram();
+    	echo $this->Cpanel_model->jsonprogram($this->tahunskr);
   	}
 	function program(){
 
@@ -201,7 +204,7 @@ class Cpanel extends MX_Controller {
 	/*Kegiatan*/
 	function jsonkegiatan(){
     	header('Content-Type: application/json');
-    	echo $this->Cpanel_model->jsonkegiatan();
+    	echo $this->Cpanel_model->jsonkegiatan($this->tahunskr);
   	}
 	function kegiatan(){
 
@@ -218,7 +221,7 @@ class Cpanel extends MX_Controller {
 	/*Anggaran*/
 	function jsonanggaran(){
     	header('Content-Type: application/json');
-    	echo $this->Cpanel_model->jsonanggaran();
+    	echo $this->Cpanel_model->jsonanggaran($this->tahunskr);
   	}
 	function anggaran(){
 
@@ -282,10 +285,10 @@ class Cpanel extends MX_Controller {
 			$this->data= array(
 					'idopd'		=>  $id,
 					'opd' 		=> 	$opd->nmunit,
-                  	'thn' 		=>	$opd->tahun,
-                  	'program' 	=>	$program
-                 );
-
+          'thn' 		=>	$opd->tahun,
+          'program' =>	$program
+      );
+		//	echo json_encode($this->data);
 			$this->template->load('template','v_detail_dpa22',$this->data);
 		} else {
 			redirect('Home', 'refresh');
@@ -529,60 +532,115 @@ class Cpanel extends MX_Controller {
 		echo '<pre>';
 		print_r($new);
 	}
-	function apiprgrm(){
-		$result=$this->Cpanel_model->addprgrm();
-	  echo $result;
 
-	}
+//API
 	function apidaftunit(){
-		$result=$this->Cpanel_model->adddaftunit();
-	  echo $result;
+		$result=$this->Cpanel_model->adddaftunit($this->tahunskr);
+		$data['data'][] = array(
+
+			'status'   =>  $result
+
+		);
+
+		 echo json_encode($data);
+
+
 
 	}
+	function apiprgrm(){
+
+		$result=$this->Cpanel_model->addprgrm($this->tahunskr);
+		$data['data'][] = array(
+
+			'status'   =>  $result
+
+		);
+
+		 echo json_encode($data);
+
+	}
+
 	function apimkegiatan(){
-		$result=$this->Cpanel_model->addmkegiatan();
-	  echo $result;
+
+		$result=$this->Cpanel_model->addmkegiatan($this->tahunskr);
+		$data['data'][] = array(
+
+ 			'status'   =>  $result
+
+ 		);
+
+ 		 echo json_encode($data);
 
 	}
+
+	function apimatangr(){
+		$result=$this->Cpanel_model->addmatangr($this->tahunskr);
+		$data['data'][] = array(
+
+			'status'   =>  $result
+
+		);
+
+		 echo json_encode($data);
+
+	}
+
+	function apidpa22(){
+		$unit = $this->input->post('unitkey');
+
+		$result=$this->Cpanel_model->adddpa22($this->tahunskr,$unit);
+		$data['data'][] = array(
+
+			'status'   =>  $result
+
+		);
+
+		 echo json_encode($data);
+
+	}
+
+	function apidpa221(){
+
+		$unit = $this->input->post('unitkey');
+		$result=		$this->Cpanel_model->adddpa221($this->tahunskr,$unit);
+		$data['data'][] = array(
+
+			'status'   =>  $result
+
+		);
+
+		 echo json_encode($data);
+
+	}
+
+	function apiangkas(){
+		$unit = $this->input->post('unitkey');
+		$result=		$this->Cpanel_model->addangkas($this->tahunskr,$unit);
+		$data['data'][] = array(
+			'status'   =>  $result
+		);
+		 echo json_encode($data);
+	}
+
 	function apidpa21(){
 		$result=$this->Cpanel_model->adddpa21();
 	  echo $result;
 
 	}
-	function apimatangr(){
-		$result=$this->Cpanel_model->addmatangr();
-	  echo $result;
 
-	}
 	function apidpa211(){
 		$result=$this->Cpanel_model->adddpa211();
 	  echo $result;
 
 	}
-	function apidpa22(){
-		$result=$this->Cpanel_model->adddpa22();
-	  echo $result;
 
-	}
 	function angkas(){
 		$result=$this->Cpanel_model->angkas();
 	  echo $result;
 
 	}
-    function setAngkas(){
-		$dafunit = $this->Cpanel_model->getdaftunit();
-		foreach($dafunit as $key){
-			$this->Cpanel_model->addangkas($key->unitkey);
-		}
-		//$this->Cpanel_model->addangkas('43_');
-	}
-	function apiDpa221($key){
-		// 	$dafunit = $this->Cpanel_model->getdaftunit();
-		// foreach($dafunit as $key){
-		// 	$this->Cpanel_model->adddpa221($key->unitkey);
-		// }
-		$this->Cpanel_model->adddpa221($key);
-	}
+
+
 	/*********Agung-Agung-Agung-Agung-Agung-Agung-Agung-Agung-*/
 	function raporOpd(){
 

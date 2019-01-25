@@ -10,7 +10,7 @@ $('.contentHolder').each(function(){
 <div class="content">
 
                 <div class="container-fluid">
-                  
+
                   <div class="row">
                         <div class="col-lg-3 col-md-6 col-sm-6">
                             <div class="card card-stats">
@@ -42,11 +42,7 @@ $('.contentHolder').each(function(){
                                                             <li>
                                                                 <a href="<?php echo base_url('Cpanel/anggaran');?>">Master Anggaran</a>
                                                             </li>
-                                                            <li class="divider"></li>
-                                                            <li>
-                                                                <a href="<?php echo base_url('Cpanel/opddpa');?>">DPA 2.2</a>
-                                                                <a href="#link">Aliran KAS</a>
-                                                            </li>
+
                                                         </ul>
                                                     </div>
 

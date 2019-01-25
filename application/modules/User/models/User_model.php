@@ -10,6 +10,566 @@ class User_model extends CI_Model
         parent::__construct();
 
     }
+  //bagian kasubagprogram
+
+  function ksubpro_listprogram($idopd,$thn){
+    $this->db->select('mpgrm.IDPRGRM, mpgrm.NMPRGRM');
+    $this->db->from('dpa22');
+    $this->db->join('mkegiatan', 'dpa22.kdkegunit = mkegiatan.kdkegunit');
+    $this->db->join('mpgrm', 'mpgrm.IDPRGRM = mkegiatan.idprgrm');
+    $this->db->where('dpa22.unitkey', $idopd);
+    $this->db->where('dpa22.tahun', $thn);
+    $this->db->where('mpgrm.tahun', $thn);
+    $this->db->where('mkegiatan.tahun', $thn);
+    $this->db->group_by('mpgrm.IDPRGRM');
+    return $this->db->get()->result_array();
+  }
+
+  function ksubpro_listkegiatan($idopd,$thn,$prog){
+    $this->db->select('dpa22.kdkegunit,mkegiatan.nmkegunit, sum(dpa22.nilai) as nilai');
+    $this->db->from('dpa22');
+    $this->db->join('mkegiatan', 'dpa22.kdkegunit = mkegiatan.kdkegunit');
+    $this->db->join('mpgrm', 'mpgrm.IDPRGRM = mkegiatan.idprgrm');
+    $this->db->where('dpa22.unitkey', $idopd);
+    $this->db->where('dpa22.tahun', $thn);
+    $this->db->where('mpgrm.tahun', $thn);
+    $this->db->where('mkegiatan.tahun', $thn);
+    $this->db->where('mkegiatan.idprgrm', $prog);
+    $this->db->group_by('dpa22.kdkegunit');
+    return $this->db->get();
+  }
+
+
+
+  function addprgrm($thn){
+        $fp = fsockopen("192.168.10.5", 8080, $errno, $errstr, 10);
+        //if the socket failed it's offline...
+        if (!$fp) {
+            $status = false;
+        }else{
+        $url = 'http://192.168.10.5:8080/mpgrm/22384ee59631a5a61ce3386af63c094b/'.$thn;
+        $jsondata = file_get_contents($url);
+        $obj = json_decode($jsondata, true);
+
+
+        $data['responcode']=$obj['ResponseCode'];
+        $data['data']= array();
+        $data['update']= array();
+        $list= array();
+        foreach ($obj['DATA'] as $row) {
+          $idpgrm    = $row['IDPRGRM'];
+          $nmprogram = $row['NMPRGRM'];
+
+          $this->db->where('tahun', $thn);
+          $this->db->where('IDPRGRM', $idpgrm);
+          $cek = $this->db->get('mpgrm');
+            if (!$cek->num_rows()>0){
+              $data['data'][] = array(
+                "IDPRGRM"  =>  $idpgrm,
+                "NMPRGRM"  =>  $nmprogram,
+                "tahun"    =>  $thn
+              );
+            }
+          $data['update'][] = array(
+            "idpgrm"  =>  $idpgrm,
+            "nmpgrm"   =>  $nmprogram,
+            "tahun"    =>  $thn
+          );
+        }
+
+        if(empty($data['data'])){
+            $status = true;
+        }else{
+          $this->db->trans_start();
+          $this->db->insert_batch('mpgrm', $data['data']);
+          $this->db->trans_complete();
+
+          if ($this->db->trans_status() === FALSE){
+            $this->db->trans_rollback();
+            $status = false;
+          }else{
+            $this->db->trans_commit();
+            $status = true;
+          }
+        }
+
+          foreach ($data['update'] as $x => $key ) {
+            $dataup=array(
+              'NMPRGRM'=>$key['nmpgrm']
+            );
+            $this->db->where('tahun', $key['tahun']);
+            $this->db->where('IDPRGRM', $key['idpgrm']);
+            $this->db->update('mpgrm',$dataup);
+          }
+
+        }
+          return $status;
+  }
+
+  function addmkegiatan($thn){
+
+    $fp = fsockopen("192.168.10.5", 8080, $errno, $errstr, 10);
+    //if the socket failed it's offline...
+    if (!$fp) {
+          $status = false;
+    }else{
+    $url = 'http://192.168.10.5:8080/mkegiatan/22384ee59631a5a61ce3386af63c094b/'.$thn;
+    $jsondata = file_get_contents($url);
+    $obj = json_decode($jsondata, true);
+    $data['responcode']=$obj['ResponseCode'];
+    $data['data']= array();
+    $data['update']= array();
+    $list= array();
+    foreach ($obj['DATA'] as $row) {
+      $idprgrm    = $row['IDPRGRM'];
+      $kdkegunit  = $row['KDKEGUNIT'];
+      $nmkegunit  = $row['NMKEGUNIT'];
+
+      $this->db->where('tahun', $thn);
+      $this->db->where('idprgrm', $idprgrm);
+      $this->db->where('kdkegunit', $kdkegunit);
+      $cek = $this->db->get('mkegiatan');
+        if (!$cek->num_rows()>0){
+          $data['data'][] = array(
+            "idprgrm"    => $idprgrm,
+            "kdkegunit"  => $kdkegunit,
+            "nmkegunit"  => $nmkegunit,
+            "tahun"      => $thn
+          );
+        }
+      $data['update'][] = array(
+        "idprgrm"    => $idprgrm,
+        "kdkegunit"  => $kdkegunit,
+        "nmkegunit"  => $nmkegunit,
+        "tahun"      => $thn
+      );
+    }
+
+    if(empty($data['data'])){
+        $status = true;
+    }else{
+      $this->db->trans_start();
+      $this->db->insert_batch('mkegiatan', $data['data']);
+      $this->db->trans_complete();
+
+      if ($this->db->trans_status() === FALSE){
+        $this->db->trans_rollback();
+        $status = false;
+      }else{
+        $this->db->trans_commit();
+        $status = true;
+      }
+    }
+
+      foreach ($data['update'] as $x => $key ) {
+        $dataup=array(
+          'nmkegunit'=>$key['nmkegunit']
+        );
+        $this->db->where('tahun', $key['tahun']);
+        $this->db->where('idprgrm', $key['idprgrm']);
+        $this->db->where('kdkegunit', $key['kdkegunit']);
+        $this->db->update('mkegiatan',$dataup);
+      }
+
+    }
+    return $status;
+  }
+
+  function sinkrondpa22($thn,$unit){
+
+    // http://192.168.10.5:8080/dpa22/token/tahun/unitkey/kdkegunit
+    // http://192.168.10.5:8080/dpa22/22384ee59631a5a61ce3386af63c094b/2018/80_/11_
+    $fp = fsockopen("192.168.10.5", 8080, $errno, $errstr, 10);
+    //if the socket failed it's offline...
+    if (!$fp) {
+            $status = false;
+    }else{
+
+
+
+    $url = 'http://192.168.10.5:8080/dpa22/22384ee59631a5a61ce3386af63c094b/'.$thn.'/'.$unit;
+    $jsondata = file_get_contents($url);
+    $obj = json_decode($jsondata, true);
+
+
+    $data['responcode']=$obj['ResponseCode'];
+    $data['data']= array();
+    $data['update']= array();
+    $list= array();
+    foreach ($obj['DATA'] as $row) {
+          $nilai    = $row['NILAI'];
+          $kdkeg    = $row['KDKEGUNIT'];
+          $mtgkey   = $row['MTGKEY'];
+          $unitkey  = $row['UNITKEY'];
+
+          $this->db->where('tahun', $thn);
+          $this->db->where('unitkey', $unit);
+          $this->db->where('kdkegunit', $kdkeg);
+          $this->db->where('mtgkey', $mtgkey);
+          $cek = $this->db->get('dpa22');
+      if (!$cek->num_rows()>0){
+        $data['data'][] = array(
+          "nilai"       =>  $nilai,
+          "kdkegunit"   =>  $kdkeg ,
+          "mtgkey"      =>  $mtgkey ,
+          "unitkey"     =>  $unitkey ,
+          "tahun"       =>  $thn
+        );
+      }
+      $data['update'][] = array(
+        "nilai"       =>  $nilai,
+        "kdkegunit"   =>  $kdkeg ,
+        "mtgkey"      =>  $mtgkey ,
+        "unitkey"     =>  $unitkey ,
+        "tahun"       =>  $thn
+      );
+
+    }
+
+    // $dataa = array(
+    //    array(
+    //      'tahun' => '2018',
+    //      'mtgkey' => '1132_' ,
+    //      'nilai' => '888'
+    //    ),
+    //    array(
+    //       'tahun' => '2018',
+    //       'mtgkey' => '1093_' ,
+    //       'nilai' => '777'
+    //
+    //    )
+    // );
+    // $this->db->update_batch('dpa22', $dataa, 'mtgkey, tahun');
+    //update batch kantau
+  //  echo json_encode($data['update']);
+
+
+
+    if(empty($data['data'])){
+        $status = true;
+    }else{
+      $this->db->trans_start();
+      $this->db->insert_batch('dpa22', $data['data']);
+      $this->db->trans_complete();
+
+      if ($this->db->trans_status() === FALSE){
+        $this->db->trans_rollback();
+        $status = false;
+      }else{
+        $this->db->trans_commit();
+        $status = true;
+      }
+    }
+
+        foreach ($data['update'] as $x => $key ) {
+          $dataup=array(
+              'nilai'=>$key['nilai']
+          );
+          $this->db->where('tahun', $key['tahun']);
+          $this->db->where('unitkey', $key['unitkey']);
+          $this->db->where('kdkegunit', $key['kdkegunit']);
+          $this->db->where('mtgkey', $key['mtgkey']);
+          $this->db->update('dpa22',$dataup);
+
+        }
+
+
+
+    }
+    return $status;
+  }
+  function sinkrondpa221($thn,$unit){
+
+    $fp = fsockopen("192.168.10.5", 8080, $errno, $errstr, 10);
+    //if the socket failed it's offline...
+    if (!$fp) {
+        $status = false;
+    }else{
+    $url = 'http://192.168.10.5:8080/dpa221/22384ee59631a5a61ce3386af63c094b/'.$thn.'/'.$unit;
+    $jsondata = file_get_contents($url);
+    $obj = json_decode($jsondata, true);
+    $data['responcode']=$obj['ResponseCode'];
+    $data['data']= array();
+    $data['update']= array();
+    $list= array();
+    foreach ($obj['DATA'] as $row) {
+      //$row['SUBTOTAL'] tidak di  deklarasikan
+        $satuan    =  $row['SATUAN'];
+        $kdkegunit =  $row['KDKEGUNIT'];
+        $mtgkey    =  $row['MTGKEY'];
+        $jumbyek   =  $row['JUMBYEK'];
+        $unitkey   =  $row['UNITKEY'];
+        $uraian    =  $row['URAIAN'];
+        $tarif     =  $row['TARIF'];
+        $kdjabar   =  $row['KDJABAR'];
+        $type      =  $row['TYPE'];
+
+      $this->db->where('tahun', $thn);
+      $this->db->where('unitkey', $unitkey);
+      $this->db->where('kdkegunit', $kdkegunit);
+      $this->db->where('mtgkey', $mtgkey);
+      $this->db->where('type', $type);
+      $this->db->where('kdjabar', $kdjabar);
+      $cek = $this->db->get('dpa221');
+
+        if (!$cek->num_rows()>0){
+          $data['data'][] = array(
+             "satuan"    =>  $satuan,
+             "kdkegunit" =>  $kdkegunit,
+             "mtgkey"    =>  $mtgkey,
+             "jumbyek"   =>  $jumbyek,
+             "unitkey"   =>  $unitkey,
+             "uraian"    =>  $uraian,
+             "tarif"     =>  $tarif,
+             "kdjabar"   =>  $kdjabar,
+             "type"      =>  $type,
+             "tahun"     =>  $thn
+          );
+        }
+
+      $data['update'][] = array(
+        "satuan"    =>  $satuan,
+        "kdkegunit" =>  $kdkegunit,
+        "mtgkey"    =>  $mtgkey,
+        "jumbyek"   =>  $jumbyek,
+        "unitkey"   =>  $unitkey,
+        "uraian"    =>  $uraian,
+        "tarif"     =>  $tarif,
+        "kdjabar"   =>  $kdjabar,
+        "type"      =>  $type,
+        "tahun"     =>  $thn
+      );
+    }
+
+    if(empty($data['data'])){
+        $status = true;
+    }else{
+      $this->db->trans_start();
+      $this->db->insert_batch('dpa221', $data['data']);
+      $this->db->trans_complete();
+
+      if ($this->db->trans_status() === FALSE){
+        $this->db->trans_rollback();
+        $status = false;
+      }else{
+        $this->db->trans_commit();
+        $status = true;
+      }
+    }
+
+      foreach ($data['update'] as $x => $key ) {
+
+        $dataup=array(
+          'jumbyek'  => $key['jumbyek'],
+          'satuan'   => $key['satuan'],
+          'tarif'    => $key['tarif'],
+          'uraian'   => $key['uraian']
+        );
+
+          $this->db->where('tahun', $key['tahun']);
+          $this->db->where('unitkey', $key['unitkey']);
+          $this->db->where('kdkegunit', $key['kdkegunit']);
+          $this->db->where('mtgkey', $key['mtgkey']);
+          $this->db->where('type', $key['type']);
+          $this->db->where('kdjabar', $key['kdjabar']);
+          $this->db->update('dpa221',$dataup);
+        }
+      }
+    return $status;
+  }
+
+
+  function ksubpro_listprogram_dpa($idopd,$thn){
+    $this->db->select('mpgrm.IDPRGRM, mpgrm.NMPRGRM');
+    $this->db->from('dpa221');
+    $this->db->join('mkegiatan', 'dpa221.kdkegunit = mkegiatan.kdkegunit');
+    $this->db->join('mpgrm', 'mpgrm.IDPRGRM = mkegiatan.idprgrm');
+    $this->db->where('dpa221.unitkey', $idopd);
+    $this->db->where('dpa221.tahun', $thn);
+    $this->db->group_by('mpgrm.IDPRGRM');
+    return $this->db->get()->result_array();
+  }
+  function ksubpro_listkegiatan_dpa($idopd,$thn,$prog){
+    $this->db->select('dpa221.kdkegunit,mkegiatan.nmkegunit,SUM(`dpa221`.`jumbyek` *`dpa221`.`tarif`) as nilai');
+    $this->db->from('dpa221');
+    $this->db->join('mkegiatan', 'dpa221.kdkegunit = mkegiatan.kdkegunit');
+    $this->db->join('mpgrm', 'mpgrm.IDPRGRM = mkegiatan.idprgrm');
+    $this->db->where('dpa221.unitkey', $idopd);
+    $this->db->where('dpa221.tahun', $thn);
+    $this->db->where('mkegiatan.idprgrm', $prog);
+    $this->db->group_by('dpa221.kdkegunit');
+    return $this->db->get();
+  }
+
+  function lv1($unit,$kdkegunit,$thn){
+    $this->db->select('sum(`dpa22`.`nilai`) as jml ,SUBSTRING(`matangr`.`kdper`,1,4) AS rek');
+    $this->db->from('dpa22');
+    $this->db->join('matangr', '`dpa22`.`mtgkey` = `matangr`.`mtgkey`');
+    $this->db->where('`dpa22`.`unitkey`', $unit);
+    $this->db->where('`dpa22`.`kdkegunit`', $kdkegunit);
+    $this->db->where('`dpa22`.`tahun`', $thn);
+    $this->db->where('`matangr`.`tahun`', $thn);
+    $this->db->group_by('SUBSTRING(`kdper`,1,4)');
+    return $this->db->get()->row_array();
+  }
+
+  function mtglv($kdrek,$thn){
+    $this->db->select('kdper,nmper');
+    $this->db->from('matangr');
+    $this->db->where('kdper', $kdrek);
+    $this->db->where('tahun', $thn);
+    return $this->db->get()->row_array();
+  }
+
+  function lv2($unit,$kdkegunit,$thn){
+    $this->db->select('sum(`dpa22`.`nilai`) as jml, SUBSTRING(`matangr`.`kdper`,1,6) AS rek');
+    $this->db->from('dpa22');
+    $this->db->join('matangr', '`dpa22`.`mtgkey` = `matangr`.`mtgkey`');
+    $this->db->where('`dpa22`.`unitkey`', $unit);
+    $this->db->where('`dpa22`.`kdkegunit`', $kdkegunit);
+    $this->db->where('`dpa22`.`tahun`', $thn);
+    $this->db->where('`matangr`.`tahun`', $thn);
+    $this->db->group_by('SUBSTRING(`kdper`,1,6)');
+    $this->db->order_by('`matangr`.`kdper`','asc');
+    return $this->db->get()->result_array();
+
+  }
+
+  function lv3($unit,$kdkegunit,$thn,$rek){
+    $this->db->select('sum(`dpa22`.`nilai`) as jml,SUBSTRING(`matangr`.`kdper`,1,9) AS rek');
+    $this->db->from('dpa22');
+    $this->db->join('matangr', '`dpa22`.`mtgkey` = `matangr`.`mtgkey`');
+    $this->db->where('`dpa22`.`unitkey`', $unit);
+    $this->db->where('`dpa22`.`kdkegunit`', $kdkegunit);
+    $this->db->where('`dpa22`.`tahun`', $thn);
+    $this->db->where('`matangr`.`tahun`', $thn);
+    // $this->db->where('`matangr`.`kdper`', 'SUBSTRING('..',1,9)');
+    $this->db->like('`matangr`.`kdper`', $rek, 'both');
+    $this->db->group_by('SUBSTRING(`kdper`,1,9)');
+    $this->db->order_by('`matangr`.`kdper`','asc');
+    return $this->db->get()->result_array();
+  }
+
+  function jsondpa22($unit,$kdkegunit,$thn,$rek){
+    $this->db->select('`dpa22`.`id`
+    , `dpa22`.`unitkey`
+    , `dpa22`.`kdkegunit`
+    , `dpa22`.`mtgkey`
+    , `dpa22`.`nilai`
+    , `dpa22`.`tahun`
+    , `matangr`.`kdper`
+    , `matangr`.`nmper`
+    , `matangr`.`type`
+    , `matangr`.`mtglevel`');
+    $this->db->from('dpa22');
+    $this->db->join('matangr', '`dpa22`.`mtgkey` = `matangr`.`mtgkey`');
+    $this->db->where('`dpa22`.`unitkey`', $unit);
+    $this->db->where('`dpa22`.`kdkegunit`', $kdkegunit);
+    $this->db->where('`dpa22`.`tahun`', $thn);
+    $this->db->where('`matangr`.`tahun`', $thn);
+    $this->db->like('`matangr`.`kdper`', $rek, 'both');
+    $this->db->order_by('`matangr`.`kdper`','asc');
+    return $this->db->get()->result_array();
+
+  }
+  function jsondpa221($unit,$kdkegunit,$mtgkey,$thn){
+
+    $this->db->where('`dpa221`.`tahun`', $thn);
+    $this->db->where('`dpa221`.`unitkey`', $unit);
+    $this->db->where('`dpa221`.`kdkegunit`', $kdkegunit);
+    $this->db->where('`dpa221`.`mtgkey`', $mtgkey);
+    return $this->db->get('dpa221')->result_array();
+
+  }
+
+  function sinkronangkas($thn,$unit){
+
+  $fp = fsockopen("192.168.10.5", 8080, $errno, $errstr, 10);
+  //if the socket failed it's offline...
+  if (!$fp) {
+      $status = false;
+  }else{
+  $url = 'http://192.168.10.5:8080/angkas/22384ee59631a5a61ce3386af63c094b/'.$thn.'/'.$unit;
+  $jsondata = file_get_contents($url);
+  $obj = json_decode($jsondata, true);
+  $data['responcode']=$obj['ResponseCode'];
+  $data['data']= array();
+  $data['update']= array();
+  $list= array();
+  foreach ($obj['DATA'] as $row) {
+    $unitkey   = $row['UNITKEY'];
+    $kdkegunit = $row['KDKEGUNIT'];
+    $kd_bulan  = $row['KD_BULAN'];
+    $nilai     = $row['NILAI'];
+    $mtgkey    = $row['MTGKEY'];
+
+    $this->db->where('tahun', $thn);
+    $this->db->where('unitkey', $unitkey);
+    $this->db->where('kdkegunit', $kdkegunit);
+    $this->db->where('mtgkey', $mtgkey);
+    $this->db->where('kd_bulan', $kd_bulan );
+    $cek = $this->db->get('angkas');
+
+      if (!$cek->num_rows()>0){
+        $data['data'][] = array(
+          "unitkey"     =>  $unitkey,
+          "kdkegunit"   =>  $kdkegunit,
+          "kd_bulan"    =>  $kd_bulan ,
+          "nilai"       =>  $nilai,
+          "mtgkey"      =>  $mtgkey,
+          "tahun"       =>  $thn
+        );
+      }
+
+    $data['update'][] = array(
+      "unitkey"     =>  $unitkey,
+      "kdkegunit"   =>  $kdkegunit,
+      "kd_bulan"    =>  $kd_bulan ,
+      "nilai"       =>  $nilai,
+      "mtgkey"      =>  $mtgkey,
+      "tahun"       =>  $thn
+    );
+  }
+
+  if(empty($data['data'])){
+      $status = true;
+  }else{
+    $this->db->trans_start();
+    $this->db->insert_batch('angkas', $data['data']);
+    $this->db->trans_complete();
+
+    if ($this->db->trans_status() === FALSE){
+      $this->db->trans_rollback();
+      $status = false;
+    }else{
+      $this->db->trans_commit();
+      $status = true;
+    }
+  }
+
+    foreach ($data['update'] as $x => $key ) {
+
+
+      $dataup=array(
+
+        'nilai'      => $key['nilai']
+      );
+
+      $this->db->where('tahun',$key['tahun'] );
+      $this->db->where('unitkey', $key['unitkey'] );
+      $this->db->where('kdkegunit',$key['kdkegunit'] );
+      $this->db->where('mtgkey', $key['mtgkey'] );
+      $this->db->where('kd_bulan', $key['kd_bulan'] );
+      $this->db->update('angkas',$dataup);
+    }
+
+  }
+  return $status;
+
+  }
+
+  //akhir kasubagprogram
+
 
     function cekstrukturopd($opd){
       $this->db->where('id_unit', $opd);
@@ -53,6 +613,7 @@ class User_model extends CI_Model
     }
     function updatestruktur($data,$id)
     {
+
         $this->db->where('id', $id);
         $upstrukt = $this->db->update('tab_struktur', $data);
         if($upstrukt)
@@ -85,8 +646,8 @@ class User_model extends CI_Model
   }
 
 
-    function getlistkegiatan($nip){
-      $thn='2018';
+    function getlistkegiatan($nip,$thn){
+
      $this->db->select('
       `tab_pptk`.`id`
     ,`mkegiatan`.`kdkegunit`
@@ -106,8 +667,8 @@ class User_model extends CI_Model
       $this->db->where('tab_pptk.idpnspptk', $nip);
       return $this->db->get()->result_array();
     }
-    function getdetlistkegiatan($nip,$kdkegunit){
-      $thn='2018';
+    function getdetlistkegiatan($nip,$kdkegunit,$thn){
+
      $this->db->select('
     `tab_pptk`.`id`
     ,`mkegiatan`.`kdkegunit`
@@ -128,8 +689,8 @@ class User_model extends CI_Model
       $this->db->where('tab_pptk.kdkegunit', $kdkegunit);
       return $this->db->get()->row();
     }
-    function getdetlistkegiatan_detpptk($nip,$kdkegunit){
-      $thn='2018';
+    function getdetlistkegiatan_detpptk($nip,$kdkegunit,$thn){
+
      $this->db->select('
       `mpgrm`.`NMPRGRM` as prog
     ,`mkegiatan`.`kdkegunit` as kdkeg
@@ -153,8 +714,8 @@ class User_model extends CI_Model
       return $this->db->get()->row();
     }
 
-     function getheader_realisasipptk($unit,$kdkegunit){
-      $thn='2018';
+     function getheader_realisasipptk($unit,$kdkegunit,$thn){
+
      $this->db->select('
        `dpa221`.`kdkegunit`
       , `dpa221`.`mtgkey`
@@ -170,8 +731,8 @@ class User_model extends CI_Model
       $this->db->group_by('`matangr`.`kdper`');
       return $this->db->get()->result_array();
     }
-     function getheader_realisasipptk_angkas($unit,$kdkegunit,$bulan){
-      $thn='2018';
+     function getheader_realisasipptk_angkas($unit,$kdkegunit,$bulan,$thn){
+
      $this->db->select('
       `angkas`.`id`
       ,`angkas`.`unitkey`
@@ -184,10 +745,10 @@ class User_model extends CI_Model
       $this->db->from('angkas');
       $this->db->join('matangr', '`angkas`.`mtgkey` = `matangr`.`mtgkey`');
       $this->db->where('`angkas`.`tahun`', $thn);
-      $this->db->where(' `angkas`.`unitkey`', $unit);
+      $this->db->where('`angkas`.`unitkey`', $unit);
       $this->db->where('`angkas`.`kdkegunit`', $kdkegunit);
       $this->db->where('`angkas`.`kd_bulan`', $bulan);
-       $this->db->order_by('`matangr`.`kdper`','asc');
+      $this->db->order_by('`matangr`.`kdper`','asc');
       return $this->db->get()->result_array();
     }
 
@@ -267,8 +828,8 @@ function getttdkak($idtabpptk){
     }
     /*Sampai agung*/
 
-     function kegperbulan($idkeg,$unitkey){
-      $thn='2018';
+     function kegperbulan($idkeg,$unitkey,$thn){
+
       $this->db->select('kd_bulan,SUM(`nilai`) as nilai');
       $this->db->from('angkas');
       $this->db->where('angkas.tahun', $thn);
@@ -279,8 +840,8 @@ function getttdkak($idtabpptk){
       return $this->db->get()->result_array();
      }
 
-      function angkasrek_by($idkeg,$unitkey,$bulan){
-      $thn='2018';
+      function angkasrek_by($idkeg,$unitkey,$bulan,$thn){
+
       $this->db->select('
         `angkas`.`mtgkey`
       , `angkas`.`nilai`
@@ -294,9 +855,7 @@ function getttdkak($idtabpptk){
       $this->db->where('angkas.kdkegunit', $idkeg);
       $this->db->where('angkas.unitkey', $unitkey);
       $this->db->where('angkas.kd_bulan', $bulan);
-
-
-
+      $this->db->order_by('matangr.kdper','asc');
       return $this->db->get()->result_array();
       }
 
@@ -473,8 +1032,8 @@ function getttdkak($idtabpptk){
 //-------------------------------------------------------------------------------------------------//
 //ppk
 //#ryh
- function getdetlistkegiatan_ppk($nip){
-    $thn='2018';
+ function getdetlistkegiatan_ppk($nip,$thn){
+
     $this->db->select('
     `mkegiatan`.`kdkegunit`
     ,`mkegiatan`.`nmkegunit`
@@ -496,8 +1055,8 @@ function getttdkak($idtabpptk){
 
       return $this->db->get()->result_array();
     }
-function getdetlistkegiatan_detppk($nip,$kdkegunit){
-      $thn='2018';
+function getdetlistkegiatan_detppk($nip,$kdkegunit,$thn){
+
      $this->db->select('
       `mpgrm`.`NMPRGRM` as prog
     ,`mkegiatan`.`kdkegunit` as kdkeg
@@ -574,12 +1133,14 @@ function getdetlistkegiatan_detppk($nip,$kdkegunit){
 
    //akhirpptk
 	//Kasubag ryh
-	function listkegiatan($idunit){
+	function listkegiatan($idunit,$thn){
 		$this->db->select('dpa22.unitkey,mkegiatan.kdkegunit,mkegiatan.nmkegunit as namakeg,SUM(dpa22.nilai) as nilai');
       	$this->db->from('dpa22');
       	$this->db->join('mkegiatan', 'dpa22.kdkegunit = mkegiatan.kdkegunit');
       	$this->db->join('daftunit', 'dpa22.unitkey = daftunit.unitkey');
-
+        $this->db->where('daftunit.tahun', $thn);
+        $this->db->where('mkegiatan.tahun', $thn);
+        $this->db->where('dpa22.tahun', $thn);
       	$this->db->where('dpa22.unitkey', $idunit);
       	$this->db->group_by('dpa22.kdkegunit');
         $this->db->order_by('dpa22.kdkegunit');
@@ -971,9 +1532,9 @@ function simpanentrikak($masterkak){
                 return 1;
         }
   }
-    function cekblnjamodal($unitkey,$idkeg){
+    function cekblnjamodal($unitkey,$idkeg,$thn){
 
-        $this->db->select(' `angkas`.`kdkegunit`
+        $this->db->select('`angkas`.`kdkegunit`
         , `matangr`.`mtgkey`
         , `matangr`.`kdper`
         , `matangr`.`nmper`');
@@ -981,6 +1542,8 @@ function simpanentrikak($masterkak){
         $this->db->join('matangr', '`angkas`.`mtgkey` = `matangr`.`mtgkey`');
         $this->db->where('`angkas`.`unitkey`', $unitkey);
         $this->db->where('`angkas`.`kdkegunit`', $idkeg);
+        $this->db->where('`angkas`.`tahun`', $thn);
+        $this->db->where('`matangr`.`tahun`', $thn);
         $this->db->like('`matangr`.`kdper`', '5.2.3.', 'both');
         $this->db->group_by('`matangr`.`mtgkey`');
         return $this->db->get();
@@ -990,17 +1553,20 @@ function simpanentrikak($masterkak){
       return $this->db->get('tab_metode_pelaksanaan')->result();
     }
 
-    function jsonlistbmodal($unit,$kegiatan){
+    function jsonlistbmodal($unit,$kegiatan,$thn){
       $this->datatables->select('`angkas`.`kdkegunit` as kdkegunit
         , `matangr`.`mtgkey` as mtgkey
         , `matangr`.`kdper` as kdper
         , `matangr`.`nmper` as nmper
         , (`tab_target_blnj_modal`.`idtab_pptk` IS NOT NULL) AS ada');
-      $this->datatables->from('`db_sodap`.`angkas`');
-      $this->datatables->join('`db_sodap`.`matangr`', '`angkas`.`mtgkey` = `matangr`.`mtgkey`');
-      $this->datatables->join('`db_sodap`.`tab_target_blnj_modal`', '`tab_target_blnj_modal`.`mtgkey` = `matangr`.`mtgkey`','LEFT');
+      $this->datatables->from('`angkas`');
+      $this->datatables->join('`matangr`', '`angkas`.`mtgkey` = `matangr`.`mtgkey`');
+      $this->datatables->join('`tab_target_blnj_modal`', '`tab_target_blnj_modal`.`mtgkey` = `matangr`.`mtgkey`','LEFT');
       $this->datatables->where('`angkas`.`unitkey`', $unit);
       $this->datatables->where('`angkas`.`kdkegunit`', $kegiatan);
+      $this->datatables->where('`angkas`.`tahun`', $thn);
+      $this->datatables->where('`matangr`.`tahun`', $thn);
+      // $this->datatables->where('`tab_target_blnj_modal`.`tahun`', $thn);
       $this->datatables->like('`matangr`.`kdper`', '5.2.3.', 'both');
       $this->datatables->group_by('`matangr`.`mtgkey`');
 
@@ -1012,9 +1578,9 @@ function simpanentrikak($masterkak){
         , `matangr`.`kdper` as kdper
         , `matangr`.`nmper` as nmper
         , (`tab_target_blnj_modal`.`idtab_pptk` IS NOT NULL) AS ada');
-      $this->db->from('`db_sodap`.`angkas`');
-      $this->db->join('`db_sodap`.`matangr`', '`angkas`.`mtgkey` = `matangr`.`mtgkey`');
-      $this->db->join('`db_sodap`.`tab_target_blnj_modal`', '`tab_target_blnj_modal`.`mtgkey` = `matangr`.`mtgkey`','LEFT');
+      $this->db->from('`angkas`');
+      $this->db->join('`matangr`', '`angkas`.`mtgkey` = `matangr`.`mtgkey`');
+      $this->db->join('`tab_target_blnj_modal`', '`tab_target_blnj_modal`.`mtgkey` = `matangr`.`mtgkey`','LEFT');
       $this->db->where('`angkas`.`unitkey`', $unit);
       $this->db->where('`angkas`.`kdkegunit`', $kegiatan);
 
@@ -1072,8 +1638,8 @@ function simpanentrikak($masterkak){
         `tab_pns`.`nip`
         , `tab_pns`.`nama`
         FROM
-        `db_sodap`.`tab_struktur`
-        INNER JOIN `db_sodap`.`tab_pns`
+        `tab_struktur`
+        INNER JOIN `tab_pns`
             ON (`tab_struktur`.`nip` = `tab_pns`.`nip`) WHERE `tab_struktur`.`parent`='.$parent;
         $result = $this->db->query($query)->result_array();
         return $result;
@@ -1087,12 +1653,12 @@ function simpanentrikak($masterkak){
         , `tab_pns`.`nama` AS nama_pptk
 
         FROM
-        `db_sodap`.`tab_struktur`
-        INNER JOIN `db_sodap`.`tab_pns`
+        `tab_struktur`
+        INNER JOIN `tab_pns`
             ON (`tab_struktur`.`nip` = `tab_pns`.`nip`)
-      	INNER JOIN `db_sodap`.`tab_struktur` ts2
+      	INNER JOIN `tab_struktur` ts2
       	ON (ts2.`id` = `tab_struktur`.`parent`)
-      	INNER JOIN `db_sodap`.`tab_pns` pns2
+      	INNER JOIN `tab_pns` pns2
       	ON (ts2.`nip` = `pns2`.`nip`)
              WHERE `tab_struktur`.`peran`= 3 AND `tab_struktur`.`id_unit` = "'.$unitkey.'"';
         $result = $this->db->query($query)->result_array();
@@ -1121,14 +1687,14 @@ function simpanentrikak($masterkak){
     , `angkas`.`nilai`
     , `angkas`.`tahun`
 FROM
-    `db_sodap`.`dpa221`
-    INNER JOIN `db_sodap`.`matangr`
+    `dpa221`
+    INNER JOIN `matangr`
         ON (`dpa221`.`mtgkey` = `matangr`.`mtgkey`)
-    INNER JOIN `db_sodap`.`mkegiatan`
+    INNER JOIN `mkegiatan`
         ON (`dpa221`.`kdkegunit` = `mkegiatan`.`kdkegunit`)
-    INNER JOIN `db_sodap`.`angkas`
+    INNER JOIN `angkas`
         ON (`matangr`.`mtgkey` = `angkas`.`mtgkey`)
-    INNER JOIN `db_sodap`.`tab_pptk`
+    INNER JOIN `tab_pptk`
         ON (`tab_pptk`.`kdkegunit` = `mkegiatan`.`kdkegunit`) AND (`angkas`.`kdkegunit` = `mkegiatan`.`kdkegunit`) WHERE `dpa221`.`unitkey` ="'.$unitkey.'" AND `tab_pptk`.`idpnsppk`="'.$nipppk.'" AND `angkas`.`tahun`=YEAR(NOW())';
         return $this->db->query($query)->result_array();
     }
@@ -1141,8 +1707,8 @@ FROM
         $query = 'SELECT
     SUM(`angkas`.`nilai`) AS `pagu_tahun`
 FROM
-    `db_sodap`.`tab_pptk`
-    INNER JOIN `db_sodap`.`angkas`
+    `tab_pptk`
+    INNER JOIN `angkas`
         ON (`tab_pptk`.`kdkegunit` = `angkas`.`kdkegunit`) WHERE `tab_pptk`.`idpnsppk`='.$nipppk.' AND `angkas`.`tahun` = YEAR(NOW()) AND `angkas`.`unitkey`="'.$unitkey.'"';
 
         return $this->db->query($query)->row()->pagu_tahun;
@@ -1156,8 +1722,8 @@ FROM
         $query = 'SELECT
     SUM(`angkas`.`nilai`) AS `angkas_bulan`
 FROM
-    `db_sodap`.`tab_pptk`
-    INNER JOIN `db_sodap`.`angkas`
+    `tab_pptk`
+    INNER JOIN `angkas`
         ON (`tab_pptk`.`kdkegunit` = `angkas`.`kdkegunit`) WHERE `tab_pptk`.`idpnsppk`='.$nipppk.' AND `angkas`.`kd_bulan` <= MONTH(NOW()) AND `angkas`.`tahun` = YEAR(NOW()) AND `angkas`.`unitkey`="'.$unitkey.'"';
 
 
@@ -1185,8 +1751,8 @@ FROM
         $query = 'SELECT
     SUM(`angkas`.`nilai`) AS `angkas_bulan`
 FROM
-    `db_sodap`.`tab_pptk`
-    INNER JOIN `db_sodap`.`angkas`
+    `tab_pptk`
+    INNER JOIN `angkas`
         ON (`tab_pptk`.`kdkegunit` = `angkas`.`kdkegunit`) WHERE `tab_pptk`.`idpnsppk`='.$nipppk.' AND `angkas`.`kd_bulan` = MONTH(NOW()) AND `angkas`.`tahun` = YEAR(NOW()) AND `angkas`.`unitkey`="'.$unitkey.'"';
         return $this->db->query($query)->row()->angkas_bulan;
     }
@@ -1197,7 +1763,7 @@ FROM
         $query = 'SELECT
     SUM(`angkas`.`nilai`) AS `angkas_bulan`
 FROM
-    `db_sodap`.`angkas`
+    `angkas`
          WHERE `angkas`.`unitkey`="'.$unitkey.'" AND `angkas`.`kdkegunit`!="0_" AND `angkas`.`kd_bulan` = MONTH(NOW()) AND `angkas`.`tahun` = YEAR(NOW())';
 
         return $this->db->query($query)->row()->angkas_bulan;
@@ -1212,8 +1778,8 @@ FROM
     `angkas`.`nilai`,
     `angkas`.`kdkegunit`
 FROM
-    `db_sodap`.`tab_pptk`
-    INNER JOIN `db_sodap`.`angkas`
+    `tab_pptk`
+    INNER JOIN `angkas`
         ON (`tab_pptk`.`kdkegunit` = `angkas`.`kdkegunit`) WHERE `tab_pptk`.`idpnsppk`='.$nipppk.' AND `angkas`.`kd_bulan` = MONTH(NOW()) AND `angkas`.`tahun` = YEAR(NOW()) AND `angkas`.`unitkey`="'.$unitkey.'"';
         return $this->db->query($query)->result_array();
     }
@@ -1224,7 +1790,7 @@ FROM
     `angkas`.`nilai`,
     `angkas`.`kdkegunit`
 FROM
-    `db_sodap`.`angkas`
+    `angkas`
       WHERE `angkas`.`unitkey`="'.$unitkey.'" AND `angkas`.`kdkegunit`!="0_" AND `angkas`.`kd_bulan` = MONTH(NOW()) AND `angkas`.`tahun` = YEAR(NOW())';
         return $this->db->query($query)->result_array();
     }
@@ -1237,10 +1803,10 @@ FROM
         $query = 'SELECT
     SUM(`tab_realisasi_det`.`jumlah_harga`) AS `realisasi`
 FROM
-    `db_sodap`.`tab_realisasi_det`
-    INNER JOIN `db_sodap`.`tab_realisasi`
+    `tab_realisasi_det`
+    INNER JOIN `tab_realisasi`
         ON (`tab_realisasi_det`.`id_tab_realisasi` = `tab_realisasi`.`id`)
-    INNER JOIN `db_sodap`.`tab_struktur`
+    INNER JOIN `tab_struktur`
         ON (`tab_struktur`.`nip` = `tab_realisasi`.`admin_entri`) WHERE `tab_struktur`.`parent`='.$idppk.' AND MONTH(`tab_realisasi`.`real_bulan`)=MONTH(NOW()) AND YEAR(`tab_realisasi`.`real_bulan`)=YEAR(NOW())';
         if($this->db->query($query)->num_rows()!=0){
             return $this->db->query($query)->row()->realisasi;
@@ -1258,10 +1824,10 @@ FROM
     , `dpa221`.`mtgkey`
     , `dpa221`.`kdkegunit`
 FROM
-    `db_sodap`.`tab_realisasi_bmodal`
-    INNER JOIN `db_sodap`.`tab_struktur`
+    `tab_realisasi_bmodal`
+    INNER JOIN `tab_struktur`
         ON (`tab_realisasi_bmodal`.`admin_entri` = `tab_struktur`.`nip`)
-    INNER JOIN `db_sodap`.`dpa221`
+    INNER JOIN `dpa221`
         ON (`dpa221`.`mtgkey` = `tab_realisasi_bmodal`.`mtgkey`)
         WHERE `tab_struktur`.`parent`='.$idstrukturppk.' AND `dpa221`.`unitkey`="'.$unitkey.'" AND MONTH(`tab_realisasi_bmodal`.`real_bulan`)=MONTH(NOW()) AND YEAR(`tab_realisasi_bmodal`.`real_bulan`)=YEAR(NOW());';
         if($this->db->query($query)->num_rows()!=0){
@@ -1279,10 +1845,10 @@ FROM
     , `dpa221`.`mtgkey`
     , `dpa221`.`kdkegunit`
     FROM
-    `db_sodap`.`tab_realisasi_bmodal`
-    INNER JOIN `db_sodap`.`tab_struktur`
+    `tab_realisasi_bmodal`
+    INNER JOIN `tab_struktur`
         ON (`tab_realisasi_bmodal`.`admin_entri` = `tab_struktur`.`nip`)
-    INNER JOIN `db_sodap`.`dpa221`
+    INNER JOIN `dpa221`
         ON (`dpa221`.`mtgkey` = `tab_realisasi_bmodal`.`mtgkey`)
         WHERE `tab_realisasi_bmodal`.`id_struktur`='.$idstrukturppk.' AND `dpa221`.`unitkey`="'.$unitkey.'" AND MONTH(`tab_realisasi_bmodal`.`real_bulan`)=MONTH(NOW()) AND YEAR(`tab_realisasi_bmodal`.`real_bulan`)=YEAR(NOW());';
         if($this->db->query($query)->num_rows()!=0){
@@ -1300,8 +1866,8 @@ FROM
 `mkegiatan`.`kdkegunit`,
 `tab_pptk`.`idpnspptk`
 FROM
-`db_sodap`.`tab_pptk`
-INNER JOIN `db_sodap`.`mkegiatan`
+`tab_pptk`
+INNER JOIN `mkegiatan`
 ON (`tab_pptk`.`kdkegunit` = `mkegiatan`.`kdkegunit`) WHERE `tab_pptk`.`idpnsppk`='.$nipppk.' AND `mkegiatan`.`tahun`=YEAR(NOW())';
         return $this->db->query($query)->result_array();
     }
@@ -1314,10 +1880,10 @@ ON (`tab_pptk`.`kdkegunit` = `mkegiatan`.`kdkegunit`) WHERE `tab_pptk`.`idpnsppk
         `mkegiatan`.`kdkegunit`,
         `tab_pptk`.`idpnspptk`
         FROM
-        `db_sodap`.`tab_pptk`
-        INNER JOIN `db_sodap`.`mkegiatan`
+        `tab_pptk`
+        INNER JOIN `mkegiatan`
         ON (`tab_pptk`.`kdkegunit` = `mkegiatan`.`kdkegunit`)
-        INNER JOIN `db_sodap`.`tab_pptk_master`
+        INNER JOIN `tab_pptk_master`
         ON (`tab_pptk`.`id_pptk_master` = `tab_pptk_master`.`id`)
         WHERE `tab_pptk_master`.`unitkey`='$opd'";
         // return $this->db->query($query)->result_array();
@@ -1333,14 +1899,14 @@ ON (`tab_pptk`.`kdkegunit` = `mkegiatan`.`kdkegunit`) WHERE `tab_pptk`.`idpnsppk
     , `mkegiatan`.`kdkegunit`
     , `mkegiatan`.`nmkegunit`
 FROM
-    `db_sodap`.`tab_realisasi_det`
-    INNER JOIN `db_sodap`.`tab_realisasi`
+    `tab_realisasi_det`
+    INNER JOIN `tab_realisasi`
         ON (`tab_realisasi_det`.`id_tab_realisasi` = `tab_realisasi`.`id`)
-    INNER JOIN `db_sodap`.`dpa221`
+    INNER JOIN `dpa221`
         ON (`dpa221`.`id` = `tab_realisasi_det`.`id_dpa`)
-    INNER JOIN `db_sodap`.`mkegiatan`
+    INNER JOIN `mkegiatan`
         ON (`mkegiatan`.`kdkegunit` = `dpa221`.`kdkegunit`)
-    INNER JOIN `db_sodap`.`tab_pptk`
+    INNER JOIN `tab_pptk`
         ON (`tab_pptk`.`kdkegunit` = `mkegiatan`.`kdkegunit`) WHERE `tab_pptk`.`idpnsppk`='.$nipppk.' AND MONTH(`tab_realisasi`.`real_bulan`)=MONTH(NOW()) AND YEAR(`tab_realisasi`.`real_bulan`)=YEAR(NOW())';
         return $this->db->query($query)->result_array();
     }
@@ -1353,14 +1919,14 @@ FROM
     , `mkegiatan`.`kdkegunit`
     , `mkegiatan`.`nmkegunit`
 FROM
-    `db_sodap`.`tab_realisasi_det`
-    INNER JOIN `db_sodap`.`tab_realisasi`
+    `tab_realisasi_det`
+    INNER JOIN `tab_realisasi`
         ON (`tab_realisasi_det`.`id_tab_realisasi` = `tab_realisasi`.`id`)
-    INNER JOIN `db_sodap`.`dpa221`
+    INNER JOIN `dpa221`
         ON (`dpa221`.`id` = `tab_realisasi_det`.`id_dpa`)
-    INNER JOIN `db_sodap`.`mkegiatan`
+    INNER JOIN `mkegiatan`
         ON (`mkegiatan`.`kdkegunit` = `dpa221`.`kdkegunit`)
-    INNER JOIN `db_sodap`.`tab_pptk`
+    INNER JOIN `tab_pptk`
         ON (`tab_pptk`.`kdkegunit` = `mkegiatan`.`kdkegunit`) WHERE `tab_realisasi`.`id_struktur`='.$idstruktur.' AND MONTH(`tab_realisasi`.`real_bulan`) ="'.date('m').'"';
         return $this->db->query($query)->result_array();
     }
@@ -1374,14 +1940,14 @@ FROM
     , `mkegiatan`.`kdkegunit`
     , `mkegiatan`.`nmkegunit`
 FROM
-    `db_sodap`.`tab_realisasi_det`
-    INNER JOIN `db_sodap`.`tab_realisasi`
+    `tab_realisasi_det`
+    INNER JOIN `tab_realisasi`
         ON (`tab_realisasi_det`.`id_tab_realisasi` = `tab_realisasi`.`id`)
-    INNER JOIN `db_sodap`.`dpa221`
+    INNER JOIN `dpa221`
         ON (`dpa221`.`id` = `tab_realisasi_det`.`id_dpa`)
-    INNER JOIN `db_sodap`.`mkegiatan`
+    INNER JOIN `mkegiatan`
         ON (`mkegiatan`.`kdkegunit` = `dpa221`.`kdkegunit`)
-    INNER JOIN `db_sodap`.`tab_pptk`
+    INNER JOIN `tab_pptk`
         ON (`tab_pptk`.`kdkegunit` = `mkegiatan`.`kdkegunit`) WHERE `tab_pptk`.`idpnsppk`='.$nipppk.' AND MONTH(`tab_realisasi`.`real_bulan`)<MONTH(NOW()) AND YEAR(`tab_realisasi`.`real_bulan`)=YEAR(NOW())';
         return $this->db->query($query)->result_array();
     }
@@ -1393,12 +1959,12 @@ FROM
     , `mkegiatan`.`kdkegunit`
     , `mkegiatan`.`nmkegunit`
 FROM
-    `db_sodap`.`tab_realisasi_det`
-    INNER JOIN `db_sodap`.`tab_realisasi`
+    `tab_realisasi_det`
+    INNER JOIN `tab_realisasi`
         ON (`tab_realisasi_det`.`id_tab_realisasi` = `tab_realisasi`.`id`)
-    INNER JOIN `db_sodap`.`dpa221`
+    INNER JOIN `dpa221`
         ON (`dpa221`.`id` = `tab_realisasi_det`.`id_dpa`)
-    INNER JOIN `db_sodap`.`mkegiatan`
+    INNER JOIN `mkegiatan`
         ON (`mkegiatan`.`kdkegunit` = `dpa221`.`kdkegunit`)
     WHERE `tab_realisasi`.`id_struktur`='.$id_struktur.' AND MONTH(`tab_realisasi`.`real_bulan`) <"'.date('m').'"';
         return $this->db->query($query)->result_array();
@@ -1412,14 +1978,14 @@ FROM
         $query = 'SELECT
     SUM(`tab_realisasi_det`.`jumlah_harga`) as `total_realisasi`
 FROM
-    `db_sodap`.`tab_realisasi_det`
-    INNER JOIN `db_sodap`.`tab_realisasi`
+    `tab_realisasi_det`
+    INNER JOIN `tab_realisasi`
         ON (`tab_realisasi_det`.`id_tab_realisasi` = `tab_realisasi`.`id`)
-    INNER JOIN `db_sodap`.`dpa221`
+    INNER JOIN `dpa221`
         ON (`dpa221`.`id` = `tab_realisasi_det`.`id_dpa`)
-    INNER JOIN `db_sodap`.`mkegiatan`
+    INNER JOIN `mkegiatan`
         ON (`mkegiatan`.`kdkegunit` = `dpa221`.`kdkegunit`)
-    INNER JOIN `db_sodap`.`tab_pptk`
+    INNER JOIN `tab_pptk`
         ON (`tab_pptk`.`kdkegunit` = `mkegiatan`.`kdkegunit`) WHERE `tab_pptk`.`idpnsppk`='.$nipppk.' AND MONTH(`tab_realisasi`.`real_bulan`)<MONTH(NOW()) AND YEAR(`tab_realisasi`.`real_bulan`)=YEAR(NOW())';
 
         if($this->db->query($query)->num_rows()!=0){
@@ -1481,10 +2047,10 @@ FROM
     , `angkas`.`kdkegunit`
     , SUM(`angkas`.`nilai`) AS `total_angkas`
 FROM
-    `db_sodap`.`angkas`
-    INNER JOIN `db_sodap`.`mkegiatan`
+    `angkas`
+    INNER JOIN `mkegiatan`
         ON (`angkas`.`kdkegunit` = `mkegiatan`.`kdkegunit`)
-    INNER JOIN `db_sodap`.`tab_pptk`
+    INNER JOIN `tab_pptk`
         ON (`tab_pptk`.`kdkegunit` = `mkegiatan`.`kdkegunit`) WHERE `tab_pptk`.`idpnsppk` = '.$nipppk.' AND `angkas`.`kd_bulan`<MONTH(NOW()) AND `angkas`.`tahun`=YEAR(NOW()) AND `angkas`.`unitkey`="'.$unitkey.'" GROUP BY `angkas`.`kdkegunit`;';
 
         if($this->db->query($query)->num_rows()!=0){
@@ -1501,8 +2067,8 @@ FROM
     , `angkas`.`kdkegunit`
     , SUM(`angkas`.`nilai`) AS `total_angkas`
 FROM
-    `db_sodap`.`angkas`
-    INNER JOIN `db_sodap`.`mkegiatan`
+    `angkas`
+    INNER JOIN `mkegiatan`
         ON (`angkas`.`kdkegunit` = `mkegiatan`.`kdkegunit`)
      WHERE `angkas`.`unitkey` = "'.$unitkey.'" AND `angkas`.`kd_bulan`<MONTH(NOW()) GROUP BY `angkas`.`kdkegunit`;';
 
@@ -1535,16 +2101,16 @@ FROM
     , `dpa221`.`satuan`
     , `dpa221`.`uraian`
 FROM
-    `db_sodap`.`tab_realisasi`
-    INNER JOIN `db_sodap`.`tab_realisasi_det`
+    `tab_realisasi`
+    INNER JOIN `tab_realisasi_det`
         ON (`tab_realisasi`.`id` = `tab_realisasi_det`.`id_tab_realisasi`)
-    INNER JOIN `db_sodap`.`dpa221`
+    INNER JOIN `dpa221`
         ON (`tab_realisasi_det`.`id_dpa` = `dpa221`.`id`)
-    INNER JOIN `db_sodap`.`matangr`
+    INNER JOIN `matangr`
         ON (`dpa221`.`mtgkey` = `matangr`.`mtgkey`)
-    INNER JOIN `db_sodap`.`mkegiatan`
+    INNER JOIN `mkegiatan`
         ON (`dpa221`.`kdkegunit` = `mkegiatan`.`kdkegunit`)
-    INNER JOIN `db_sodap`.`tab_sumber_dana`
+    INNER JOIN `tab_sumber_dana`
         ON (`tab_sumber_dana`.`id` = `tab_realisasi_det`.`sumber_dana`)
         WHERE `mkegiatan`.`kdkegunit` = "'.$kdkegunit.'" AND MONTH(`tab_realisasi`.`real_bulan`)=MONTH(NOW()) AND YEAR(`tab_realisasi`.`real_bulan`)=YEAR(NOW())';
 
@@ -1565,12 +2131,12 @@ FROM
     , `matangr`.`mtgkey`
     , SUM(`tab_realisasi_det`.`sisa_dana`) AS `sisa_dana`
 FROM
-    `db_sodap`.`matangr`
-    INNER JOIN `db_sodap`.`dpa221`
+    `matangr`
+    INNER JOIN `dpa221`
         ON (`matangr`.`mtgkey` = `dpa221`.`mtgkey`)
-    INNER JOIN `db_sodap`.`tab_realisasi_det`
+    INNER JOIN `tab_realisasi_det`
         ON (`dpa221`.`id` = `tab_realisasi_det`.`id_dpa`)
-    INNER JOIN `db_sodap`.`tab_realisasi`
+    INNER JOIN `tab_realisasi`
         ON (`tab_realisasi_det`.`id_tab_realisasi` = `tab_realisasi`.`id`)
         WHERE `dpa221`.`kdkegunit`= "'.$kdkegunit.'" AND MONTH(`tab_realisasi`.`real_bulan`)=MONTH(NOW()) AND YEAR(`tab_realisasi`.`real_bulan`)=YEAR(NOW()) GROUP BY `matangr`.`kdper`';
 
@@ -1590,12 +2156,12 @@ FROM
     , `matangr`.`nmper`
     , `matangr`.`mtgkey`
 FROM
-    `db_sodap`.`tab_realisasi_bmodal_det`
-    INNER JOIN `db_sodap`.`tab_realisasi_bmodal`
+    `tab_realisasi_bmodal_det`
+    INNER JOIN `tab_realisasi_bmodal`
         ON (`tab_realisasi_bmodal_det`.`id_tab_real_bmodal` = `tab_realisasi_bmodal`.`id`)
-    INNER JOIN `db_sodap`.`matangr`
+    INNER JOIN `matangr`
         ON (`tab_realisasi_bmodal`.`mtgkey` = `matangr`.`mtgkey`)
-    INNER JOIN `db_sodap`.`dpa221`
+    INNER JOIN `dpa221`
         ON (`dpa221`.`mtgkey` = `matangr`.`mtgkey`)
         WHERE `dpa221`.`kdkegunit`= "'.$kdkegunit.'" AND MONTH(`tab_realisasi_bmodal`.`real_bulan`)=MONTH(NOW()) AND YEAR(`tab_realisasi_bmodal`.`real_bulan`)=YEAR(NOW()) GROUP BY `matangr`.`kdper`';
 
@@ -1615,10 +2181,10 @@ FROM
     , `angkas`.`kdkegunit`
     , SUM(`angkas`.`nilai`) AS `total_angkas`
 FROM
-    `db_sodap`.`angkas`
-    INNER JOIN `db_sodap`.`mkegiatan`
+    `angkas`
+    INNER JOIN `mkegiatan`
         ON (`angkas`.`kdkegunit` = `mkegiatan`.`kdkegunit`)
-    INNER JOIN `db_sodap`.`tab_pptk`
+    INNER JOIN `tab_pptk`
 
 
         ON (`tab_pptk`.`kdkegunit` = `mkegiatan`.`kdkegunit`) WHERE `tab_pptk`.`idpnsppk` = '.$nipppk.' AND `angkas`.`tahun`=YEAR(NOW()) AND `angkas`.`unitkey`="'.$unitkey.'" GROUP BY `angkas`.`kdkegunit`;';
@@ -1638,8 +2204,8 @@ FROM
     , `angkas`.`kdkegunit`
     , SUM(`angkas`.`nilai`) AS `total_angkas`
 FROM
-    `db_sodap`.`angkas`
-    INNER JOIN `db_sodap`.`mkegiatan`
+    `angkas`
+    INNER JOIN `mkegiatan`
         ON (`angkas`.`kdkegunit` = `mkegiatan`.`kdkegunit`)
      WHERE `angkas`.`unitkey` = "'.$unitkey.'" AND `angkas`.`tahun`=YEAR(NOW()) GROUP BY `angkas`.`kdkegunit`;';
 
@@ -1670,12 +2236,12 @@ FROM
     , `tab_schedule`.`nov` AS `bulan_11`
     , `tab_schedule`.`des` AS `bulan_12`
 FROM
-    `db_sodap`.`tab_kak`
-    INNER JOIN `db_sodap`.`tab_pptk`
+    `tab_kak`
+    INNER JOIN `tab_pptk`
         ON (`tab_kak`.`idtab_pptk` = `tab_pptk`.`id`)
-    INNER JOIN `db_sodap`.`mkegiatan`
+    INNER JOIN `mkegiatan`
         ON (`tab_pptk`.`kdkegunit` = `mkegiatan`.`kdkegunit`)
-    INNER JOIN `db_sodap`.`tab_schedule`
+    INNER JOIN `tab_schedule`
         ON (`tab_schedule`.`id_tab_kak` = `tab_kak`.`id`)
         WHERE `tab_pptk`.`idpnsppk`='.$nipppk.' AND `mkegiatan`.`tahun`=YEAR(NOW())';
 
@@ -1704,14 +2270,14 @@ FROM
     , `tab_schedule`.`nov` AS `bulan_11`
     , `tab_schedule`.`des` AS `bulan_12`
 FROM
-    `db_sodap`.`tab_kak`
-    INNER JOIN `db_sodap`.`tab_pptk`
+    `tab_kak`
+    INNER JOIN `tab_pptk`
         ON (`tab_kak`.`idtab_pptk` = `tab_pptk`.`id`)
-    INNER JOIN `db_sodap`.`tab_pptk_master`
+    INNER JOIN `tab_pptk_master`
         ON (`tab_pptk`.`id_pptk_master` = `tab_pptk_master`.`id`)
-    INNER JOIN `db_sodap`.`mkegiatan`
+    INNER JOIN `mkegiatan`
         ON (`tab_pptk`.`kdkegunit` = `mkegiatan`.`kdkegunit`)
-    INNER JOIN `db_sodap`.`tab_schedule`
+    INNER JOIN `tab_schedule`
         ON (`tab_schedule`.`id_tab_kak` = `tab_kak`.`id`)
         WHERE `tab_pptk_master`.`unitkey`="'.$unitkey.'" AND `mkegiatan`.`tahun`=YEAR(NOW())';
 
@@ -1731,10 +2297,10 @@ FROM
     `mkegiatan`.`kdkegunit`
     , `tab_realisasi`.`bobot_real`
 FROM
-    `db_sodap`.`tab_pptk`
-    INNER JOIN `db_sodap`.`mkegiatan`
+    `tab_pptk`
+    INNER JOIN `mkegiatan`
         ON (`tab_pptk`.`kdkegunit` = `mkegiatan`.`kdkegunit`)
-    INNER JOIN `db_sodap`.`tab_realisasi`
+    INNER JOIN `tab_realisasi`
         ON (`tab_realisasi`.`id_tabpptk` = `tab_pptk`.`id`)
         WHERE `tab_pptk`.`idpnsppk`='.$nipppk.' AND `mkegiatan`.`tahun`=YEAR(NOW()) AND MONTH(`tab_realisasi`.`real_bulan`)=MONTH(NOW()) AND YEAR(`tab_realisasi`.`real_bulan`)=YEAR(NOW())';
 
@@ -1753,10 +2319,10 @@ FROM
     `mkegiatan`.`kdkegunit`
     , `tab_realisasi`.`bobot_real`
 FROM
-    `db_sodap`.`tab_pptk`
-    INNER JOIN `db_sodap`.`mkegiatan`
+    `tab_pptk`
+    INNER JOIN `mkegiatan`
         ON (`tab_pptk`.`kdkegunit` = `mkegiatan`.`kdkegunit`)
-    INNER JOIN `db_sodap`.`tab_realisasi`
+    INNER JOIN `tab_realisasi`
         ON (`tab_realisasi`.`id_tabpptk` = `tab_pptk`.`id`)
         WHERE `tab_realisasi`.`id_struktur`='.$id_struktur.' AND `mkegiatan`.`tahun`=YEAR(NOW()) AND MONTH(`tab_realisasi`.`real_bulan`)=MONTH(NOW())';
 
@@ -1774,12 +2340,12 @@ FROM
     , `tab_realisasi_bmodal`.`nilai_ktrk` AS `harga_satuan`
     , `tab_realisasi_bmodal`.`nilai_ktrk` AS `jumlah_harga`
 FROM
-    `db_sodap`.`tab_realisasi_bmodal_det`
-    INNER JOIN `db_sodap`.`tab_realisasi_bmodal`
+    `tab_realisasi_bmodal_det`
+    INNER JOIN `tab_realisasi_bmodal`
         ON (`tab_realisasi_bmodal_det`.`id_tab_real_bmodal` = `tab_realisasi_bmodal`.`id`)
-    INNER JOIN `db_sodap`.`matangr`
+    INNER JOIN `matangr`
         ON (`tab_realisasi_bmodal`.`mtgkey` = `matangr`.`mtgkey`)
-    INNER JOIN `db_sodap`.`dpa221`
+    INNER JOIN `dpa221`
         ON (`dpa221`.`mtgkey` = `matangr`.`mtgkey`)
         WHERE `dpa221`.`kdkegunit`="'.$kdkegunit.'" AND MONTH(`tab_realisasi_bmodal`.`real_bulan`)=MONTH(NOW()) AND YEAR(`tab_realisasi_bmodal`.`real_bulan`)=YEAR(NOW())';
 
@@ -1797,8 +2363,8 @@ FROM
         $query = 'SELECT
     SUM(`tab_realisasi_bmodal`.`nilai_ktrk`) AS `total_real_bmodal`
 FROM
-    `db_sodap`.`tab_realisasi_bmodal`
-    INNER JOIN `db_sodap`.`tab_struktur`
+    `tab_realisasi_bmodal`
+    INNER JOIN `tab_struktur`
         ON (`tab_realisasi_bmodal`.`admin_entri` = `tab_struktur`.`nip`)
         WHERE `tab_struktur`.`parent`='.$idstrukturppk.' AND MONTH(`tab_realisasi_bmodal`.`real_bulan`)<MONTH(NOW()) AND YEAR(`tab_realisasi_bmodal`.`real_bulan`)=YEAR(NOW());';
 
@@ -1816,8 +2382,8 @@ FROM
         $query = 'SELECT
     SUM(`tab_realisasi_bmodal`.`nilai_ktrk`) AS `total_real_bmodal`
 FROM
-    `db_sodap`.`tab_realisasi_bmodal`
-    INNER JOIN `db_sodap`.`tab_struktur`
+    `tab_realisasi_bmodal`
+    INNER JOIN `tab_struktur`
         ON (`tab_realisasi_bmodal`.`admin_entri` = `tab_struktur`.`nip`)
         WHERE `tab_struktur`.`parent`='.$idstrukturppk.' AND MONTH(`tab_realisasi_bmodal`.`real_bulan`)=MONTH(NOW()) AND YEAR(`tab_realisasi_bmodal`.`real_bulan`)=YEAR(NOW());';
 
@@ -1835,7 +2401,7 @@ FROM
         $query = 'SELECT
             `nilai`,`mtgkey`
             FROM
-    `db_sodap`.`angkas`
+    `angkas`
     WHERE `angkas`.`kdkegunit`="'.$kdkegunit.'" AND `angkas`.`tahun`=YEAR(NOW()) AND `angkas`.`unitkey`="'.$unitkey.'"';
 
 
@@ -1885,9 +2451,9 @@ FROM
     $blnsdskr = $this->db->get()->row_array();
 
     $nilai[]=array(
-              'tahun' => $tahun['tahun'],
-               'blnskr'=>$blnskr['blnskr'],
-               'blnsdskr'=>$blnsdskr['blnsdskr']
+      'tahun' => $tahun['tahun'],
+      'blnskr'=> $blnskr['blnskr'],
+      'blnsdskr'=>$blnsdskr['blnsdskr']
               );
 
     return $nilai;
