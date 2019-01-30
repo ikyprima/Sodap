@@ -1032,11 +1032,93 @@ function getttdkak($idtabpptk){
 //-------------------------------------------------------------------------------------------------//
 //ppk
 //#ryh
+function tarkeu_ppk($unit,$thn,$kdbln,$kdkeg){
+// select angkas
+  $this->db->select('sum(nilai) as nilai');
+  $this->db->from('angkas');
+  $this->db->where('angkas.tahun', $thn);
+  $this->db->where('angkas.unitkey', $unit);
+  $this->db->where('angkas.kdkegunit', $kdkeg);
+  $this->db->where('angkas.kd_bulan', $kdbln);
+  $this->db->where('angkas.kdkegunit!=', '0_');
+  $this->db->group_by('angkas.kdkegunit');
+  return $this->db->get()->row_array();
+}
+function tarkeu_ppk_thn($unit,$thn,$kdkeg){
+// select angkas
+  $this->db->select('sum(nilai) as nilai');
+  $this->db->from('angkas');
+  $this->db->where('angkas.tahun', $thn);
+  $this->db->where('angkas.unitkey', $unit);
+  $this->db->where('angkas.kdkegunit', $kdkeg);
+  $this->db->where('angkas.kdkegunit!=', '0_');
+  $this->db->group_by('angkas.kdkegunit');
+  return $this->db->get()->row_array();
+}
+function realkeu_ppk_persen($wherein,$thn,$kdbln,$sd=null){
+// select tab_realisasi MONTH(`tab_realisasi_bmodal`.`real_bulan`)
+  $this->db->select('SUM(`tab_realisasi_det`.`jumlah_harga`) AS nilai');
+  $this->db->from('`tab_realisasi_det`');
+  $this->db->join('tab_realisasi', '`tab_realisasi_det`.`id_tab_realisasi` = `tab_realisasi`.`id`');
+  $this->db->where_in('tab_realisasi.id_tabpptk', $wherein);
+  if($sd!=null){
+    $this->db->where('MONTH(`tab_realisasi`.`real_bulan`) <=', $kdbln);
+  }else{
+    $this->db->where('MONTH(`tab_realisasi`.`real_bulan`)', $kdbln);
+  }
+  $this->db->where('YEAR(`tab_realisasi`.`real_bulan`)', $thn);
+  return $this->db->get()->row_array();
+}
+function realkeu_ppk_bmodal_persen($wherein,$thn,$kdbln,$sd=null){
+// select tab_realisasi MONTH(`tab_realisasi_bmodal`.`real_bulan`)
+  $this->db->select('SUM(`tab_realisasi_bmodal_det`.`real_keuangan`) AS nilai');
+  $this->db->from('`tab_realisasi_bmodal_det`');
+  $this->db->join('tab_realisasi_bmodal', '`tab_realisasi_bmodal_det`.`id_tab_real_bmodal` = `tab_realisasi_bmodal`.`id`');
+  $this->db->where_in('tab_realisasi_bmodal.id_tab_pptk', $wherein);
+  if($sd!=null){
+    $this->db->where('MONTH(`tab_realisasi_bmodal_det`.`real_bulan`) <=', $kdbln);
+  }else{
+    $this->db->where('MONTH(`tab_realisasi_bmodal_det`.`real_bulan`)', $kdbln);
+  }
+
+  $this->db->where('YEAR(`tab_realisasi_bmodal_det`.`real_bulan`)', $thn);
+  return $this->db->get()->row_array();
+}
+function realkeu_ppk($idtab,$thn,$kdbln){
+// select tab_realisasi MONTH(`tab_realisasi_bmodal`.`real_bulan`)
+
+  $this->db->select('bobot_real,SUM(`tab_realisasi_det`.`jumlah_harga`) AS nilai');
+  $this->db->from('`tab_realisasi_det`');
+  $this->db->join('tab_realisasi', '`tab_realisasi_det`.`id_tab_realisasi` = `tab_realisasi`.`id`');
+  $this->db->where('tab_realisasi.id_tabpptk', $idtab);
+
+  $this->db->where('MONTH(`tab_realisasi`.`real_bulan`)', $kdbln);
+  $this->db->where('YEAR(`tab_realisasi`.`real_bulan`)', $thn);
+  return $this->db->get()->row_array();
+}
+function realkeu_ppk_bmodal($idtab,$thn,$kdbln){
+// select tab_realisasi MONTH(`tab_realisasi_bmodal`.`real_bulan`)
+  $this->db->select('SUM(`tab_realisasi_bmodal_det`.`real_keuangan`) AS nilai');
+  $this->db->from('`tab_realisasi_bmodal_det`');
+  $this->db->join('tab_realisasi_bmodal', '`tab_realisasi_bmodal_det`.`id_tab_real_bmodal` = `tab_realisasi_bmodal`.`id`');
+  $this->db->where('tab_realisasi_bmodal.id_tab_pptk', $idtab);
+  $this->db->where('MONTH(`tab_realisasi_bmodal_det`.`real_bulan`)', $kdbln);
+  $this->db->where('YEAR(`tab_realisasi_bmodal_det`.`real_bulan`)', $thn);
+  return $this->db->get()->row_array();
+}
+function tarfis_ppk($idtabpptk){
+  $this->db->select('*');
+  $this->db->from('tab_schedule');
+  $this->db->join('tab_kak', '`tab_schedule`.`id_tab_kak` = `tab_kak`.`id`');
+  $this->db->where('`tab_kak`.`idtab_pptk`', $idtabpptk);
+
+  return $this->db->get()->result_array();
+}
  function getdetlistkegiatan_ppk($nip,$thn){
 
     $this->db->select('
-    `mkegiatan`.`kdkegunit`
-    ,`mkegiatan`.`nmkegunit`
+    `mkegiatan`.`kdkegunit` as kdkegunit
+    ,`mkegiatan`.`nmkegunit` as nmkegunit
     , `tab_pptk`.`nilai`
     , `tab_pptk`.`id`
     , `tab_pptk`.`status`
@@ -1085,6 +1167,49 @@ function getdetlistkegiatan_detppk($nip,$kdkegunit,$thn){
         $this->db->where('idtab_pptk', $idtab);
         $this->db->update('tab_kak', $data);
         return TRUE;
+    }
+    function pagupptk($thnsekarang,$blnsekarang,$idopd,$arrkdkegunit){
+  //     SELECT
+  //     SUM(`angkas`.`nilai`) AS `pagu_tahun`
+  // FROM angkas WHERE `unitkey`='80_' AND `kdkegunit`!='0_' AND `kdkegunit`IN('11142_','11_','12_','13_','15_','17_','1841_','18_','19_','1_','29_','2_','36_','40_','51_','64_','6_','7_','8_') AND `kd_bulan`>='1' AND `kd_bulan`<='12'
+    $nilai = array();
+    $this->db->select('
+    SUM(`angkas`.`nilai`) AS `tahun`');
+    $this->db->from('angkas');
+    $this->db->where('tahun', $thnsekarang);
+    $this->db->where('unitkey', $idopd);
+    $this->db->where('kdkegunit!=', '0_');
+    $this->db->where_in('kdkegunit', $arrkdkegunit);
+    $tahun = $this->db->get()->row_array();
+
+    $this->db->select('
+    SUM(`angkas`.`nilai`) AS `blnskr`');
+    $this->db->from('angkas');
+    $this->db->where('tahun', $thnsekarang);
+    $this->db->where('unitkey', $idopd);
+    $this->db->where('kd_bulan', $blnsekarang);
+    $this->db->where('kdkegunit!=', '0_');
+    $this->db->where_in('kdkegunit', $arrkdkegunit);
+    $blnskr = $this->db->get()->row_array();
+
+    $this->db->select('
+    SUM(`angkas`.`nilai`) AS `blnsdskr`');
+    $this->db->from('angkas');
+    $this->db->where('tahun', $thnsekarang);
+    $this->db->where('unitkey', $idopd);
+    $this->db->where('kd_bulan <=', $blnsekarang);
+    $this->db->where('kdkegunit!=', '0_');
+    $this->db->where_in('kdkegunit', $arrkdkegunit);
+    $blnsdskr = $this->db->get()->row_array();
+
+    $nilai[]=array(
+      'tahun' => $tahun['tahun'],
+      'blnskr'=> $blnskr['blnskr'],
+      'blnsdskr'=>$blnsdskr['blnsdskr']
+              );
+
+    return $nilai;
+
     }
 //akhir ppk
 //-------------------------------------------------------------------------------------------------//

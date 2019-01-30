@@ -6,6 +6,12 @@
                 window.location.href = base_url + "User/kakppk";
             });
         });
+        $("#dashevalpptk").click(function () {
+            Pace.restart();
+            Pace.track(function () {
+                window.location.href = base_url + "User/dafevalpptk";
+            });
+        });
     });
 
 </script>
@@ -75,25 +81,9 @@
             </div>
         </div>
         <!-- ./col -->
-        <!-- ./col -->
-        <div class="col-lg-3 col-xs-6">
-            <!-- small box -->
-            <div class="small-box bg-green">
-                <div class="inner">
-                    <h3>Evaluasi</h3>
-                    <p>Semua Kegiatan</p>
-                </div>
-                <div class="icon">
-                    <i class="ion ion-pie-graph"></i>
-                </div>
-                <a class="btn btn-block btn-social btn-success" id="dashrealopd">
-                    <i class="fa fa-bars"></i> proses
-                </a>
-            </div>
-        </div>
-        <!-- ./col -->
+
     </div>
-    <div class="row col-md-12 col-sm-12 col-xs-12">
+    <!-- <div class="row col-md-12 col-sm-12 col-xs-12">
         <div class="box box-primary">
             <div class="box-header with-border" style="font-size: 18px">
                 <center><strong>Realisasi</strong></center>
@@ -405,14 +395,14 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 </section>
 <!-- include the style -->
-<link rel="stylesheet" href="<?php echo base_url('assets/alertify/css/alertify.min.css') ?>"/>
+<!-- <link rel="stylesheet" href="<?php echo base_url('assets/alertify/css/alertify.min.css') ?>"/> -->
 <!-- include a theme -->
-<link rel="stylesheet" href="<?php echo base_url('assets/alertify/css/themes/default.min.css') ?>"/>
+<!-- <link rel="stylesheet" href="<?php echo base_url('assets/alertify/css/themes/default.min.css') ?>"/> -->
 <!-- include the script -->
-<script src="<?php echo base_url('assets/alertify/alertify.min.js') ?>"></script>
+<!-- <script src="<?php echo base_url('assets/alertify/alertify.min.js') ?>"></script>
 <script type="application/javascript">
 $(document).ready(function() {
   ajaxtoken();
@@ -1129,5 +1119,5 @@ $(document).ready(function() {
             }
         });
     }
-</script>
+</script> -->
 <!-- /.content -->

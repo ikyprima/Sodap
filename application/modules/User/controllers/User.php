@@ -6,11 +6,15 @@ class User extends MX_Controller
     //function general= PPK/PPTK/KADIS/ASISTEN/SEKDA dan WAKO
     public $data;
     public $tahunskr;
+    public $bulanskr;
     public function __construct()
     {
         parent::__construct();
-      //  $this->tahunskr =$this->tahunskr;
-        $this->tahunskr ='2019';
+      //  $this->tahunskr =$this->tahunskr; date('n');
+        $this->tahunskr =date('Y');
+        $this->bulanskr =date('n');
+        // $this->bulanskr ='12';
+
         $this->load->model(array('User_model'));
         $this->load->library(array('ion_auth','upload'));
     }
@@ -23,7 +27,7 @@ class User extends MX_Controller
               'token' => $this->security->get_csrf_hash()
           );
           header('Content-Type: application/json');
-          echo json_encode($arr);  
+          echo json_encode($arr);
         }
 
     }
@@ -172,43 +176,44 @@ class User extends MX_Controller
                     $this->template->load('templatenew', 'dashboard_kadis', $this->data);
                 }elseif($peran=='2'){
                     /*jika peran 2 maka PPK*/
-                    $lskeg = $this->User_model->getdetlistkegiatan_ppk($nip,$this->tahunskr);
-                    $unitkeyppk = $this->User_model->getunitkeyppk($nip);
-                    $data = $this->User_model->getdatappk($unitkeyppk, $nip);
-                    $pgthn = $this->User_model->getpagutahun($nip,$unitkeyppk);
-                    $angkas = $this->User_model->getangkashinggabulanini($nip,$unitkeyppk);
-                    $totreal = $this->User_model->gettotalrealisasi($nip); //total realisasi hingga bulan sebelumnya
-                    $totrealbmodalhbs = $this->User_model->gettotalrealbmodalhbs($this->User_model->getidstrukturppk($nip)); //total realisasi belanja modal hingga bulan sebelumnya
-                    $totrealbmodalbi = $this->User_model->gettotalrealbmodalbi($this->User_model->getidstrukturppk($nip)); //total realisasi belanja modal bulan ini
-                    $angkasbulanini = $this->User_model->getangkasbulanini($nip,$unitkeyppk) + (($angkas - $this->User_model->getangkasbulanini($nip,$unitkeyppk)) - $totreal - $totrealbmodalhbs);
-                    $detangkasbulanini = $this->User_model->getdetangkasbulanini($nip,$unitkeyppk);
-                    $realisasibulanini = ($this->User_model->getrealisasibulanini($this->User_model->getidstrukturppk($nip)))+$totrealbmodalbi;
-                    $persenrealisasibulanini = ($realisasibulanini / $angkasbulanini) * 100;
-                    $lspptk = $this->User_model->getnipstrukturpptk($this->User_model->getidstrukturppk($nip));
-                    //var_dump($detangkasbulanini).exit;
-                    //echo $this->template->rupiah($pgthn);
-                    // var_dump($this->User_model->getdetrealbmodalbi($this->User_model->getidstrukturppk($nip),$unitkeyppk)).exit;
-                    //echo json_encode($this->User_model->getdataschedule($nip));
+                    // $lskeg = $this->User_model->getdetlistkegiatan_ppk($nip,$this->tahunskr);
+                    // $unitkeyppk = $this->User_model->getunitkeyppk($nip);
+                    // $data = $this->User_model->getdatappk($unitkeyppk, $nip);
+                    // $pgthn = $this->User_model->getpagutahun($nip,$unitkeyppk);
+                    // $angkas = $this->User_model->getangkashinggabulanini($nip,$unitkeyppk);
+                    // $totreal = $this->User_model->gettotalrealisasi($nip); //total realisasi hingga bulan sebelumnya
+                    // $totrealbmodalhbs = $this->User_model->gettotalrealbmodalhbs($this->User_model->getidstrukturppk($nip)); //total realisasi belanja modal hingga bulan sebelumnya
+                    // $totrealbmodalbi = $this->User_model->gettotalrealbmodalbi($this->User_model->getidstrukturppk($nip)); //total realisasi belanja modal bulan ini
+                    // $angkasbulanini = $this->User_model->getangkasbulanini($nip,$unitkeyppk) + (($angkas - $this->User_model->getangkasbulanini($nip,$unitkeyppk)) - $totreal - $totrealbmodalhbs);
+                    // $detangkasbulanini = $this->User_model->getdetangkasbulanini($nip,$unitkeyppk);
+                    // $realisasibulanini = ($this->User_model->getrealisasibulanini($this->User_model->getidstrukturppk($nip)))+$totrealbmodalbi;
+                    // $persenrealisasibulanini = ($realisasibulanini / $angkasbulanini) * 100;
+                    // $lspptk = $this->User_model->getnipstrukturpptk($this->User_model->getidstrukturppk($nip));
+                    // //var_dump($detangkasbulanini).exit;
+                    // //echo $this->template->rupiah($pgthn);
+                    // // var_dump($this->User_model->getdetrealbmodalbi($this->User_model->getidstrukturppk($nip),$unitkeyppk)).exit;
+                    // //echo json_encode($this->User_model->getdataschedule($nip));
                     $this->data = array(
                         'idopd' => $idopd,
                         'nmopd' => $namaopd,
                         'tahun' => $this->tahunskr,
-                        'list' => $lskeg,
-                        'pagu_tahun' => $this->template->rupiah($pgthn),
-                        'angkas_bulan' => $this->template->rupiah($angkas),
-                        'angkas_bulan_ini' => $this->template->rupiah($angkasbulanini),
-                        'det_angkas_bulan_ini' => $detangkasbulanini,
-                        'det_angkas_satu_tahun' => $this->User_model->getdetangkassatutahun($nip,$unitkeyppk),
-                        'realisasi_bulan_ini' => $this->template->rupiah($realisasibulanini),
-                        'persen_realisasi' => round($persenrealisasibulanini, 2) . ' %',
-                        'lspptk' => $lspptk,
-                        'kegiatan' => $this->User_model->getkegiatan($nip),
-                        'data_realisasi' => $this->User_model->getdatarealisasi($nip), //data realisasi bulan ini
-                        'data_realisasi_hbs' => $this->User_model->getdatarealisasihbs($nip), //data realisasi hingga bulan sebelumnya
-                        'data_angkas_hbs' => $this->User_model->getdetangkashbs($nip,$unitkeyppk), //data angkas hingga bulan sebelumnya
-                        'data_schedule' => $this->User_model->getdataschedule($nip), //data schedule satu tahun
-                        'data_real_fisik' => $this->User_model->getrealfisik($nip), //data realisasi fisik bulan ini
-                        'det_real_bmodalbi' => $this->User_model->getdetrealbmodalbi($this->User_model->getidstrukturppk($nip),$unitkeyppk), //detail realisasi belanja modal bulan ini
+                        // 'list' => $lskeg,
+                        // 'pagu_tahun' => $this->template->rupiah($pgthn),
+                        // 'angkas_bulan' => $this->template->rupiah($angkas),
+                        // 'angkas_bulan_ini' => $this->template->rupiah($angkasbulanini),
+                        // 'det_angkas_bulan_ini' => $detangkasbulanini,
+                        // 'det_angkas_satu_tahun' => $this->User_model->getdetangkassatutahun($nip,$unitkeyppk),
+                        // 'realisasi_bulan_ini' => $this->template->rupiah($realisasibulanini),
+                        // 'persen_realisasi' => round($persenrealisasibulanini, 2) . ' %',
+                        // 'lspptk' => $lspptk,
+                        // 'kegiatan' => $this->User_model->getkegiatan($nip),
+                        // 'data_realisasi' => $this->User_model->getdatarealisasi($nip), //data realisasi bulan ini
+                        // 'data_realisasi_hbs' => $this->User_model->getdatarealisasihbs($nip), //data realisasi hingga bulan sebelumnya
+                        // 'data_angkas_hbs' => $this->User_model->getdetangkashbs($nip,$unitkeyppk), //data angkas hingga bulan sebelumnya
+                        // 'data_schedule' => $this->User_model->getdataschedule($nip), //data schedule satu tahun
+                        // 'data_real_fisik' => $this->User_model->getrealfisik($nip), //data realisasi fisik bulan ini
+                        // 'det_real_bmodalbi' => $this->User_model->getdetrealbmodalbi($this->User_model->getidstrukturppk($nip),$unitkeyppk), //detail realisasi belanja modal bulan ini
+
                     );
                     $this->template->load('templatenew', 'dashboard_ppk', $this->data);
 
@@ -3823,14 +3828,278 @@ function cektargetfisik(){
         echo json_encode($arr);
     }
 
+    function dafevalpptk(){
+
+        if (!$this->ion_auth->logged_in()){
+            redirect('Home/login', 'refresh');
+        }elseif ($this->ion_auth->is_admin()){
+            redirect('Cpanel', 'refresh');
+        }elseif ($this->ion_auth->is_kasubag()){
+           /*Dari function ini akan di cek ke tabel struktur apakah user tersebut KADIS/PPK/PPTK */
+            redirect('User/admingeneral', 'refresh');
+
+        }else{
+            /*Dari function ini akan di cek ke tabel struktur apakah user tersebut KADIS/PPK/PPTK */
+            $nip=$this->ion_auth->user()->row()->username;
+            $struktur = $this->User_model->cekstrukturpns($nip);
+            $getopd = $this->User_model->getnamaopd($nip);
+            $idopd =$getopd->unitkey;
+            $namaopd=$getopd->nmunit;
+            if($struktur ){
+
+                $peran=$struktur->peran;
+
+                if($peran=='2'){
+                    /*jika peran 2 maka PPK*/
+                    $arrkdkegunit = array();
+                  //$blnsekarang=  2;
+                    $lskeg = $this->User_model->getdetlistkegiatan_ppk($nip,$this->tahunskr);
+
+                    if($lskeg){
+                      foreach ($lskeg as $key) {
+                          $arrkdkegunit[]= $key['kdkegunit'];
+                      }
+                      //nilai pagu
+                      $datapagu=$this->User_model->pagupptk( $this->tahunskr,$this->bulanskr,$idopd,$arrkdkegunit);
+                      // output nilai Pagu ----->>> echo json_encode($datapagu[0]['tahun']);
+                      //nilai persentase
+                      // $persentase =
+
+                    }
+
+                $arraybuln = array('Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember' );
+                $arrbln = array('jan','feb','mar','apr','mei','jun','jul','ags','sep','okt','nov','des' );
+                $data = array();
+                $totalKeg=array();
+                $totalreal=array();
+                $totalrealfis=array();
+                $tottarfis =array();
+                $lskeg  = $this->User_model->getdetlistkegiatan_ppk($nip,$this->tahunskr);
+
+                $wherein = array();
+                foreach ($lskeg as $key => $value) {
+                  $wherein[]=$value['id'];
+                }
+                $modelprsnreal = $this->User_model->realkeu_ppk_persen($wherein,$this->tahunskr,$this->bulanskr);
+                $modelprsnlrealbmodal = $this->User_model->realkeu_ppk_bmodal_persen($wherein,$this->tahunskr,$this->bulanskr);
+                $prsnreal = $modelprsnreal['nilai'] + $modelprsnlrealbmodal['nilai']; //nilai untuk mencari persen bulan sekarang
+                $modelrealsd = $this->User_model->realkeu_ppk_persen($wherein,$this->tahunskr,$this->bulanskr,1);
+                $modelrealbmodalsd = $this->User_model->realkeu_ppk_bmodal_persen($wherein,$this->tahunskr,$this->bulanskr,1);
+                $realsd =  $modelrealsd['nilai'] + $modelrealbmodalsd['nilai'];
+                for ($i=0; $i < count($arraybuln) ; $i++) {
+                  $kdbln=$i+1;
+                  $det=array();
+
+
+                  foreach ($lskeg as $key ) {
+                    $kdkeg = $key['kdkegunit'];
+                    $idtab = $key['id'];
+
+
+                    //----------------------------target-----------------------------------------------------//
+                    $modeltarkeu = $this->User_model->tarkeu_ppk($idopd,$this->tahunskr,$kdbln,$kdkeg);
+                    $modeltarkeuthn = $this->User_model->tarkeu_ppk_thn($idopd,$this->tahunskr,$kdkeg);
+
+                    $nlskr    = $modeltarkeu['nilai']; //nilai kegiatan perbulan dari aliran kas
+
+                    if(!array_key_exists($kdkeg,$totalKeg)){
+                      $totalKeg[$kdkeg] = $nlskr;
+                    }else{
+                      $totalKeg[$kdkeg] += $nlskr;
+                    }
+
+                    $nltotbln = $totalKeg[$kdkeg]; //jumlah total nilai kegiatan perbulan sampai dengan bulan berjalan
+                    $nltotthn = $modeltarkeuthn['nilai']; //jumlah total nilai kegiatan pertahun
+                    //---------------------------------------------------------------------------------------//
+                    //---------------------------realisasi---------------------------------------------------//
+                    $modelnlreal = $this->User_model->realkeu_ppk($idtab,$this->tahunskr,$kdbln);
+                    $modelnlrealbmodal = $this->User_model->realkeu_ppk_bmodal($idtab,$this->tahunskr,$kdbln);
+
+                    if(isset($modelnlreal['nilai'])){
+                      $nlreal=$modelnlreal['nilai'];
+                    }else{
+                      $nlreal =0;
+                    }
+
+                    if(isset($modelnlrealbmodal['nilai'])){
+                      $nlrealbmodal=$modelnlrealbmodal['nilai'];
+                    }else{
+                      $nlrealbmodal =0;
+                    }
+
+                    $fixnlreal = $nlreal + $nlrealbmodal;
+
+                    if(!array_key_exists($kdkeg,$totalreal)){
+                      $totalreal[$kdkeg] = $fixnlreal;
+                    }else{
+                      $totalreal[$kdkeg] += $fixnlreal;
+                    }
+                      $nlrealbln = $totalreal[$kdkeg];
+                      //cari bobot realisasi fisik
+
+
+                      if(isset($modelnlreal['bobot_real'])){
+                        $botreal=$modelnlreal['bobot_real'];
+                      }else{
+                        $botreal =0;
+                      }
+                      if(!array_key_exists($kdkeg,$totalrealfis)){
+                        $totalrealfis[$kdkeg] = $botreal;
+                      }else{
+                        $totalrealfis[$kdkeg] += $botreal;
+                      }
+                      $bobotrealfis =   $totalrealfis[$kdkeg] ;
+                    //---------------------------------------------------------------------------------------//
+                      if ($nltotbln > 0) {
+                        $capaian = number_format($nlrealbln/$nltotbln*100,2);
+                      }else{
+                        $capaian =  number_format(0,2);
+                      }
+
+                      if ($nltotthn > 0) {
+                        $persenreal = number_format($nlrealbln/$nltotthn*100,2);
+                      }else{
+                        $persenreal =  number_format(0,2);
+                      }
+                      //---------------------------------fisik------------------------------------------------//
+
+                      $modelfistarget=$this->User_model->tarfis_ppk($idtab);
+                      $arsir=0;
+
+                      foreach ($modelfistarget as $fiskey => $vlfis) {
+                        $arsir+= strlen($vlfis['jan']);
+                        $arsir+= strlen($vlfis['feb']);
+                        $arsir+= strlen($vlfis['mar']);
+                        $arsir+= strlen($vlfis['apr']);
+                        $arsir+= strlen($vlfis['mei']);
+                        $arsir+= strlen($vlfis['jun']);
+                        $arsir+= strlen($vlfis['jul']);
+                        $arsir+= strlen($vlfis['ags']);
+                        $arsir+= strlen($vlfis['sep']);
+                        $arsir+= strlen($vlfis['okt']);
+                        $arsir+= strlen($vlfis['nov']);
+                        $arsir+= strlen($vlfis['des']);
+                      }
+
+                      if ($arsir > 0) {
+                        $nilaiperarsir = number_format(100/$arsir,2);
+                      }else{
+                        $nilaiperarsir =  number_format(0,2);
+                      }
+                      $arsirbln=0;
+
+                      foreach ($modelfistarget as $xfiskey => $xvlfis) {
+                          if(isset($xvlfis[$arrbln[$i]])){
+                            $arsirbln += strlen($xvlfis[$arrbln[$i]]);
+                          }else{
+                            $arsirbln +=0;
+                          }
+
+                      }
+                      $blnarsir = 0;
+                      if ($arsirbln > 0) {
+                        $blnarsir = number_format($arsirbln*$nilaiperarsir,2);
+                      }else{
+                        $blnarsir =  number_format(0,2);
+                      }
+
+                      if(!array_key_exists($kdkeg,$tottarfis)){
+                        $tottarfis[$kdkeg] = $arsirbln;
+                      }else{
+                        $tottarfis[$kdkeg] += $arsirbln;
+                      }
+                      $fixtottarfis1 = $tottarfis[$kdkeg];
+                      if ($fixtottarfis1 > 0) {
+                        $fixtottarfis = number_format($fixtottarfis1*$nilaiperarsir,2);
+                      }else{
+                        $fixtottarfis =  number_format(0,2);
+                      }
+
+                      if($fixtottarfis > 99 && $fixtottarfis < 100  ){
+                          $fixtottarfis=number_format (ceil($fixtottarfis),2);
+                      }elseif($fixtottarfis > 100){
+                          $fixtottarfis=number_format (ceil($fixtottarfis),2);
+                      }
+
+
+                      //---------------------------------------------------------------------------------------//
+                    $det[]=array(
+                      'kdkeg'     => $kdkeg,
+                      'nmkeg'     => $key['nmkegunit'],
+                      'ppk'       => $key['idpnsppk'],
+                      'pptk'      => $key['idpnspptk'],
+                      'nlskr'     => $nlskr,
+                      'nltskr'    => $this->template->nominal($nltotbln),
+                      'nlthn'     => $nltotthn,
+                      'prstarget' => number_format($nltotbln/$nltotthn*100,2),
+                      'realnl'    => $this->template->nominal($nlrealbln),
+                      'prsreal'   => $persenreal,
+                      'cpaian'    => $capaian,
+                      'blnarsir'  => $blnarsir,
+                      'prstarfis' => $fixtottarfis,
+                      'prsrealfis'=>number_format($bobotrealfis,2)
+
+                    );
+
+
+                  }
+
+                  // echo json_encode($totalKeg);exit;
+                  $data[]=array(
+                    'kdbln' => $kdbln,
+                    'nmbln' => $arraybuln[$i],
+                    'det'   => $det
+
+                  );
+
+                }
+
+                  if($realsd > 0){
+                    $prsnrealsd= number_format($realsd/$datapagu[0]['blnsdskr']*100,2);
+                  }else{
+                    $prsnrealsd= number_format(0,2);
+                  }
+                  if($prsnreal > 0 ){
+                    $prsnrealskr = number_format($prsnreal/$datapagu[0]['blnskr']*100,2);
+                  }else{
+                    $prsnrealskr = number_format(0,2);
+                  }
+                    $this->data= array(
+                        'tahun'     => $this->tahunskr,
+                        'bulan'     => $this->bulanskr,
+                        'idopd'     => $idopd,
+                        'nmopd'     => $namaopd,
+                        'pagu'      => $datapagu,
+                        'realsd'    => $realsd,
+                        'prsnrealsd'=> $prsnrealsd,
+                        'realbulnskr' => $prsnreal,
+                        'prsnrealskr'  => $prsnrealskr,
+                        'data'      => $data
+                    );
+
+                    //echo json_encode($this->data);exit;
+                    $this->template->load('templatenew','v_eval_pptk',$this->data);
+
+                }else{
+                    /*jika tidak*/
+                    redirect('User', 'refresh');
+                }
+            }else{
+              redirect('User', 'refresh');
+            }
+
+
+      }
+    }
+
+
 
 
 //------------------------------------------akhir ppk--------------------------------------------------//
 
 
 //------------------------------------------awal sekreataris -------------------------------------------//
-function dafkegsekretaris(){
-
+function dafevalsekretaris(){
 
     if (!$this->ion_auth->logged_in()){
         redirect('Home/login', 'refresh');
@@ -3856,19 +4125,15 @@ function dafkegsekretaris(){
                 $arridtabpptk = array();
                 $arrkdkegunit = array();
 
-
-                $thnsekarang= $this->tahunskr;
-                $blnsekarang=  date('n');
               //$blnsekarang=  2;
                 $lskeg = $this->User_model->getdetlistkegiatan_ppk($nip,$this->tahunskr);
                 if($lskeg){
                   foreach ($lskeg as $key) {
-
                       $arridtabpptk[]= $key['id'];
                       $arrkdkegunit[]= $key['kdkegunit'];
                   }
                   //nilai pagu
-                  $datapagu=$this->User_model->pagupptksekretaris($thnsekarang,$blnsekarang,$idopd,$arrkdkegunit);
+                  $datapagu=$this->User_model->pagupptksekretaris( $this->tahunskr,$this->bulanskr,$idopd,$arrkdkegunit);
                   // output nilai Pagu ----->>> echo json_encode($datapagu[0]['tahun']);
                   //nilai persentase
                   // $persentase =
@@ -3879,14 +4144,14 @@ function dafkegsekretaris(){
                 $this->data= array(
                     'idopd'     => $idopd,
                     'nmopd'     => $namaopd,
-                    'tahun'     => $thnsekarang,
+                    'tahun'     => $this->tahunskr,
                     'list'      => $lskeg,
-                    'blnskr'    => $blnsekarang,
+                    'blnskr'    => $this->bulanskr,
                     'datapagu'  => $datapagu
                 );
                 // echo json_encode($datapagu[0]['tahun']);
                  //echo json_encode($lskeg);
-                $this->template->load('templatenew','v_dafkeg_pptk_sekretaris',$this->data);
+                $this->template->load('templatenew','v_eval_pptk_sekretaris',$this->data);
 
             }else{
                 /*jika tidak*/
