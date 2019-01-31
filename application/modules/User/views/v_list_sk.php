@@ -89,7 +89,7 @@
             "data": "status",
             "orderable": false,
             "searchable"    : false,
-              "visible": false,
+            "visible": false,
             render : function (data, type, row) {
               return data == '1' ? '<span class="label label-success">Aktif</span>' : data == '0' ? '<span class="label label-danger">Tidak Aktif</span>' : '<span class="label label-warning">Belum Ada</span>'
             },

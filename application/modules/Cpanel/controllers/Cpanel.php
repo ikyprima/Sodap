@@ -10,7 +10,8 @@ class Cpanel extends MX_Controller {
 	{
 		parent::__construct();
 		$this->blnskr =date('n');
-		$this->tahunskr ='2019';
+		//$this->tahunskr ='2019';
+		$this->tahunskr =date('Y');
 		// $this->blnskr =1;
 		$this->load->model(array('Cpanel_model'));
 		$this->load->library(array('ion_auth', 'form_validation'));

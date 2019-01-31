@@ -9,7 +9,7 @@
         $("#dashevalpptk").click(function () {
             Pace.restart();
             Pace.track(function () {
-                window.location.href = base_url + "User/dafkegsekretaris";
+                window.location.href = base_url + "User/dafevalsekretaris";
             });
         });
         $("#dashrealopd").click(function () {

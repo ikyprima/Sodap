@@ -10,7 +10,7 @@
   <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
   <meta name="viewport" content="width=device-width" />
   <!-- Canonical SEO -->
-  <link rel="canonical" href="http://sodap.payakumbuhkota.go.id" />
+  <link rel="canonical" href="http://sodap.payakumbuhkota.go.id/dev" />
   <!--  Social tags      -->
   <meta name="keywords" content="kota payakumbuh, aplikasi kota payakumbuh, goverment kota payakumbuh, kominfo kota payakumbuh, aplikasi kominfo payakumbuh, dinas kominfo kota payakumbuh, sodap kota payakumbuh, payakumbuh sumatra barat, pemerintah kota payakumbuh, sodap, smart city kota payakumbuh, payakumbuh go online,kominfo kota payakumbuh sumatra barat">
   <meta name="description" content="Aplikasi pemerintahan Kota Payakumbuh, yang di kembangkan Dinas Kominfo Kota Payakumbuh.">
@@ -75,6 +75,18 @@
   <link rel="stylesheet" href="<?php echo base_url('assets/orgchart/css/jquery.orgchart.css')?>">
   <link rel="stylesheet" href="<?php echo base_url('assets/orgchart/css/style.css')?>">
   <style type="text/css">
+  .allSides
+		{
+      top : -2px;
+      left: 5px;
+
+			border: solid 1px #555;
+			background-color: #eed;
+			box-shadow:  0 0 15px  rgba(0,0,0,0.6);
+			-moz-box-shadow: 0 0 15px  rgba(0,0,0,0.6);
+			-webkit-box-shadow: 0 0 15px  rgba(0,0,0,0.6);
+			-o-box-shadow: 0 0 15px  rgba(0,0,0,0.6);
+ 		}
   #chart-container { height: 100%; border: 2px solid #aaa; }
   .orgchart { background: #fff; }
   .orgchart td.left, .orgchart td.right, .orgchart td.top { border-color: #aaa; }
