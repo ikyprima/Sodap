@@ -689,30 +689,30 @@ class User_model extends CI_Model
       $this->db->where('tab_pptk.kdkegunit', $kdkegunit);
       return $this->db->get()->row();
     }
-    function getdetlistkegiatan_detpptk($nip,$kdkegunit,$thn){
-
-     $this->db->select('
-      `mpgrm`.`NMPRGRM` as prog
-    ,`mkegiatan`.`kdkegunit` as kdkeg
-    ,`mkegiatan`.`nmkegunit` as keg
-    ,`tab_pptk`.`nilai` as nl
-    , u2.nama pptk
-    , u1.nama ppk');
-      $this->db->from('tab_pptk');
-      $this->db->join('tab_pns u1', 'tab_pptk.idpnsppk = u1.nip');
-      $this->db->join('tab_pns u2', 'tab_pptk.idpnspptk = u2.nip');
-      $this->db->join('tab_pptk_master', 'tab_pptk.id_pptk_master = tab_pptk_master.id');
-      $this->db->join('daftunit', 'tab_pptk_master.unitkey = daftunit.unitkey');
-      $this->db->join('mkegiatan', 'tab_pptk.kdkegunit = mkegiatan.kdkegunit');
-      $this->db->join('mpgrm', 'mkegiatan.idprgrm = mpgrm.IDPRGRM');
-      $this->db->where('tab_pptk_master.tahun', $thn);
-      $this->db->where('daftunit.tahun', $thn);
-      $this->db->where('mkegiatan.tahun', $thn);
-      $this->db->where('mpgrm.tahun', $thn);
-      $this->db->where('tab_pptk.idpnspptk', $nip);
-      $this->db->where('tab_pptk.kdkegunit', $kdkegunit);
-      return $this->db->get()->row();
-    }
+    // function getdetlistkegiatan_detpptk($nip,$kdkegunit,$thn){
+    //
+    //  $this->db->select('
+    //   `mpgrm`.`NMPRGRM` as prog
+    // ,`mkegiatan`.`kdkegunit` as kdkeg
+    // ,`mkegiatan`.`nmkegunit` as keg
+    // ,`tab_pptk`.`nilai` as nl
+    // , u2.nama pptk
+    // , u1.nama ppk');
+    //   $this->db->from('tab_pptk');
+    //   $this->db->join('tab_pns u1', 'tab_pptk.idpnsppk = u1.nip');
+    //   $this->db->join('tab_pns u2', 'tab_pptk.idpnspptk = u2.nip');
+    //   $this->db->join('tab_pptk_master', 'tab_pptk.id_pptk_master = tab_pptk_master.id');
+    //   $this->db->join('daftunit', 'tab_pptk_master.unitkey = daftunit.unitkey');
+    //   $this->db->join('mkegiatan', 'tab_pptk.kdkegunit = mkegiatan.kdkegunit');
+    //   $this->db->join('mpgrm', 'mkegiatan.idprgrm = mpgrm.IDPRGRM');
+    //   $this->db->where('tab_pptk_master.tahun', $thn);
+    //   $this->db->where('daftunit.tahun', $thn);
+    //   $this->db->where('mkegiatan.tahun', $thn);
+    //   $this->db->where('mpgrm.tahun', $thn);
+    //   $this->db->where('tab_pptk.idpnspptk', $nip);
+    //   $this->db->where('tab_pptk.kdkegunit', $kdkegunit);
+    //   return $this->db->get()->row();
+    // }
 
      function getheader_realisasipptk($unit,$kdkegunit,$thn){
 
@@ -1087,7 +1087,7 @@ function realkeu_ppk_bmodal_persen($wherein,$thn,$kdbln,$sd=null){
 function realkeu_ppk($idtab,$thn,$kdbln){
 // select tab_realisasi MONTH(`tab_realisasi_bmodal`.`real_bulan`)
 
-  $this->db->select('bobot_real,SUM(`tab_realisasi_det`.`jumlah_harga`) AS nilai');
+  $this->db->select('tab_realisasi.id as id,permasalahan,real_fisik,bobot_real,SUM(`tab_realisasi_det`.`jumlah_harga`) AS nilai');
   $this->db->from('`tab_realisasi_det`');
   $this->db->join('tab_realisasi', '`tab_realisasi_det`.`id_tab_realisasi` = `tab_realisasi`.`id`');
   $this->db->where('tab_realisasi.id_tabpptk', $idtab);
@@ -1117,11 +1117,15 @@ function tarfis_ppk($idtabpptk){
  function getdetlistkegiatan_ppk($nip,$thn){
 
     $this->db->select('
-    `mkegiatan`.`kdkegunit` as kdkegunit
+    `mpgrm`.`IDPRGRM` as idprog
+    ,`mpgrm`.`NMPRGRM` as prog
+    ,`mkegiatan`.`kdkegunit` as kdkegunit
     ,`mkegiatan`.`nmkegunit` as nmkegunit
     , `tab_pptk`.`nilai`
     , `tab_pptk`.`id`
     , `tab_pptk`.`status`
+    ,`tab_pptk`.`idpnspptk` as nippptk
+    ,`tab_pptk`.`idpnsppk` as nipppk
     , u2.nama idpnspptk
     , u1.nama idpnsppk');
       $this->db->from('tab_pptk');
@@ -1130,6 +1134,7 @@ function tarfis_ppk($idtabpptk){
       $this->db->join('tab_pptk_master', 'tab_pptk.id_pptk_master = tab_pptk_master.id');
       $this->db->join('daftunit', 'tab_pptk_master.unitkey = daftunit.unitkey');
       $this->db->join('mkegiatan', 'tab_pptk.kdkegunit = mkegiatan.kdkegunit');
+      $this->db->join('mpgrm', 'mkegiatan.idprgrm = mpgrm.IDPRGRM');
       $this->db->where('tab_pptk_master.tahun', $thn);
       $this->db->where('daftunit.tahun', $thn);
       $this->db->where('mkegiatan.tahun', $thn);
@@ -1140,12 +1145,16 @@ function tarfis_ppk($idtabpptk){
 function getdetlistkegiatan_detppk($nip,$kdkegunit,$thn){
 
      $this->db->select('
-      `mpgrm`.`NMPRGRM` as prog
-    ,`mkegiatan`.`kdkegunit` as kdkeg
-    ,`mkegiatan`.`nmkegunit` as keg
-    ,`tab_pptk`.`nilai` as nl
-    , u2.nama pptk
-    , u1.nama ppk');
+      `mpgrm`.`IDPRGRM` as idprog
+      ,`mpgrm`.`NMPRGRM` as prog
+      ,`mkegiatan`.`kdkegunit` as kdkeg
+      ,`mkegiatan`.`nmkegunit` as keg
+      ,`tab_pptk`.`id`
+      ,`tab_pptk`.`nilai` as nl
+      ,`tab_pptk`.`idpnspptk` as nippptk
+      ,`tab_pptk`.`idpnsppk` as nipppk
+      ,u2.nama pptk
+      ,u1.nama ppk');
       $this->db->from('tab_pptk');
       $this->db->join('tab_pns u1', 'tab_pptk.idpnsppk = u1.nip');
       $this->db->join('tab_pns u2', 'tab_pptk.idpnspptk = u2.nip');
@@ -1160,6 +1169,34 @@ function getdetlistkegiatan_detppk($nip,$kdkegunit,$thn){
       $this->db->where('tab_pptk.idpnsppk', $nip);
       $this->db->where('tab_pptk.kdkegunit', $kdkegunit);
       return $this->db->get()->row();
+    }
+function getdetlistkegiatan_detpptk($nip,$kdkegunit,$thn){
+
+     $this->db->select('
+      `mpgrm`.`IDPRGRM` as idprog
+      ,`mpgrm`.`NMPRGRM` as prog
+      ,`mkegiatan`.`kdkegunit` as kdkeg
+      ,`mkegiatan`.`nmkegunit` as keg
+      ,`tab_pptk`.`id` as id
+      ,`tab_pptk`.`nilai` as nl
+      ,`tab_pptk`.`idpnspptk` as nippptk
+      ,`tab_pptk`.`idpnsppk` as nipppk
+      ,u2.nama pptk
+      ,u1.nama ppk');
+      $this->db->from('tab_pptk');
+      $this->db->join('tab_pns u1', 'tab_pptk.idpnsppk = u1.nip');
+      $this->db->join('tab_pns u2', 'tab_pptk.idpnspptk = u2.nip');
+      $this->db->join('tab_pptk_master', 'tab_pptk.id_pptk_master = tab_pptk_master.id');
+      $this->db->join('daftunit', 'tab_pptk_master.unitkey = daftunit.unitkey');
+      $this->db->join('mkegiatan', 'tab_pptk.kdkegunit = mkegiatan.kdkegunit');
+      $this->db->join('mpgrm', 'mkegiatan.idprgrm = mpgrm.IDPRGRM');
+      $this->db->where('tab_pptk_master.tahun', $thn);
+      $this->db->where('daftunit.tahun', $thn);
+      $this->db->where('mkegiatan.tahun', $thn);
+      $this->db->where('mpgrm.tahun', $thn);
+      $this->db->where('tab_pptk.idpnspptk', $nip);
+      $this->db->where('tab_pptk.kdkegunit', $kdkegunit);
+      return $this->db->get()->row_array();
     }
 
  function updraft($data,$idtab)
@@ -1211,6 +1248,72 @@ function getdetlistkegiatan_detppk($nip,$kdkegunit,$thn){
     return $nilai;
 
     }
+
+    function rowsub_detail($tahun,$unitkey,$kdkegunit,$mtgkey){
+      $this->db->select('`dpa221`.`id`
+    , `dpa221`.`satuan`
+    , `dpa221`.`kdkegunit`
+    , `dpa221`.`mtgkey`
+    , `matangr`.`kdper`
+    , `matangr`.`nmper`
+    , `dpa221`.`jumbyek`
+    , `dpa221`.`unitkey`
+    , `dpa221`.`uraian`
+    , `dpa221`.`tarif`
+    , `dpa221`.`kdjabar`
+    , `dpa221`.`type`
+    , `dpa221`.`tahun`');
+      $this->db->from('dpa221');
+      $this->db->join('matangr', '`dpa221`.`mtgkey` = `matangr`.`mtgkey`');
+      $this->db->where('`dpa221`.`tahun`', $tahun);
+      $this->db->where('`dpa221`.`unitkey`', $unitkey);
+      $this->db->where('`dpa221`.`kdkegunit`', $kdkegunit);
+      $this->db->where('`dpa221`.`mtgkey`', $mtgkey);
+      return $this->db->get()->result_array();
+    }
+
+    function rincirealisasi($idreal,$detmtgkey,$detid){
+      $this->db->select('`tab_sumber_dana`.`id`
+      ,`tab_sumber_dana`.`nm_dana`
+      , `tab_realisasi_det`.`vol`
+      , `tab_realisasi_det`.`harga_satuan`
+      , `tab_realisasi_det`.`jumlah_harga`
+      , `tab_realisasi_det`.`sisa_dana`');
+      $this->db->from('tab_realisasi_det');
+      $this->db->join('tab_sumber_dana', '`tab_realisasi_det`.`sumber_dana` = `tab_sumber_dana`.`id`');
+      $this->db->where('id_tab_realisasi', $idreal);
+      $this->db->where('mtgkey', $detmtgkey);
+      $this->db->where('id_dpa', $detid);
+      return $this->db->get()->row_array();
+    }
+
+    function rincirealisasibmodal($idtab,$detmtgkey){
+        // select id , id_tab_pptk , nilai_ktrk  where id_tab_pptk dan mtgkey
+      $this->db->select('`tab_realisasi_bmodal`.`id`
+      ,`tab_realisasi_bmodal`.`id_tab_pptk`
+      , `tab_realisasi_bmodal`.`nilai_ktrk`');
+      $this->db->from('tab_realisasi_bmodal');
+      $this->db->where('id_tab_pptk', $idtab);
+      $this->db->where('mtgkey', $detmtgkey);
+      return $this->db->get()->row_array();
+    }
+    function rincirealisasibmodaldet($idrealmodal,$thn,$bln){
+        // select id , id_tab_pptk , nilai_ktrk  where id_tab_pptk dan mtgkey
+      $this->db->select('`tab_realisasi_bmodal_det`.`id`
+      ,`tab_realisasi_bmodal_det`.`real_bulan`
+      ,`tab_realisasi_bmodal_det`.`bobot_bljmodal`
+      ,`tab_realisasi_bmodal_det`.`real_keuangan`
+      ,`tab_realisasi_bmodal_det`.`realfisik_bljmodal`
+      , `tab_realisasi_bmodal_det`.`bobot_real_bljmodal`');
+      $this->db->from('tab_realisasi_bmodal_det');
+      $this->db->where('id_tab_real_bmodal', $idrealmodal);
+      $this->db->where('YEAR(`tab_realisasi_bmodal_det`.`real_bulan`)', $thn);
+      $this->db->where('MONTH(`tab_realisasi_bmodal_det`.`real_bulan`)', $bln);
+      return $this->db->get()->row_array();
+    }
+
+
+
 //akhir ppk
 //-------------------------------------------------------------------------------------------------//
 

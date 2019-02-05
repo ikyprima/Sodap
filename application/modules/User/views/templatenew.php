@@ -75,10 +75,14 @@
   <link rel="stylesheet" href="<?php echo base_url('assets/orgchart/css/jquery.orgchart.css')?>">
   <link rel="stylesheet" href="<?php echo base_url('assets/orgchart/css/style.css')?>">
   <style type="text/css">
+  .scaled {
+  transform: scale(1.01,1.04); /* Equal to scaleX(0.7) scaleY(0.7) */
+  /* background-color: pink; */
+  }
   .allSides
 		{
-      top : -2px;
-      left: 5px;
+      /* top : -2px;
+      left: 5px; */
 
 			border: solid 1px #555;
 			background-color: #eed;
