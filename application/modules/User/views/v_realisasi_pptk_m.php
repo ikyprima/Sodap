@@ -206,7 +206,7 @@
 
 <hr>
 <table class="table table-bordered table-condensed " style="font-size: 11px">
-  <thead >
+  <thead>
     <tr>
       <th rowspan="3" style="vertical-align : middle;text-align:center; width: 100px">Kode Rekening</th>
       <th rowspan="3" style="vertical-align : middle;text-align:center; width: 160px">Uraian</th>
@@ -1163,7 +1163,7 @@ if($ubah==1){
         self.Value('0');
       }
     });
-      
+
 
     $('.harga-jumlah').inputmask("numeric",{
       radixPoint: ",",

@@ -71,7 +71,7 @@
       var id      = $(this).data("id");
       var keg     = $(this).text();
       var html = '';
-      var dethtml = '';
+      
       ajaxtoken();
       var token = localStorage.getItem("token");
       Pace.restart ();
