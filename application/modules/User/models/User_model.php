@@ -1312,7 +1312,21 @@ function getdetlistkegiatan_detpptk($nip,$kdkegunit,$thn){
       return $this->db->get()->row_array();
     }
 
+function cekstatteruskanppk($postidtabpptk,$posttahun,$postbulan){
+  $this->db->where('id_tabpptk', $postidtabpptk);
+  $this->db->where('YEAR(`tab_realisasi`.`real_bulan`)', $posttahun);
+  $this->db->where('MONTH(`tab_realisasi`.`real_bulan`)', $postbulan);
+  return $this->db->get('tab_realisasi');
+}
 
+function update_teruskan_ppk($postidtabpptk,$posttahun,$postbulan,$data){
+
+  $this->db->where('id_tabpptk', $postidtabpptk);
+  $this->db->where('YEAR(`tab_realisasi`.`real_bulan`)', $posttahun);
+  $this->db->where('MONTH(`tab_realisasi`.`real_bulan`)', $postbulan);
+  return $this->db->update('tab_realisasi', $data);
+
+}
 
 //akhir ppk
 //-------------------------------------------------------------------------------------------------//
@@ -2690,6 +2704,22 @@ FROM
 
     //end query untuk mendapatkan data angkas untuk belanja modal-->
 
+    function get_row_pptk_master ($idopd,$thn){
+      $this->db->where('unitkey', $idopd);
+      $this->db->where('tahun', $thn);
+      return $this->db->get('tab_pptk_master');
+    }
+
+    function get_list_ppk ($idmaster){
+
+      $this->db->where('id_pptk_master', $idmaster);
+      $this->db->group_by('idpnsppk');
+      $this->db->order_by('idpnsppk','asc');
+      return $this->db->get('tab_pptk');
+
+    }
+
+    // batas sektretaris
 
     function update_id_struktur($value,$where,$table)
     {

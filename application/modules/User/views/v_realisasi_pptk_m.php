@@ -2400,10 +2400,11 @@ $(function () {
               contentType: false,
               cache: false,
               processData: false,
-              success: function(result){
-                    console.log(result);
-                var jsonData = JSON.parse(result);
+               complete: function(data){
 
+                    console.log(data);
+                // var jsonData = JSON.parse(result);
+                  var jsonData = JSON.parse(data.responseText);
                   if (jsonData.data[0].status == false){
                     swal(
                       'info',
@@ -2432,6 +2433,7 @@ $(function () {
                   }
               },
               error: function(jqXHR, textStatus, errorThrown){
+                console.log(jqXHR);
                 swal({
                   title: 'Kesalahan !!',
                   text: 'Gagal Simpan Data',

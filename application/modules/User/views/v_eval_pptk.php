@@ -255,7 +255,7 @@
         var kdkeg   = $(this).data("kdkeg");
 
         var html = '';
-        var htmlmslh = '';
+
 
 
        Pace.restart ();
@@ -276,6 +276,9 @@
            complete: function(data){
              ajaxtoken();
              var jsonData = JSON.parse(data.responseText);
+             var tahun = jsonData.data[0].tahun;
+             var bulan = jsonData.data[0].bulan;
+             var idtab = jsonData.data[0].idtab;
              var nmkeg = jsonData.data[0].nmkeg;
              var nmpgrm = jsonData.data[0].nmpgrm;
              var nlkeg = jsonData.data[0].nlkeg;
@@ -602,27 +605,158 @@
                         'transition':'fade',
                         // 'title': ,
                         'labels': {
-                          ok:'Teruskan', cancel:'Tutup'
+                          ok:'Konfirmasi', cancel:'Tutup'
                         },
                         'startMaximized':true,
+
                         onok: function(){
-                          htmlmslh +=  '  <div class="form-group">  '  +
-                                       '  <label>Permasalahan <p class="text-muted">*Silahkan di tambahkan jika perlu</p></label> <br> '  +
-                                       '  <textarea class="textarea" id="mslh" name="mslh"  placeholder="Silahkan di Isi Jika Ada Masalah" style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;">'+mslh+'</textarea>  '  +
-                                       '  </div>   ' ;
-                          alertify.alert()
-                          .setHeader('Konfirmasi dan Teruskan Realisasi Bulan '+nmbln)
-                          .set({
-                              'resizable':true,
-                              'label':'Konfirmasi',
-                              onok: function(){
-                                alertify.success('Great');
+                          ajaxtoken();
+                          var htmlmslh = '';
+                          var token = localStorage.getItem("token");
+
+                          $.ajax ({
+                            url: base_url+"User/json_cek_detail_tab_realisasi_ppk/",
+                            type: "POST",
+                            data: {
+
+                              token   : token,
+                              idtab   : idtab,
+                              thn     : tahun,
+                              bln     : bulan
+
+                            },
+                            dataType: "JSON",
+                            complete: function(data){
+                              var jsonData2 = JSON.parse(data.responseText);
+                              var status = jsonData2.data[0].status;
+                              var teruskan = jsonData2.data[0].teruskan;
+                              if(status==false){
+                                var notification = alertify.notify('Belum Ada Realisasi', 'error', 2, function(){
+                                  //nanti pakai javascript
+                                  ajaxtoken();
+                                });
+
+                              }else{
+                                  ajaxtoken();
+                                if(teruskan==true){
+                                  htmlmslh +=   '<div class="box box-success box-solid">  '  +
+                                                 '     <div class="box-header with-border ">  '  +
+                                                 '       <i class="fa fa-check-square-o"></i>  '  +
+                                                 '       <h3 class="box-title">Evaluasi Realisasi</h3>  '  +
+                                                 '     </div>  '  +
+                                                 '     <div class="box-body">  '  +
+                                                 '  <div class="form-group">  '  +
+                                                 '  <label>Permasalahan </label>  <br> '  +
+                                                 '  <textarea class="textarea" id="mslh" name="mslh"  placeholder="Silahkan di Isi Jika Ada Masalah" style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;">'+mslh+'</textarea>  '  +
+                                                 '  <p class="text-muted">*Silahkan di tambahkan jika perlu</p></label>'+
+                                                 '  </div>'+
+                                                 '     </div>  '  +
+                                                 '     <div class="box-footer">  '  +
+                                                 '   <div class="row">  '  +
+                                                  '         <div class="col-md-3 col-sm-6 col-xs-12">  '  +
+                                                  '         </div>  '  +
+                                                  '         <div class="col-md-3 col-sm-6 col-xs-12">  '  +
+                                                  '           </div>  '  +
+                                                  '           <div class="col-md-3 col-sm-6 col-xs-12">   '  +
+                                                  '           </div>  '  +
+                                                  '           <div class="col-md-3 col-sm-6 col-xs-12">  '  +
+                                                  '             <a class="btn btn-block btn-social btn-success btn-flat" id="btn-konfirmasi">  '  +
+                                                  '               <i class="fa fa-send"></i> TERUSKAN  '  +
+                                                  '             </a>  '  +
+                                                  '           </div>  '  +
+                                                  '        </div>  '+
+                                                 '     </div>  '  +
+                                                 '  </div>  ' ;
+
+                                  alertify.alert().destroy();
+                                  alertify.alert()
+                                  .setHeader('Konfirmasi dan Teruskan Realisasi Bulan '+nmbln)
+                                  .set({
+                                      'resizable':true,
+                                      'label':'Konfirmasi',
+                                      'autoReset': true,
+                                      'transition':'fade',
+                                      // 'closableByDimmer': false,
+                                      'frameless':true,
+
+                                       onok: function(){
+                                         var notification = alertify.notify('Belum Konfirmasi !!', 'error', 2, function(){
+                                           //nanti pakai javascript
+                                           ajaxtoken();
+                                         });
+                                      }
+                                  })
+                                  .resizeTo('60%','76%')
+                                  .setContent(htmlmslh)
+                                  .show();
+
+                                  $('.textarea').wysihtml5();
+                                  $("#btn-konfirmasi").click(function() {
+
+
+                                     var vmslh = $('#mslh').val() ;
+                                     ajaxtoken();
+                                     var token = localStorage.getItem("token");
+                                     $.ajax ({
+                                     url: base_url+"User/simpan_teruskan_ppk/",
+                                     type: "POST",
+                                     data: {
+                                       token   : token,
+                                       idtab   : idtab,
+                                       thn     : tahun,
+                                       bln     : bulan,
+                                       mslh    : vmslh
+
+                                     },
+                                     dataType: "JSON",
+                                     complete: function(data){
+                                       var jsonDataupdate = JSON.parse(data.responseText);
+                                       var statusupdate = jsonDataupdate.data[0].status;
+                                         alertify.alert().destroy();
+                                       if(statusupdate==false){
+                                         var notification = alertify.notify('Terjadi Kesalahan, Reload Halaman', 'error', 3, function(){
+                                           //nanti pakai javascript
+                                           ajaxtoken();
+
+                                         });
+                                       }else{
+                                         var notification = alertify.notify('Berhasil di teruskan', 'success', 2, function(){
+                                           //nanti pakai javascript
+                                           ajaxtoken();
+
+                                         });
+                                       }
+
+                                     },
+                                     error: function(jqXHR, textStatus, errorThrown){
+                                       var notification = alertify.notify('Terjadi Kesalahan, Reload Halaman', 'error', 3, function(){
+                                         //nanti pakai javascript
+                                         ajaxtoken();
+                                           alertify.alert().destroy();
+                                       });
+                                       }
+                                    });
+
+                                  });
+                                }else{
+                                  var notification = alertify.notify('Realisasi Sudah Di Teruskan', 'success', 2, function(){
+                                    //nanti pakai javascript
+                                    ajaxtoken();
+                                  });
+
+                                }
                               }
-                          })
-                          .resizeTo('60%','70%')
-                          .setContent(htmlmslh)
-                          .show();
-                           $('.textarea').wysihtml5()
+
+                            },
+                            error: function(jqXHR, textStatus, errorThrown){
+                                swal(
+                                  'error',
+                                  'Terjadi Kesalahan, Coba Lagi Nanti',
+                                  'error'
+                                )
+                              }
+                           });
+
                             return false;
                         },
                         onclose:function(){

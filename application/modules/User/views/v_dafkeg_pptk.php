@@ -213,8 +213,10 @@
         var mm = d.getMonth()+1;
         var yyyy = d.getFullYear();
 
-        var skr   =new Date("01"+"/06/"+yyyy);
-
+        //var skr   =new Date("02"+"/06/"+yyyy);
+        var skr   =new Date(mm+"/"+day+"/"+yyyy);
+        // console.log(day+'-'+mm+'-'+yyyy);
+        // console.log(skr);
         var jsonData = JSON.parse(data.responseText);
         html+="<table class='table table-bordered'>\
                 <thead>\
@@ -242,9 +244,9 @@
 
                   var batasawl = new Date(no+"/05/"+yyyy);
                   var batasakr = new Date(nobln+"/05/"+yyyy);
+                  var batasjn = new Date("2/05/"+yyyy); //batas untuk bulan januari
 
-                  var batasjn = new Date("2/05/"+yyyy);
-                  if(1 < no){
+                  if(mm < no){
                     //dibatasi bulan sekarang (tidak boleh lebih dari bulan sekarang)
                     tmb = "<button class='btn bg-maroon btn-flat disabled'>Realisasi<div class='ripple-container'></div></button>";
 
@@ -309,8 +311,6 @@
                          }
 
 
-
-
                     }else{
                       //misal bulan 4 pada kegiatan 11338_ tabpptk 5
                         //(pertama!=1 && nilai!=0)
@@ -323,8 +323,9 @@
                           //cek nominal
                           //jika nominal 0 maka entri realisasi, jika tidak maka ubah
                           if(nmnltotreal==0){
-                            tmb="<button class='enjanuari btn bg-blue btn-flat'>Entri Realisasi<div class='ripple-container'></div></button>";
+                            tmb="<button class='enjanuari btn bg-blue btn-flat'>Entri Reaalisasi<div class='ripple-container'></div></button>";
                             stat="0";
+                            //iko jiko nilai keuangan nol tapi alah ado fisik // harus di fixkan
                           }else{
                             tmb = "<button class='enjanuari btn bg-blue btn-flat'>Ubah Realisasi<div class='ripple-container'></div></button>";
                             stat="1";
