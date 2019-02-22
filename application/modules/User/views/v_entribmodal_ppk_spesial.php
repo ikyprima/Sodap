@@ -1,6 +1,12 @@
+<!-- include the style -->
+<link rel="stylesheet" href="<?php echo base_url('assets/alertify/css/alertify.min.css') ?>"/>
+<!-- include a theme -->
+<link rel="stylesheet" href="<?php echo base_url('assets/alertify/css/themes/default.min.css') ?>"/>
+<script src="<?php echo base_url('assets/alertify/alertify.min.js') ?>"></script>
 <script type="text/javascript">
   var jumlah=0;
   var tblbelanjamodal;
+
 
   $(document).ready(function() {
 
@@ -14,90 +20,142 @@
   var kdunit  = $('#kdunit').html();
   var kdkeg   = $('#idkegiatan').html();
 
-  /*Datatable untuk List Belanja Modal*/
+  $.fn.dataTableExt.oApi.fnPagingInfo = function(oSettings){
+   return{
+     "iStart": oSettings._iDisplayStart,
+     "iEnd": oSettings.fnDisplayEnd(),
+     "iLength": oSettings._iDisplayLength,
+     "iTotal": oSettings.fnRecordsTotal(),
+     "iFilteredTotal": oSettings.fnRecordsDisplay(),
+     "iPage": Math.ceil(oSettings._iDisplayStart / oSettings._iDisplayLength),
+     "iTotalPages": Math.ceil(oSettings.fnRecordsDisplay() / oSettings._iDisplayLength)
+   };
+ };
+ tblbelanjamodal = $('#tbl-list-bmodal').DataTable({
+// dom: '<"toolbar">frtip',
+  bPaginate: true,
+   bLengthChange: true,
+   bFilter: true,
+   bInfo: true,
+   bAutoWidth: false,
+   initComplete: function() {
 
+     var api = this.api();
+     $('#tbl-list-bmodal_filter input')
+     .off('.DT')
+     .on('keyup.DT', function(e) {
+       if (e.keyCode == 13) {
+         api.search(this.value).draw();
+       }
+     });
+   },
+   language: {
+       sProcessing: "loading...",
+       search: "_INPUT_",
+       searchPlaceholder: "Cari Belanja Modal..."
+   },
 
-   $.fn.dataTableExt.oApi.fnPagingInfo = function(oSettings){
-    return{
-      "iStart": oSettings._iDisplayStart,
-      "iEnd": oSettings.fnDisplayEnd(),
-      "iLength": oSettings._iDisplayLength,
-      "iTotal": oSettings.fnRecordsTotal(),
-      "iFilteredTotal": oSettings.fnRecordsDisplay(),
-      "iPage": Math.ceil(oSettings._iDisplayStart / oSettings._iDisplayLength),
-      "iTotalPages": Math.ceil(oSettings.fnRecordsDisplay() / oSettings._iDisplayLength)
-    };
-  };
-  tblbelanjamodal = $('#tbl-list-bmodal').DataTable({
-    initComplete: function() {
-      var api = this.api();
-      $('#tbl-list-bmodal_filter input')
-      .off('.DT')
-      .on('keyup.DT', function(e) {
-        if (e.keyCode == 13) {
-          api.search(this.value).draw();
-        }
-      });
-    },
-    language: {
-        sProcessing: "loading...",
-        search: "_INPUT_",
-        searchPlaceholder: "Cari Belanja Modal..."
-    },
+   responsive: true,
+   processing: true,
+   serverSide: true,
+   ajax: {
+     "url": base_url+"User/jsonlistbmodal_spesial/"+kdunit+"/"+kdkeg,
+     "type": "POST",
 
-    responsive: true,
-    processing: true,
-    serverSide: true,
-    ajax: {
-      "url": base_url+"User/jsonlistbmodal/"+kdunit+"/"+kdkeg,
-      "type": "POST",
+   },
 
-    },
-
-    columns: [
-      {
-        "data": "kdkegunit",
-        "orderable": false,
-        "searchable": false
-      },
-      {
-        "data": "mtgkey",
-        "orderable": false,
-        "visible": false,
-        "searchable": false
-      },
-      {
-        "data": "kdper",
-      },
-      {
-        "data": "nmper",
-      },
-      {
-        "data": "ada",
-        "orderable": false,
-         render : function (data, type, row) {
-                  return data == '1' ? '<button type="button" class="btnkak btn btn-block btn-primary btn-flat disabled"data-toggle="tooltip"\
-                              title="Target Belanja Modal Sudah Di entri">Entri Target <i class="fa fa-check text-success"></i></button>'  : '<button type="button" class="btnblnjamodal btn btn-block btn-primary btn-flat" data-toggle="tooltip"\
-                              title="Target Belanja Modal Belum di Tetapkan">Entri Targget <i class="fa fa-hourglass-start text-danger"></i></button>'
-        },
-        "className" : "text-center",
-        "searchable": false
+   columns: [
+     {
+       "data": "kdkegunit",
+       "orderable": false,
+       "searchable": false
+     },
+     {
+       "data": "mtgkey",
+       "orderable": false,
+       "visible": false,
+       "searchable": false
+     },
+     {
+       "data": "kdper",
+       "orderable": false,
+       "visible": false
+     },
+     {
+       "data": "nmper",
+           "visible": false,
+            "targets": 3
+     },
+     {
+       "data": "kdjabar",
+      //  render : function (data, type, row) {
+      //           return '<p>'+data+'</p>'
+      // }
+       // style="margin-left:4.3em"
+     },
+     {
+       "data": "uraian",
+       render : function (data, type, row) {
+                return '<p  style="margin-left:1em">'+data+'</p>'
       }
+     },
+     {
+       "data": "ada",
+       "orderable": false,
+        render : function (data, type, row) {
+                 return data == '1' ? '<button type="button" class="btnkak btn btn-block btn-primary btn-flat disabled"data-toggle="tooltip"\
+                             title="Target Belanja Modal Sudah Di entri">Entri Target <i class="fa fa-check text-success"></i></button>'  : '<button type="button" class="btnblnjamodal btn btn-block btn-primary btn-flat" data-toggle="tooltip"\
+                             title="Target Belanja Modal Belum di Tetapkan">Entri Targget <i class="fa fa-hourglass-start text-danger"></i></button>'
+       },
+       "className" : "text-center",
+       "searchable": false
+     }
 
-    ],
+   ],
 
-    //rowsGroup: [0], //ini untuk colspan atau grouping
-    // order: [[4, 'asc']],
-    displayLength: 50,
-    //ini untuk menambahkan kolom no di index 0
-    rowCallback: function(row, data, iDisplayIndex) {
-      var info = this.fnPagingInfo();
-      var page = info.iPage;
-      var length = info.iLength;
-      var index = page * length + (iDisplayIndex + 1);
-      $('td:eq(0)', row).html(index);
-    }
-  });
+
+   //rowsGroup: [0], //ini untuk colspan atau grouping
+   // order: [[4, 'asc']],
+   displayLength: 50,
+   //ini untuk menambahkan kolom no di index 0
+   rowCallback: function(row, data, iDisplayIndex) {
+     var info = this.fnPagingInfo();
+     var page = info.iPage;
+     var length = info.iLength;
+     var index = page * length + (iDisplayIndex + 1);
+     $('td:eq(0)', row).html(index);
+   },
+   drawCallback: function ( settings ) {
+
+         var api = this.api();
+         var rows = api.rows({
+             page: 'current'
+         }).nodes();
+         var last = null;
+         api.column(2, {
+             page: 'current'
+         }).data().each(function (group, i) {
+             if (last !== group) {
+
+                 $(rows).eq(i).before(
+                 $("<tr></tr>", {
+                     "class": "group",
+                     "data-id": group
+                 }).append($("<td colspan= 2 ><p style='margin-left:3.4em'>"+group+"</p></td>")).append($("<td></td>", {
+                     "id": "e" + group,
+                     "class": "namarek",
+                     "text": api.row(api.row($(rows).eq(i)).index()).data().nmper,
+                     "colspan" : "2"
+
+                 })).prop('outerHTML'));
+                 last = group;
+             }
+             // val = api.row(api.row($(rows).eq(i)).index()).data();
+             // $("#e" + val.mtgkey).text(val.mtgkey);
+
+         });
+     }
+ });
 
   $('#tbl-list-bmodal').on( 'click', 'button.btnblnjamodal', function (){
   var row = $(this).closest('tr');
@@ -177,87 +235,184 @@
   });
 
   });
+var tabeluraian;
+var kontenuraian;
 
-  // $(".btnblnjamodal").click(function() {
-  //  if ($(this).hasClass('disabled')) {
-  //     swal(
-  //       'info',
-  //       'Target Fisik Belanja Modal Sudah di Entri',
-  //       'info'
-  //     )
-  //   } else {
-  //     var row = $(this).closest("tr");    // Find the row
-  //     var kdkegunit = row.find(".kdkegunit").text(); // Find the text
-  //     var mtgkey = row.find(".mtgkey").text(); // Find the text
-  //     var unit = $('#kdunit').html();
-  //     var tabppk = $('#idtabpptk').html();
-  //     var awalthun = $('#tahunawal').html();
-  //     var awalblan = $('#bulanawal').html() ;
-  //     var akhirthn = $('#tahunakhir').html();
-  //     var akhirblan = $('#bulanakhir').html() ;
-  //     var fixawalbulan= parseInt(awalblan,10)-1;
-  //     var fixakhirbulan= parseInt(akhirblan,10)-1;
-  //     var token = localStorage.getItem("token");
-  //     $('#awalkegfisik').datepicker({
-  //       format: "MM yyyy",
-  //       language: "id",
-  //       viewMode: "months",
-  //       minViewMode: "months",
-  //       autoclose: true,
-  //       startDate: new Date(awalthun, fixawalbulan, '01'),
-  //       endDate: new Date(akhirthn, fixakhirbulan, '01')
-  //     }).on("input change", function (e) {
-  //         // string jadi array
+$('#btn-list-uraian').click(function(){
+  kontenuraian = '';
+  kontenuraian +=  '<div class="table-responsive">  '  +
+ '       <table id="tbl-list-uraian" class="table table-bordered table-striped">  '  +
+ '         <thead>  '  +
+ '           <tr>  '  +
+ '             <th class="text-left"  width="2%"><b>#</b></th>  '  +
+ '             <th class="col-xs-3 text-left" >Kode Rekening</th>  '  +
+ '             <th class="col-xs-4 text-left" >Nama Rekening</th>  '  +
+ '             <th class="col-xs-4 text-left" >Uraian</th>  '  +
+ '             <th class=" td-actions text-center" >Aksi</th>  '  +
+ '           </tr>  '  +
+ '         </thead>  '  +
+ '       </table>  '  +
+ '  </div>  ' ;
+  alertify.alert().destroy();
 
-  //       var namabln =this.value;
-  //       var convert = namabln.split(" ");
-  //       // console.log(awalbln);
-  //       $('#akhirkegfisik').datepicker('setDate', null);
-  //       $('#akhirkegfisik').datepicker('destroy');
-  //       awalbln=0;
-  //       akhirbln=0;
-  //       awalbln = bulan[convert[0]];
+  alertify.alert()
+  .setHeader('List Uraian Kegiatan')
+  .set({
+    'resizable':true,
+    'movable': false,
+    'autoReset': true,
+    'transition':'zoom',
+    'labels': {
+      ok:'Simpan', cancel:'Tutup'
+    },
+    'startMaximized':false,
 
-  //         $('#akhirkegfisik').datepicker({
-  //           format: "MM yyyy",
-  //           viewMode: "months",
-  //           minViewMode: "months",
-  //           autoclose: true,
-  //           startDate: new Date(awalthun, awalbln, '01'),
-  //           endDate: new Date(akhirthn, fixakhirbulan, '01'),
+    onok: function(){
 
-  //         }).on("input change", function (e) {
+    }
+  })
+  .resizeTo('80%','84%')
+  .setContent(kontenuraian).show();
+  tabeluraian = $('#tbl-list-uraian').DataTable({
 
-  //           var namabln2 =this.value;
-  //           var convert2 = namabln2.split(" ");
+ // dom: '<"toolbar">frtip',
+   bPaginate: true,
+    bLengthChange: false,
+    bFilter: true,
+    bInfo: true,
+    bAutoWidth: false,
+    initComplete: function() {
 
-  //           akhirbln=0;
-  //           akhirbln = bulan[convert2[0]];
-  //         });
-  //       });
-  //           modaltargetfisik({
-  //             buttons: {
-  //               batal: {
-  //                 type : 'button',
-  //                 id    : 'btn-modal-batal',
-  //                 css   : 'btn-warning btn-raised btn-flat',
-  //                 label : 'Tutup'
-  //               },
-  //                simpan: {
-  //                 type : 'submit',
-  //                 id    : 'btn-modal-simpan',
-  //                 css   : 'btn-success btn-raised btn-flat ',
-  //                 label : 'Simpan'
-  //               }
-  //             },
-  //             title: 'Entri Target Fisik',
-  //             mgkey : mtgkey
+      var api = this.api();
+      $('#tbl-list-uraian_filter input')
+      .off('.DT')
+      .on('keyup.DT', function(e) {
+        if (e.keyCode == 13) {
+          api.search(this.value).draw();
+        }
+      });
+    },
+    language: {
+        sProcessing: "loading...",
+        search: "_INPUT_",
+        searchPlaceholder: "Cari Kegiatan / Uraian..."
+    },
+
+    responsive: true,
+    processing: true,
+    serverSide: true,
+    ajax: {
+      "url": base_url+"User/jsonlisturaian_spesial/"+kdunit+"/"+kdkeg,
+      "type": "POST",
+
+    },
+
+    columns: [
+      {
+        "data": "id",
+        "orderable": false,
+        "searchable": false
+      },
+      {
+        "data": "rekeningfull",
+
+      },
+      {
+        "data": "nmrek",
+
+      },
+      {
+        "data": "uraian",
+
+      },
+      {
+        "data": "action",
+        "orderable": false,
+
+        "className" : "text-center",
+        "searchable": false
+      }
+
+    ],
 
 
-  //           });
-  //   }
+    //rowsGroup: [0], //ini untuk colspan atau grouping
+    // order: [[4, 'asc']],
+    displayLength: 5,
+    //ini untuk menambahkan kolom no di index 0
+    rowCallback: function(row, data, iDisplayIndex) {
+      var info = this.fnPagingInfo();
+      var page = info.iPage;
+      var length = info.iLength;
+      var index = page * length + (iDisplayIndex + 1);
+      $('td:eq(0)', row).html(index);
+    },
 
-  // });
+  });
+  $('#tbl-list-uraian').on( 'click', 'a.tambahmodal', function (){
+
+  var row = $(this).closest('tr');
+  if ( row.hasClass('child') ) {
+    row = row.prev();
+  }
+  var kolom = tabeluraian.row( row ).data();
+  //kolom['dataname']
+  ajaxtoken();
+  var token = localStorage.getItem("token");
+  var iddpa = kolom['id'];
+  Pace.restart ();
+  Pace.track (function (){
+    $.ajax ({
+
+       url: base_url+"User/tambahmodal/"+Math.random(),
+       type: "POST",
+       data: {
+
+         token   : token,
+         iddpa   : iddpa
+       },
+     dataType: "JSON",
+     complete: function(data){
+       ajaxtoken();
+       var jsonData = JSON.parse(data.responseText);
+       var status =jsonData.data[0].status;
+       var ada =jsonData.data[0].ada;
+       if (status == false && ada == 1 ){
+         // alertify.success('Data Program dan Kegiatan Berhasil Di Sinkronkan');
+         var notification = alertify.notify('Uraian sudah ada di list', 'error', 3, function(){
+           //nanti pakai javascript
+
+         });
+       }else if (status == true && ada == 0) {
+         alertify.alert().destroy();
+         tblbelanjamodal.ajax.reload();
+         // alertify.success('Data Program dan Kegiatan Berhasil Di Sinkronkan');
+         // var notification = alertify.notify('Berhasil Tambah List ', 'success', 3, function(){
+         //   //nanti pakai javascript
+         //
+         // });
+            alertify.success('Berhasil Tambah List');
+       }else{
+         alertify.error('Gagal Tambah List Data');
+
+       }
+
+     },
+     error: function(jqXHR, textStatus, errorThrown){
+
+       swal(
+         'error',
+         'Terjadi Kesalahan, Coba Lagi sNanti',
+         'error'
+       )
+     }
+
+    });
+
+  });
+
+  });
+});
 
   $(".btn-generate-fisik").click(function() {
     if($("#awalkegfisik").datepicker("getDate") === null || $("#akhirkegfisik").datepicker("getDate") === null) {
@@ -360,6 +515,7 @@ function findTotal(){
     jumlah=tot;
 
 }
+
 
 
 $(function () {
@@ -495,7 +651,7 @@ $(function () {
        <p id="tahunakhir" hidden><?php echo $akhirtahun ?></p>
        <p id="bulanakhir" hidden><?php echo $blnakhir ?></p>
        <div class="row">
-        <div class="col-md-2 col-sm-2" style="text-align: left">Organisasi</div>
+        <div class="col-md-2 col-sm-2" style="text-align: left">Organisasi Spesial</div>
         <div class="col-md-1 col-sm-1" style="text-align: right;width: 5px">:</div>
         <div class="col-md-9 col-sm-9" style="padding-left: 25px"><?php echo $nmopd ?></div>
       </div>
@@ -633,20 +789,38 @@ $(function () {
 </div>
 <hr>
 
+<div class="box-header ui-sortable-handle" >
+
+
+
+
+    <div class=" pull-left header " >
+      <a class="btn btn-social btn-bitbucket btn-flat"  id="btn-list-uraian"><i class="fa fa-file-text-o"></i>List Uraian Kegiatan</a>
+  <!-- <a class="btn btn-block btn-social btn-success btn-flat" id="btn-lihat-kak">
+      <i class="fa fa-eye"></i> Lihat KAK
+    </a> -->
+    </div>
+  </div>
+              <br>
+              <br>
+
   <div class="table-responsive">
+
     <table id="tbl-list-bmodal" class="table table-bordered table-striped">
       <thead>
         <tr>
           <th class="text-left"  width="2%"><b>#</b></th>
           <th >mtgkey</th>
           <th class="col-xs-2 text-left" >Kode Rekening</th>
-          <th class="col-xs-6 text-left" >Nama Rekening</th>
-      <!--      <th class="col-xs-2 text-left" >Status</th>  -->
+          <th class="col-xs-2 text-left" >Kode Rekening</th>
+          <th class="col-xs-2 text-left" >Kode Rekening</th>
+          <th class="col-xs-8 text-left" >Uraian</th>
+
           <th class=" td-actions text-center" >Aksi</th>
         </tr>
       </thead>
     </table>
-           <!--  <table class="table table-striped">
+            <!-- <table class="table table-striped">
                 <thead>
                     <tr>
                         <th class="text-left"  width="2%"><b>#</b></th>

@@ -25,6 +25,7 @@
              <p id="kdunit" hidden><?php echo $idopd ?></p>
              <p id="nmopd" hidden><?php echo $nmopd ?></p>
              <p id="thn" hidden><?php echo $tahun ?></p>
+             <p id="peran" hidden><?php echo $peran?></p>
              <div class="row">
                 <div class="col-md-2 col-sm-2" style="text-align: left">Organisasi</div>
                 <div class="col-md-1 col-sm-1" style="text-align: right;width: 5px">:</div>
@@ -76,7 +77,7 @@
 <div class="box box-primary">
   <div class="box-header with-border">
     <i class="fa fa-text-width"></i>
-    <h3 class="box-title">Evaluasi Realisasi</h3>
+    <h3 class="box-title">Evaluasi Semua Realisasi Kegiatan</h3>
   </div>
   <div class="box-body">
     <?php
@@ -91,7 +92,7 @@
     <div class="row">
         <div class="table-responsive">
       <div class="col-md-12 col-sm-12 col-xs-12">
-          <p class="text-left text-muted">* Perhitungan dari seluruh kegiatan </p>
+          <p class="text-left text-muted">* Perhitungan dari pagu OPD </p>
 
         <table class="table table-bordered " style="font-size: 12px; '.$style.'">
           <thead >
@@ -137,101 +138,189 @@
     </div>
 
      <hr>
+   <?php
+   echo '<div id="menu">';
+   echo '<div class="panel list-group">';
+
+     foreach ($data as $i => $val) {
 
 
-    <?php
+         if ($i==$bulan-1){
+             //$style = 'margin-left:0.4em;';
+             $style = 'margin-left:0em;';
+             echo '<a href="javascript:void(0)" class="list-group-item active allSides scaled" data-toggle="collapse" data-target="#'.$i.'" data-parent="#menu,#menu'.$i.'" > <i class="fa fa-chevron-right"></i> <b>'.$val['nmbln'].'</b> </a>';
+         }else{
+             $style = '';
+             echo '<a href="javascript:void(0)" class="list-group-item" data-toggle="collapse" data-target="#'.$i.'" data-parent="#menu,#menu'.$i.'"> <i class="fa fa-chevron-right"></i> <b>'.$val['nmbln'].'</b> </a>';
+         }
+         echo '<div id="'.$i.'" class="sublinks collapse" >';
+         echo '<div id="menu'.$i.'">';
+         echo '<div class="panel list-group">';
+         foreach ($val['ppk'] as $x => $nmppk) {
+           if ($x % 2 == 0){
+             $bg='bg-white';
+           }else{
+             $bg='bg-white';
+           }
 
-    echo '<div id="menu">';
-    echo '<div class="panel list-group">';
+           echo '<a href="javascript:void(0)" class="list-group-item medium '.$bg.'" data-toggle="collapse" data-target="#'.$i.$nmppk['nipppk'].'" data-parent="#menu'.$i.'" ><i class="fa fa-dot-circle-o" style="margin-left:2em ;"></i> <b style="margin-left:1em ;">'.$nmppk['nmppk'].'</b></a>';
+           echo '<div id="'.$i.$nmppk['nipppk'].'" class="sublinks collapse" >';
+           //echo $nmppk['rincian'][0]['realsdppk'];
+           ?>
+           <div class="row">
+               <div class="table-responsive">
+             <div class="col-md-12 col-sm-12 col-xs-12">
 
-      foreach ($data as $i => $val) {
+               <table class="table table-bordered " style="font-size: 12px; '.$style.'">
+                 <thead >
+                   <tr class="bg-gray-active color-palette">
+                     <th rowspan="2" style="vertical-align : middle;text-align:center; ">PAGU TAHUN <span style=" text-transform: uppercase;"><?php echo $tahun ?></span></th>
+                     <th colspan="3" style="vertical-align : middle;text-align:center; " >REALISASI s/d BULAN <span style=" text-transform: uppercase;"><?php echo $val['nmbln']?></span></th>
+                     <th colspan="3" style="vertical-align : middle;text-align:center; " >REALISASI BULAN <span style=" text-transform: uppercase;"><?php echo $val['nmbln']?></span></th>
 
+                   </tr>
+                   <tr class="bg-gray-active color-palette" >
+                     <th style="vertical-align : middle;text-align:center; " >ALIRAN KAS</th>
+                     <th style="vertical-align : middle;text-align:center; " >REALISASI KEUANGAN</th>
+                     <th style="vertical-align : middle;text-align:center; " >PERSENTASE</th>
+                     <th style="vertical-align : middle;text-align:center; " >ALIRAN KAS</th>
+                     <th style="vertical-align : middle;text-align:center; " >REALISASI KEUANGAN</th>
+                     <th style="vertical-align : middle;text-align:center; " >PERSENTASE</th>
 
-          if ($i==$bulan-1){
-              //$style = 'margin-left:0.4em;';
-              $style = 'margin-left:0em;';
-              echo '<a href="javascript:void(0)" class="list-group-item active allSides scaled" data-toggle="collapse" data-target="#'.$i.'" data-parent="#menu" > <i class="fa fa-chevron-right"></i> <b>'.$val['nmbln'].'</b> </a>';
-          }else{
-              $style = '';
-              echo '<a href="javascript:void(0)" class="list-group-item" data-toggle="collapse" data-target="#'.$i.'" data-parent="#menu"> <i class="fa fa-chevron-right"></i> <b>'.$val['nmbln'].'</b> </a>';
-          }
-          echo '<div id="'.$i.'" class="sublinks collapse" >';
-          echo '<div class="table-responsive">';
-          echo '<table class="table table-bordered table-striped table-condensed " style="font-size: 12px; '.$style.'">
-                    <thead class="bg-gray-active color-palette">
-                      <tr>
-                        <th rowspan="3" style="vertical-align : middle;text-align:center; width: 2%">No</th>
-                        <th rowspan="3" style="vertical-align : middle;text-align:center; ">Kegiatan</th>
-                        <th rowspan="3" style="vertical-align : middle;text-align:center; width: 18%">PPTK</th>
-                        <th colspan="4" style="vertical-align : middle;text-align:center;">Keuangan s/d Bulan '.$val['nmbln'].'</th>
-                        <th colspan="2" style="vertical-align : middle;text-align:center;">Fisik s/d Bulan '.$val['nmbln'].'</th>
-                        <th rowspan="3" style="vertical-align : middle;text-align:center; width: 8%;">Status</th>
-                        <th rowspan="3" style="vertical-align : middle;text-align:center;width: 7%;">Rincian Realisasi Bulan '.$val['nmbln'].'</th>
-                      </tr>
-                      <tr>
-                        <th colspan="2" style="vertical-align : middle;text-align:center;" >Target</th>
-                        <th colspan="2" style="vertical-align : middle;text-align:center;" >Realisasi</th>
-                        <th  style="vertical-align : middle;text-align:center; width: 5%;" >Target</th>
-                        <th  style="vertical-align : middle;text-align:center; width: 5%;" >Realisasi</th>
-                      </tr>
-                      <tr>
-                        <th style="vertical-align : middle;text-align:center; width: 4%;" >%</th>
-                        <th style="vertical-align : middle;text-align:center; width: 9%;" >Rp</th>
-                        <th style="vertical-align : middle;text-align:center; width: 4%;" >%</th>
-                        <th style="vertical-align : middle;text-align:center; width: 9%;" >Rp</th>
-                        <th style="vertical-align : middle;text-align:center; width: 4%;" >%</th>
-                        <th style="vertical-align : middle;text-align:center; width: 4%;" >%</th>
-                      </tr>
-                      </thead>
-                      <tbody>';
+                   </tr>
+                   <tr class="bg-gray-active color-palette">
+                     <th style="vertical-align : middle;text-align:center; ">1</th>
+                     <th style="vertical-align : middle;text-align:center; width: 14%" >2</th>
+                     <th style="vertical-align : middle;text-align:center; width: 14%" >3</th>
+                     <th style="vertical-align : middle;text-align:center; width: 14%" >4 = (3 / 2) x 100</th>
+                     <th style="vertical-align : middle;text-align:center; width: 14%" >5</th>
+                     <th style="vertical-align : middle;text-align:center; width: 14%" >6</th>
+                     <th style="vertical-align : middle;text-align:center; width: 14%" >7 = (6 / 5) x 100</th>
+                   </tr>
+                    <!-- $nmppk['rincian'][0]['realsdppk'] -->
+                   <tr class="bg-green allSides scaled">
+                     <th  style="vertical-align : middle;text-align:center;margin"><?php echo $this->template->rupiah($nmppk['rincian'][0]['paguppk'][0]['tahun'])?></th>
+                     <th style="vertical-align : middle;text-align:center;" ><?php echo $this->template->rupiah($nmppk['rincian'][0]['paguppk'][0]['blnsdskr'])?></th>
+                     <th style="vertical-align : middle;text-align:center;" ><?php echo $this->template->rupiah($nmppk['rincian'][0]['realsdppk'])?></th>
+                     <th style="vertical-align : middle;text-align:center;" ><?php echo $nmppk['rincian'][0]['prsnrealsdppk'].' %'?></th>
+                     <th style="vertical-align : middle;text-align:center;" ><?php echo $this->template->rupiah($nmppk['rincian'][0]['paguppk'][0]['blnskr'])?></th>
+                     <th style="vertical-align : middle;text-align:center;" ><?php echo $this->template->rupiah($nmppk['rincian'][0]['realbulnskrppk'])?></th>
+                     <th style="vertical-align : middle;text-align:center;" ><?php echo $nmppk['rincian'][0]['prsnrealskrppk'].' %'?></th>
+                   </tr>
 
-                      foreach ($val['det'] as $x => $value) {
-                        if($value['prstarget']=='0.00'){
-                          $capaian ='<span class="badge bg-gray disabled color-palette pull-right">&nbsp&nbsp&nbsp&nbspBelum Ada&nbsp&nbsp&nbsp&nbsp</span>';
-                          $btndis='bg-gray disabled color-palette';
-                        }elseif($value['cpaian'] < 80){
-                          $capaian ='<span class="badge bg-red pull-right">Belum Tercapai</span>';
-                          $btndis='btn-detail bg-blue ';
-                        }else{
-                          $capaian ='<span class="badge bg-blue pull-right">Sudah Tercapai</span>';
-                          $btndis='btn-detail bg-blue ';
-                        }
-                        $x++;
-                        if(!$value['stat_terskn']==1){
-                          $alert='<span class="badge bg-red">'.$x.'</span>';
+                 </thead>
+               </table>
+               <br>
+               <br>
+               <hr>
+               <p><code>*detail semua kegiatan</code></p>
+               <?php
+               echo '<table class="table table-bordered table-striped table-condensed " style="font-size: 12px; '.$style.'">
+                         <thead class="bg-gray-active color-palette">
+                           <tr>
+                             <th rowspan="3" style="vertical-align : middle;text-align:center; width: 2%">No</th>
+                             <th rowspan="3" style="vertical-align : middle;text-align:center; ">Kegiatan</th>
+                             <th rowspan="3" style="vertical-align : middle;text-align:center; width: 18%">PPTK</th>
+                             <th colspan="4" style="vertical-align : middle;text-align:center;">Keuangan s/d Bulan '.$val['nmbln'].'</th>
+                             <th colspan="2" style="vertical-align : middle;text-align:center;">Fisik s/d Bulan '.$val['nmbln'].'</th>
+                             <th rowspan="3" style="vertical-align : middle;text-align:center; width: 8%;">Status</th>
+                             <th rowspan="3" style="vertical-align : middle;text-align:center;width: 7%;">Rincian Realisasi Bulan '.$val['nmbln'].'</th>
+                           </tr>
+                           <tr>
+                             <th colspan="2" style="vertical-align : middle;text-align:center;" >Target</th>
+                             <th colspan="2" style="vertical-align : middle;text-align:center;" >Realisasi</th>
+                             <th  style="vertical-align : middle;text-align:center; width: 5%;" >Target</th>
+                             <th  style="vertical-align : middle;text-align:center; width: 5%;" >Realisasi</th>
+                           </tr>
+                           <tr>
+                             <th style="vertical-align : middle;text-align:center; width: 4%;" >%</th>
+                             <th style="vertical-align : middle;text-align:center; width: 9%;" >Rp</th>
+                             <th style="vertical-align : middle;text-align:center; width: 4%;" >%</th>
+                             <th style="vertical-align : middle;text-align:center; width: 9%;" >Rp</th>
+                             <th style="vertical-align : middle;text-align:center; width: 4%;" >%</th>
+                             <th style="vertical-align : middle;text-align:center; width: 4%;" >%</th>
+                           </tr>
+                           </thead>
+                           <tbody>';
+                           foreach ($nmppk['rincian'][0]['datappk'][0]['det'] as $x => $value) {
 
-                        }else{
-                          $alert='<span class="badge bg-blue">'.$x.'</span>';
-                        }
-                        echo '<tr>
-                                <td style="vertical-align : middle;">'.$alert.'</td>
-                                <td style="vertical-align : middle;">'.$value['nmkeg'].'</td>
-                                <td class="nippptk" style="display:none;">'.$value['nippptk'].'</td>
-                                <td style="vertical-align : middle;">'.$value['pptk'].'</td>
-                                <td style="vertical-align : middle;text-align:center" class="danger">'.$value['prstarget'].'</td>
-                                <td style="vertical-align : middle;text-align:right" class="danger" >'.$value['nltskr'].'</td>
-                                <td style="vertical-align : middle;text-align:center" class="info">'.$value['prsreal'].'</td>
-                                <td style="vertical-align : middle;text-align:right" class="info">'.$value['realnl'].'</td>
-                                <td style="vertical-align : middle;text-align:center" class="danger">'.$value['prstarfis'].'</td>
-                                <td style="vertical-align : middle;text-align:center" class="info">'.$value['prsrealfis'].'</td>
-                                <td style="vertical-align : middle; text-align:center">'.$capaian.'</td>
-                                <td style="vertical-align : middle; text-align:center"><button class="btn margin '.$btndis.'" data-idbln='.$val['kdbln'].' data-nmbln='.$val['nmbln'].' data-kdkeg='.$value['kdkeg'].'>Detail<div class="ripple-container"></div></button></td>
+                             if($value['prstarget']=='0.00'){
+                               $capaian ='<span class="badge bg-gray disabled color-palette pull-right">&nbsp&nbsp&nbsp&nbspBelum Ada&nbsp&nbsp&nbsp&nbsp</span>';
+                               $btndis='bg-gray disabled color-palette';
+                             }elseif($value['cpaian'] < 80){
+                               $capaian ='<span class="badge bg-red pull-right">Belum Tercapai</span>';
+                               $btndis='btn-detail bg-blue ';
+                             }else{
+                               $capaian ='<span class="badge bg-blue pull-right">Sudah Tercapai</span>';
+                               $btndis='btn-detail bg-blue ';
+                             }
+                             $x++;
+                             //1=KADIS
+                             //6=SEKRETARIS
+                             if($peran==1){
+                               if($value['stat_terskn']==2 || $value['stat_terskn']==3 ){
+                                 $alert='<span class="badge bg-blue">'.$x.'</span>';
 
-                              </tr>';
+                               }else{
+                                 $alert='<span class="badge bg-red">'.$x.'</span>';
+                               }
+                             }elseif($peran==6){
+                               if($value['stat_terskn']==1 || $value['stat_terskn']==2 || $value['stat_terskn']==3 ){
+                                 $alert='<span class="badge bg-blue">'.$x.'</span>';
 
-                      }
-                echo '</tbody>
-                      </table>
-                      </div>';
-          echo '</div>';
+                               }else{
+                                 $alert='<span class="badge bg-red">'.$x.'</span>';
+                               }
+                             }else {
+                                $alert='<span class="badge bg-yellow">'.$x.'</span>';
+                             }
 
-      }
-      echo '</div>
-            </div>';
-    }
+                             echo '<tr>
+                                     <td style="vertical-align : middle;">'.$alert.'</td>
+                                     <td style="vertical-align : middle;">'.$value['nmkeg'].'</td>
+                                     <td class="nippptk" style="display:none;">'.$value['nippptk'].'</td>
+                                     <td style="vertical-align : middle;">'.$value['pptk'].'</td>
+                                     <td style="vertical-align : middle;text-align:center" class="danger">'.$value['prstarget'].'</td>
+                                     <td style="vertical-align : middle;text-align:right" class="danger" >'.$value['nltskr'].'</td>
+                                     <td style="vertical-align : middle;text-align:center" class="info">'.$value['prsreal'].'</td>
+                                     <td style="vertical-align : middle;text-align:right" class="info">'.$value['realnl'].'</td>
+                                     <td style="vertical-align : middle;text-align:center" class="danger">'.$value['prstarfis'].'</td>
+                                     <td style="vertical-align : middle;text-align:center" class="info">'.$value['prsrealfis'].'</td>
+                                     <td style="vertical-align : middle; text-align:center">'.$capaian.'</td>
+                                     <td style="vertical-align : middle; text-align:center"><button class="btn margin '.$btndis.'" data-idbln='.$val['kdbln'].' data-nmbln='.$val['nmbln'].' data-kdkeg='.$value['kdkeg'].'>Detail<div class="ripple-container"></div></button></td>
 
+                                   </tr>';
 
-    ?>
+                           }
+                      echo '</tbody>
+                            </table>';
+                ?>
+                <hr>
+                <br>
+                <br>
+             </div>
+             </div>
+
+           </div>
+
+           <?php
+                // foreach ($nmppk['rincian'] as $y => $rincian) {
+                //
+                //
+                //
+                // }
+           echo '</div>';
+         }
+         echo '</div>
+               </div>';
+         echo '</div>';
+
+     }
+     echo '</div>
+           </div>';
+
+ } ?>
+
   </div>
 
 
@@ -245,7 +334,6 @@
 
 
 </section>
-
 <script type="text/javascript">
   $(document).ready(function() {
     ajaxtoken();
@@ -255,6 +343,7 @@
         var row = $(this).closest("tr");    //baris tabel
         var nippptk = row.find(".nippptk").text(); // cari value td berdasarkan class <td>
         var thn     = $('#thn').html();
+        var peran   = $('#peran').html();
         var bln     = $(this).data("idbln");
         var nmbln   = $(this).data("nmbln");
         var idopd   = $('#kdunit').html();
@@ -639,136 +728,279 @@
                               var status = jsonData2.data[0].status;
                               // var teruskan = jsonData2.data[0].teruskan;
                               var intteruskan = jsonData2.data[0].intteruskan;
-                              if(status==false){
-                                var notification = alertify.notify('Belum Ada Realisasi', 'error', 2, function(){
-                                  //nanti pakai javascript
+                              if(peran == 6){
+                                //6 = Sekretaris
+                                if(status==false){
+                                  var notification = alertify.notify('Belum Ada Realisasi', 'error', 2, function(){
+                                    //nanti pakai javascript
+                                    ajaxtoken();
+                                  });
+
+                                }else if (intteruskan == 3) {
+                                  var notification = alertify.notify('Sudah di Evaluasi Atasan', 'error', 2, function(){
+                                    //nanti pakai javascript
+                                    ajaxtoken();
+                                  });
+                                }else if(intteruskan==2) {
+                                  var notification = alertify.notify('Realisasi Sudah Di Teruskan', 'error', 2, function(){
+                                    //nanti pakai javascript
+                                    ajaxtoken();
+                                  });
+                                }else if(intteruskan == 1){
                                   ajaxtoken();
-                                });
+                                    htmlmslh +=   '<div class="box box-success box-solid">  '  +
+                                                   '     <div class="box-header with-border ">  '  +
+                                                   '       <i class="fa fa-check-square-o"></i>  '  +
+                                                   '       <h3 class="box-title">Evaluasi Realisasi</h3>  '  +
+                                                   '     </div>  '  +
+                                                   '     <div class="box-body">  '  +
+                                                   '  <div class="form-group">  '  +
+                                                   '  <label>Permasalahan </label>  <br> '  +
+                                                   '  <textarea class="textarea" id="mslh" name="mslh"  placeholder="Silahkan di Isi Jika Ada Masalah" style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;">'+mslh+'</textarea>  '  +
+                                                   '  <p class="text-muted">*Silahkan di tambahkan jika perlu</p></label>'+
+                                                   '  </div>'+
+                                                   '     </div>  '  +
+                                                   '     <div class="box-footer">  '  +
+                                                   '   <div class="row">  '  +
+                                                    '         <div class="col-md-3 col-sm-6 col-xs-12">  '  +
+                                                    '         </div>  '  +
+                                                    '         <div class="col-md-3 col-sm-6 col-xs-12">  '  +
+                                                    '           </div>  '  +
+                                                    '           <div class="col-md-3 col-sm-6 col-xs-12">   '  +
+                                                    '           </div>  '  +
+                                                    '           <div class="col-md-3 col-sm-6 col-xs-12">  '  +
+                                                    '             <a class="btn btn-block btn-social btn-success btn-flat" id="btn-konfirmasi">  '  +
+                                                    '               <i class="fa fa-send"></i> TERUSKAN  '  +
+                                                    '             </a>  '  +
+                                                    '           </div>  '  +
+                                                    '        </div>  '+
+                                                   '     </div>  '  +
+                                                   '  </div>  ' ;
 
-                              }else if (intteruskan == 3) {
-                                var notification = alertify.notify('Sudah di Evaluasi Atasan', 'success', 2, function(){
-                                  //nanti pakai javascript
-                                  ajaxtoken();
-                                });
-                              }else if(intteruskan==2) {
-                                var notification = alertify.notify('Sudah di Evaluasi Atasan', 'success', 2, function(){
-                                  //nanti pakai javascript
-                                  ajaxtoken();
-                                });
-                              }else if(intteruskan==1) {
-                                var notification = alertify.notify('Realisasi Sudah di Teruskan', 'success', 2, function(){
-                                  //nanti pakai javascript
-                                  ajaxtoken();
-                                });
-                              }else if(intteruskan==0) {
-                                ajaxtoken();
-                                  htmlmslh +=   '<div class="box box-success box-solid">  '  +
-                                                 '     <div class="box-header with-border ">  '  +
-                                                 '       <i class="fa fa-check-square-o"></i>  '  +
-                                                 '       <h3 class="box-title">Evaluasi Realisasi</h3>  '  +
-                                                 '     </div>  '  +
-                                                 '     <div class="box-body">  '  +
-                                                 '  <div class="form-group">  '  +
-                                                 '  <label>Permasalahan </label>  <br> '  +
-                                                 '  <textarea class="textarea" id="mslh" name="mslh"  placeholder="Silahkan di Isi Jika Ada Masalah" style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;">'+mslh+'</textarea>  '  +
-                                                 '  <p class="text-muted">*Silahkan di tambahkan jika perlu</p></label>'+
-                                                 '  </div>'+
-                                                 '     </div>  '  +
-                                                 '     <div class="box-footer">  '  +
-                                                 '   <div class="row">  '  +
-                                                  '         <div class="col-md-3 col-sm-6 col-xs-12">  '  +
-                                                  '         </div>  '  +
-                                                  '         <div class="col-md-3 col-sm-6 col-xs-12">  '  +
-                                                  '           </div>  '  +
-                                                  '           <div class="col-md-3 col-sm-6 col-xs-12">   '  +
-                                                  '           </div>  '  +
-                                                  '           <div class="col-md-3 col-sm-6 col-xs-12">  '  +
-                                                  '             <a class="btn btn-block btn-social btn-success btn-flat" id="btn-konfirmasi">  '  +
-                                                  '               <i class="fa fa-send"></i> TERUSKAN  '  +
-                                                  '             </a>  '  +
-                                                  '           </div>  '  +
-                                                  '        </div>  '+
-                                                 '     </div>  '  +
-                                                 '  </div>  ' ;
+                                    alertify.alert().destroy();
+                                    alertify.alert()
+                                    .setHeader('Konfirmasi dan Teruskan Realisasi Bulan '+nmbln)
+                                    .set({
+                                        'resizable':true,
+                                        'label':'Konfirmasi',
+                                        'autoReset': true,
+                                        'transition':'fade',
+                                        // 'closableByDimmer': false,
+                                        'frameless':true,
 
-                                  alertify.alert().destroy();
-                                  alertify.alert()
-                                  .setHeader('Konfirmasi dan Teruskan Realisasi Bulan '+nmbln)
-                                  .set({
-                                      'resizable':true,
-                                      'label':'Konfirmasi',
-                                      'autoReset': true,
-                                      'transition':'fade',
-                                      // 'closableByDimmer': false,
-                                      'frameless':true,
+                                         onok: function(){
+                                           var notification = alertify.notify('Belum Konfirmasi !!', 'error', 2, function(){
+                                             //nanti pakai javascript
+                                             ajaxtoken();
+                                           });
+                                        }
+                                    })
+                                    .resizeTo('60%','76%')
+                                    .setContent(htmlmslh)
+                                    .show();
 
-                                       onok: function(){
-                                         var notification = alertify.notify('Belum Konfirmasi !!', 'error', 2, function(){
-                                           //nanti pakai javascript
-                                           ajaxtoken();
-                                         });
-                                      }
-                                  })
-                                  .resizeTo('60%','76%')
-                                  .setContent(htmlmslh)
-                                  .show();
-
-                                  $('.textarea').wysihtml5();
-                                  $("#btn-konfirmasi").click(function() {
+                                    $('.textarea').wysihtml5();
+                                    $("#btn-konfirmasi").click(function() {
 
 
-                                     var vmslh = $('#mslh').val() ;
-                                     ajaxtoken();
-                                     var token = localStorage.getItem("token");
-                                     $.ajax ({
-                                     url: base_url+"User/simpan_teruskan_ppk/",
-                                     type: "POST",
-                                     data: {
-                                       token   : token,
-                                       idtab   : idtab,
-                                       thn     : tahun,
-                                       bln     : bulan,
-                                       mslh    : vmslh,
-                                       stat    : 1
+                                       var vmslh = $('#mslh').val() ;
+                                       ajaxtoken();
+                                       var token = localStorage.getItem("token");
+                                       $.ajax ({
+                                       url: base_url+"User/simpan_teruskan_ppk/",
+                                       type: "POST",
+                                       data: {
+                                         token   : token,
+                                         idtab   : idtab,
+                                         thn     : tahun,
+                                         bln     : bulan,
+                                         mslh    : vmslh,
+                                         stat    : 2
 
-                                     },
-                                     dataType: "JSON",
-                                     complete: function(data){
-                                       var jsonDataupdate = JSON.parse(data.responseText);
-                                       var statusupdate = jsonDataupdate.data[0].status;
-                                         alertify.alert().destroy();
-                                       if(statusupdate==false){
+                                       },
+                                       dataType: "JSON",
+                                       complete: function(data){
+                                         var jsonDataupdate = JSON.parse(data.responseText);
+                                         var statusupdate = jsonDataupdate.data[0].status;
+                                           alertify.alert().destroy();
+                                         if(statusupdate==false){
+                                           var notification = alertify.notify('Terjadi Kesalahan, Reload Halaman', 'error', 3, function(){
+                                             //nanti pakai javascript
+                                             ajaxtoken();
+
+                                           });
+                                         }else{
+                                           var notification = alertify.notify('Berhasil di teruskan', 'success', 2, function(){
+                                             //nanti pakai javascript
+                                             ajaxtoken();
+
+                                           });
+                                         }
+
+                                       },
+                                       error: function(jqXHR, textStatus, errorThrown){
                                          var notification = alertify.notify('Terjadi Kesalahan, Reload Halaman', 'error', 3, function(){
                                            //nanti pakai javascript
                                            ajaxtoken();
-
+                                             alertify.alert().destroy();
                                          });
-                                       }else{
-                                         var notification = alertify.notify('Berhasil di teruskan', 'success', 2, function(){
-                                           //nanti pakai javascript
-                                           ajaxtoken();
+                                         }
+                                      });
 
-                                         });
-                                       }
-
-                                     },
-                                     error: function(jqXHR, textStatus, errorThrown){
-                                       var notification = alertify.notify('Terjadi Kesalahan, Reload Halaman', 'error', 3, function(){
-                                         //nanti pakai javascript
-                                         ajaxtoken();
-                                           alertify.alert().destroy();
-                                       });
-                                       }
                                     });
 
+                                }else if(intteruskan == 0){
+                                  var notification = alertify.notify('Belum di Evaluasi KPA', 'error', 3, function(){
+                                    //nanti pakai javascript
+                                    ajaxtoken();
+
                                   });
-                              }
-                              else{
-                                var notification = alertify.notify('Ups terjadi Kesalahan', 'error', 2, function(){
-                                  //nanti pakai javascript
+                                }else{
+                                  var notification = alertify.notify('Ups terjadi Kesalahan', 'error', 2, function(){
+                                    //nanti pakai javascript
+                                    ajaxtoken();
+                                  });
+
+                                }
+                              }else{
+                                //1 Kadis
+                                // cek peran di log, jika ragu
+                                if(status==false){
+                                  var notification = alertify.notify('Belum Ada Realisasi', 'error', 2, function(){
+                                    //nanti pakai javascript
+                                    ajaxtoken();
+                                  });
+
+                                }else if (intteruskan == 3) {
+                                  var notification = alertify.notify('Realisasi Sudah Di Teruskan', 'success', 2, function(){
+                                    //nanti pakai javascript
+                                    ajaxtoken();
+                                  });
+                                }else if(intteruskan==2) {
                                   ajaxtoken();
-                                });
+                                  htmlmslh +=   '<div class="box box-success box-solid">  '  +
+                                                   '     <div class="box-header with-border ">  '  +
+                                                   '       <i class="fa fa-check-square-o"></i>  '  +
+                                                   '       <h3 class="box-title">Evaluasi Realisasi</h3>  '  +
+                                                   '     </div>  '  +
+                                                   '     <div class="box-body">  '  +
+                                                   '  <div class="form-group">  '  +
+                                                   '  <label>Permasalahan </label>  <br> '  +
+                                                   '  <textarea class="textarea" id="mslh" name="mslh"  placeholder="Silahkan di Isi Jika Ada Masalah" style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;">'+mslh+'</textarea>  '  +
+                                                   '  <p class="text-muted">*Silahkan di tambahkan jika perlu</p></label>'+
+                                                   '  </div>'+
+                                                   '     </div>  '  +
+                                                   '     <div class="box-footer">  '  +
+                                                   '   <div class="row">  '  +
+                                                    '         <div class="col-md-3 col-sm-6 col-xs-12">  '  +
+                                                    '         </div>  '  +
+                                                    '         <div class="col-md-3 col-sm-6 col-xs-12">  '  +
+                                                    '           </div>  '  +
+                                                    '           <div class="col-md-3 col-sm-6 col-xs-12">   '  +
+                                                    '           </div>  '  +
+                                                    '           <div class="col-md-3 col-sm-6 col-xs-12">  '  +
+                                                    '             <a class="btn btn-block btn-social btn-success btn-flat" id="btn-konfirmasi">  '  +
+                                                    '               <i class="fa fa-send"></i> TERUSKAN  '  +
+                                                    '             </a>  '  +
+                                                    '           </div>  '  +
+                                                    '        </div>  '+
+                                                   '     </div>  '  +
+                                                   '  </div>  ' ;
+
+                                    alertify.alert().destroy();
+                                    alertify.alert()
+                                    .setHeader('Konfirmasi dan Teruskan Realisasi Bulan '+nmbln)
+                                    .set({
+                                        'resizable':true,
+                                        'label':'Konfirmasi',
+                                        'autoReset': true,
+                                        'transition':'fade',
+                                        // 'closableByDimmer': false,
+                                        'frameless':true,
+
+                                         onok: function(){
+                                           var notification = alertify.notify('Belum Konfirmasi !!', 'error', 2, function(){
+                                             //nanti pakai javascript
+                                             ajaxtoken();
+                                           });
+                                        }
+                                    })
+                                    .resizeTo('60%','76%')
+                                    .setContent(htmlmslh)
+                                    .show();
+
+                                    $('.textarea').wysihtml5();
+                                    $("#btn-konfirmasi").click(function() {
+
+
+                                       var vmslh = $('#mslh').val() ;
+                                       ajaxtoken();
+                                       var token = localStorage.getItem("token");
+                                       $.ajax ({
+                                       url: base_url+"User/simpan_teruskan_ppk/",
+                                       type: "POST",
+                                       data: {
+                                         token   : token,
+                                         idtab   : idtab,
+                                         thn     : tahun,
+                                         bln     : bulan,
+                                         mslh    : vmslh,
+                                         stat    : 3
+
+                                       },
+                                       dataType: "JSON",
+                                       complete: function(data){
+                                         var jsonDataupdate = JSON.parse(data.responseText);
+                                         var statusupdate = jsonDataupdate.data[0].status;
+                                           alertify.alert().destroy();
+                                         if(statusupdate==false){
+                                           var notification = alertify.notify('Terjadi Kesalahan, Reload Halaman', 'error', 3, function(){
+                                             //nanti pakai javascript
+                                             ajaxtoken();
+
+                                           });
+                                         }else{
+                                           var notification = alertify.notify('Berhasil di teruskan', 'success', 2, function(){
+                                             //nanti pakai javascript
+                                             ajaxtoken();
+
+                                           });
+                                         }
+
+                                       },
+                                       error: function(jqXHR, textStatus, errorThrown){
+                                         var notification = alertify.notify('Terjadi Kesalahan, Reload Halaman', 'error', 3, function(){
+                                           //nanti pakai javascript
+                                           ajaxtoken();
+                                             alertify.alert().destroy();
+                                         });
+                                         }
+                                      });
+
+                                    });
+                                }else if(intteruskan == 1){
+
+
+                                    var notification = alertify.notify('Belum di Evaluasi Sekretaris', 'error', 3, function(){
+                                      //nanti pakai javascript
+                                      ajaxtoken();
+
+                                    });
+                                }else if(intteruskan == 0){
+                                  var notification = alertify.notify('Belum di Evaluasi KPA', 'error', 3, function(){
+                                    //nanti pakai javascript
+                                    ajaxtoken();
+
+                                  });
+                                }else{
+                                  var notification = alertify.notify('Ups terjadi Kesalahan', 'error', 2, function(){
+                                    //nanti pakai javascript
+                                    ajaxtoken();
+                                  });
+
+                                }
                               }
+
 
                             },
                             error: function(jqXHR, textStatus, errorThrown){

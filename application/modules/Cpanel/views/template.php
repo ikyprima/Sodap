@@ -174,6 +174,12 @@
                         </a>
                     </li>
                     <li>
+                        <a href="<?php echo base_url('Cpanel/laporan-bulanan-opd');?>">
+                            <i class="material-icons">timeline</i>
+                            <p>Laporan Bulanan baru</p>
+                        </a>
+                    </li>
+                    <li>
                         <a href="<?php echo base_url('Cpanel/rekapBmodalOpd');?>">
                             <i class="material-icons">library_add</i>
                             <p>Rekap Belanja Modal</p>

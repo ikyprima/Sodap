@@ -726,7 +726,7 @@ $(function () {
                           window.location.href = base_url+"User/entritblnjmodal?unit="+unit+"&keg="+kegiatan+"&tab="+tab;
 
                       }else{
-                        window.location.href = base_url+"User/kakppk";
+                        window.location.href = base_url+"User/list-kegiatan-kpa";
                       }
                     },
                     error: function(jqXHR, textStatus, errorThrown){

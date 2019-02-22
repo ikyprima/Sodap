@@ -12,7 +12,7 @@
     // jQuery("#targetfisik").fadein("slow");
     ajaxtoken();
 
-  /****AGUNGAGUNGAGUNGAGUNGAGUNGAGUNGAGUNGAGUNGAGUNGAGUNGAGUNGAGUNG*/ 
+  /****AGUNGAGUNGAGUNGAGUNGAGUNGAGUNGAGUNGAGUNGAGUNGAGUNGAGUNGAGUNG*/
    if ($(this).hasClass('lihat')) {
     var row = $(this).closest("tr");    // Find the row
     var idtab = row.find(".idtab").text(); // Find the text
@@ -39,7 +39,7 @@
               var unit = jsonData.uri[0].unit;
               var kegiatan = jsonData.uri[0].keg;
               var tab = jsonData.uri[0].tab;
-              window.location.href = base_url+"User/viewkakppk?unit="+unit+"&keg="+kegiatan+"&tab="+tab;
+              window.location.href = base_url+"User/lihat-kak-kpa?unit="+unit+"&keg="+kegiatan+"&tab="+tab;
             }
         },
         error: function(jqXHR, textStatus, errorThrown){
@@ -184,7 +184,7 @@
           var unit = jsonData.uri[0].unit;
           var kegiatan = jsonData.uri[0].keg;
           var tab = jsonData.uri[0].tab;
-          window.location.href = base_url+"User/entritblnjmodal?unit="+unit+"&keg="+kegiatan+"&tab="+tab;
+          window.location.href = base_url+"User/entri-target-belanja-modal?unit="+unit+"&keg="+kegiatan+"&tab="+tab;
 
         }else if(jsonData.uri[0].status==false && jsonData.uri[0].edit==false ){
           //belum ada KAK maupun target fisik Belanja modal
@@ -196,7 +196,7 @@
 
     },
     error: function(jqXHR, textStatus, errorThrown){
-        console.log(jqXHR);
+        //console.log(jqXHR);
       swal(
         'error',
         'Terjadi Kesalahan, Coba Lagi sNanti',
@@ -319,27 +319,29 @@
                       if($statkak->row()->stat_draft==0){
                       /*$ada='<button type="button" class="btnkak lihat btn btn-block btn-primary btn-flat data-toggle="tooltip"
                               title="KAK Sudah Di Entri">Lihat<i class="fa fa-check text-success"></i></button>';*/
-                      $ada='<div class="btn-group">
-                  <button type="button" class="btn btn-info">Lihat</button>
-                  <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
-                    <span class="caret"></span>
-                    <span class="sr-only">Toggle Dropdown</span>
-                  </button>
-                  <ul class="dropdown-menu" role="menu">
-                    <li><a class="btnkak lihat">KAK</a></li>
-                    <li><a class="btnkak bmodal">Belanja Modal</a></li>
-                  </ul>
-                </div>';
+                //       $ada='<div class="btn-group">
+                //   <button type="button" class="btn btn-info">Lihat</button>
+                //   <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+                //     <span class="caret"></span>
+                //     <span class="sr-only">Toggle Dropdown</span>
+                //   </button>
+                //   <ul class="dropdown-menu" role="menu">
+                //     <li><a class="btnkak lihat">KAK</a></li>
+                //     <li><a class="btnkak bmodal">Belanja Modal</a></li>
+                //   </ul>
+                // </div>';
+                $ada='<button type="button" class="btnkak btn btn-block btn-success btn-flat lihat"
+                      title="Lihat Detail KAK Kegiatan">Lihat KAK <i class="fa fa-check-square-o "></i></button> ';
                     /*sampai AGUNG----AGUNG----AGUNG----AGUNG----AGUNG----AGUNG----AGUNG----AGUNG*/
                       }else{
                         $ada='<button type="button" class="btnkak btn btn-block btn-primary btn-flat" data-toggle="tooltip"
-                              title="Target Fisik Belanja Modal Blm Ada">Entri KAK <i class="fa fa-spinner fa-pulse fa-fw text-danger"></i></button> ';
+                              title="Target Fisik Belanja Modal Belum Ada">Entri KAK <i class="fa fa-spinner fa-pulse fa-fw text-danger"></i></button> ';
                       }
 
                     }else{
                       // $ada=0; lanjut karna belum ada
                       $ada='<button type="button" class="btnkak btn btn-block btn-primary btn-flat" data-toggle="tooltip"
-                              title="KAK Kegiatan Belum Ada">Entri KAK <i class="fa fa-hourglass-start text-danger"></i></button>';
+                              title="KAK Kegiatan Belum Ada">Entri KAK &nbsp<i class="fa fa-hourglass-start "></i></button>';
                     }
 
                     echo'<tr>

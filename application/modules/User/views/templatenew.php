@@ -72,8 +72,8 @@
   <!-- AdminLTE Skins. Choose a skin from the css/skins
   folder instead of downloading all of them to reduce the load. -->
   <link rel="stylesheet" href="<?php echo base_url('assets/admin/dist/css/skins/_all-skins.min.css') ?>">
-  <link rel="stylesheet" href="<?php echo base_url('assets/orgchart/css/jquery.orgchart.css')?>">
-  <link rel="stylesheet" href="<?php echo base_url('assets/orgchart/css/style.css')?>">
+
+
   <style type="text/css">
   .scaled {
   transform: scale(1.01,1.04); /* Equal to scaleX(0.7) scaleY(0.7) */
@@ -91,20 +91,22 @@
 			-webkit-box-shadow: 0 0 15px  rgba(0,0,0,0.6);
 			-o-box-shadow: 0 0 15px  rgba(0,0,0,0.6);
  		}
-  #chart-container { height: 100%; border: 2px solid #aaa; }
-  .orgchart { background: #fff; }
-  .orgchart td.left, .orgchart td.right, .orgchart td.top { border-color: #aaa; }
-  .orgchart td>.down { background-color: #aaa; }
-  .orgchart .middle-level .title { background-color: #006699; }
-  .orgchart .middle-level .content { border-color: #006699; }
-  .orgchart .product-dept .title { background-color: #009933; }
-  .orgchart .product-dept .content { border-color: #009933; }
-  .orgchart .rd-dept .title { background-color: #993366; }
-  .orgchart .rd-dept .content { border-color: #993366; }
-  .orgchart .pipeline1 .title { background-color: #996633; }
-  .orgchart .pipeline1 .content { border-color: #996633; }
-  .orgchart .frontend1 .title { background-color: #cc0066; }
-  .orgchart .frontend1 .content { border-color: #cc0066; }
+    /* #chart-container { height: 600px; border: 2px solid #aaa; }
+      .orgchart { background: #fff; }
+      .orgchart { background: #fff; }
+      .orgchart td.left, .orgchart td.right, .orgchart td.top { border-color: #aaa; }
+      .orgchart td>.down { background-color: #aaa; }
+      .orgchart .middle-level .title { background-color: #006699; }
+      .orgchart .middle-level .content { border-color: #006699; }
+      .orgchart .product-dept .title { background-color: #009933; }
+      .orgchart .product-dept .content { border-color: #009933; }
+      .orgchart .rd-dept .title { background-color: #993366; }
+      .orgchart .rd-dept .content { border-color: #993366; }
+      .orgchart .pipeline1 .title { background-color: #996633; }
+      .orgchart .pipeline1 .content { border-color: #996633; }
+      .orgchart .frontend1 .title { background-color: #cc0066; }
+      .orgchart .frontend1 .content { border-color: #cc0066;  } */
+
 
 
 
@@ -288,6 +290,15 @@
       left: 35%;
     }
   }
+  /*validasi*/
+  .bold {
+  font-weight:bold;
+}
+.block {
+  display:block;
+}
+
+
   </style>
 
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -308,6 +319,7 @@
 
   <!-- DataTables -->
   <script src="<?php echo base_url('assets/admin/bower_components/datatables.net/js/jquery.dataTables.min.js')?>"></script>
+  <script src="<?php echo base_url('assets/admin/bower_components/datatables.net/js/dataTables.rowsGroup.js')?>"></script>
   <script src="<?php echo base_url('assets/admin/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js')?>"></script>
 </head>
 <!-- ADD THE CLASS fixed TO GET A FIXED HEADER AND SIDEBAR LAYOUT -->
@@ -547,7 +559,6 @@ immediately after the control sidebar -->
 <script src="<?php echo base_url('assets/js/user.js')?>"></script>
 
 <script type="text/javascript" src="<?php echo base_url('assets/orgchart/js/jquery.mockjax.min.js')?>"></script>
-<script type="text/javascript" src="<?php echo base_url('assets/orgchart/js/jquery.orgchart.js')?>"></script>
 
 </body>
 </html>

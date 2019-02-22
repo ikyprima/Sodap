@@ -638,7 +638,7 @@ class User_model extends CI_Model
 	//pptk
   //#ryh
   function getnamaopd($nip){
-    $this->db->select('`daftunit`.`unitkey`,`daftunit`.`nmunit`');
+    $this->db->select('`daftunit`.`unitkey`,`daftunit`.`nmunit`,`daftunit`.`stat_kak_bmodal`');
     $this->db->from('`tab_pns`');
     $this->db->join('daftunit', '`tab_pns`.`unitkey` = `daftunit`.`unitkey`');
     $this->db->where('nip', $nip);
@@ -839,6 +839,18 @@ function getttdkak($idtabpptk){
       $this->db->order_by('angkas.kd_bulan','asc');
       return $this->db->get()->result_array();
      }
+
+     function sumangkas($idkeg,$unitkey,$thn){
+
+      $this->db->select('SUM(`nilai`) as nilai');
+      $this->db->from('angkas');
+      $this->db->where('angkas.tahun', $thn);
+      $this->db->where('angkas.kdkegunit', $idkeg);
+      $this->db->where('angkas.unitkey', $unitkey);
+
+      return $this->db->get()->row_array();
+     }
+
 
       function angkasrek_by($idkeg,$unitkey,$bulan,$thn){
 
@@ -1087,7 +1099,7 @@ function realkeu_ppk_bmodal_persen($wherein,$thn,$kdbln,$sd=null){
 function realkeu_ppk($idtab,$thn,$kdbln){
 // select tab_realisasi MONTH(`tab_realisasi_bmodal`.`real_bulan`)
 
-  $this->db->select('tab_realisasi.id as id,permasalahan,real_fisik,bobot_real,SUM(`tab_realisasi_det`.`jumlah_harga`) AS nilai');
+  $this->db->select('tab_realisasi.id as id,permasalahan,real_fisik,bobot_real,SUM(`tab_realisasi_det`.`jumlah_harga`) AS nilai , tab_realisasi.stat_teruskan');
   $this->db->from('`tab_realisasi_det`');
   $this->db->join('tab_realisasi', '`tab_realisasi_det`.`id_tab_realisasi` = `tab_realisasi`.`id`');
   $this->db->where('tab_realisasi.id_tabpptk', $idtab);
@@ -1244,6 +1256,48 @@ function getdetlistkegiatan_detpptk($nip,$kdkegunit,$thn){
       'blnskr'=> $blnskr['blnskr'],
       'blnsdskr'=>$blnsdskr['blnsdskr']
               );
+
+    return $nilai;
+
+    }
+
+    function paguopd($thnsekarang,$blnsekarang,$idopd){
+      // ambil aliran kas berdasrkan unitkey (idopd) Saja
+  //     SELECT
+  //     SUM(`angkas`.`nilai`) AS `pagu_tahun`
+  // FROM angkas WHERE `unitkey`='80_' AND `kdkegunit`!='0_' AND `kd_bulan`>='1' AND `kd_bulan`<='12'
+    $nilai = array();
+    $this->db->select('
+    SUM(`angkas`.`nilai`) AS `tahun`');
+    $this->db->from('angkas');
+    $this->db->where('tahun', $thnsekarang);
+    $this->db->where('unitkey', $idopd);
+    $this->db->where('kdkegunit!=', '0_');
+    $tahun = $this->db->get()->row_array();
+
+    $this->db->select('
+    SUM(`angkas`.`nilai`) AS `blnskr`');
+    $this->db->from('angkas');
+    $this->db->where('tahun', $thnsekarang);
+    $this->db->where('unitkey', $idopd);
+    $this->db->where('kd_bulan', $blnsekarang);
+    $this->db->where('kdkegunit!=', '0_');
+    $blnskr = $this->db->get()->row_array();
+
+    $this->db->select('
+    SUM(`angkas`.`nilai`) AS `blnsdskr`');
+    $this->db->from('angkas');
+    $this->db->where('tahun', $thnsekarang);
+    $this->db->where('unitkey', $idopd);
+    $this->db->where('kd_bulan <=', $blnsekarang);
+    $this->db->where('kdkegunit!=', '0_');
+    $blnsdskr = $this->db->get()->row_array();
+
+    $nilai[]=array(
+      'tahun' => $tahun['tahun'],
+      'blnskr'=> $blnskr['blnskr'],
+      'blnsdskr'=>$blnsdskr['blnsdskr']
+    );
 
     return $nilai;
 
@@ -1406,8 +1460,8 @@ function update_teruskan_ppk($postidtabpptk,$posttahun,$postbulan,$data){
       	$this->db->from('tab_struktur');
       	$this->db->join('tab_pns', 'tab_struktur.nip = tab_pns.nip');
       	$this->db->where('tab_struktur.id_unit', $idunit);
-        $this->db->where('tab_struktur.peran', '2');
-        $this->db->or_where('tab_struktur.peran', '6');
+        $this->db->where_in('tab_struktur.peran', '2,6');
+        // $this->db->or_where('tab_strduktur.peran', '6');
 
       	return $this->db->get()->result();
 	}
@@ -1790,6 +1844,21 @@ function simpanentrikak($masterkak){
         $this->db->group_by('`matangr`.`mtgkey`');
         return $this->db->get();
     }
+    function cekblnjamodal_spesial($unitkey,$idkeg,$thn){
+
+        $this->db->select('  `tab_modal_spesial`.`id`
+          , `matangr`.`mtgkey`
+          , `matangr`.`kdper`
+          , `matangr`.`nmper`
+          , `dpa221`.`uraian`');
+        $this->db->from('tab_modal_spesial');
+        $this->db->join('dpa221', '`tab_modal_spesial`.`id_dpa221` = `dpa221`.`id`');
+        $this->db->join('matangr', '`dpa221`.`mtgkey` = `matangr`.`mtgkey`');
+        $this->db->where('`dpa221`.`unitkey`', $unitkey);
+        $this->db->where('`dpa221`.`kdkegunit`', $idkeg);
+        $this->db->where('`dpa221`.`tahun`', $thn);
+          return $this->db->get();
+    }
 
     function getnama_metode(){
       return $this->db->get('tab_metode_pelaksanaan')->result();
@@ -1814,7 +1883,82 @@ function simpanentrikak($masterkak){
 
         return $this->datatables->generate();
     }
-     function cektargetfisik($unit,$kegiatan){
+
+    function jsonlistbmodal_spesial($unit,$kegiatan,$thn){
+
+      $this->datatables->select('`tab_modal_spesial`.`id` as id
+        , `matangr`.`mtgkey` as mtgkey
+        , `matangr`.`kdper` as kdper
+        , `matangr`.`nmper` as nmper
+        , `dpa221`.`kdkegunit` as kdkegunit
+        , CONCAT(matangr.kdper," ",dpa221.kdjabar) as kdjabar
+        , `dpa221`.`uraian` as uraian
+        , (`tab_target_blnj_modal`.`idtab_pptk` IS NOT NULL) AS ada');
+      $this->datatables->from('`tab_modal_spesial`');
+      $this->datatables->join('`dpa221`', '`tab_modal_spesial`.`id_dpa221` = `dpa221`.`id`');
+      $this->datatables->join('`matangr`', '`dpa221`.`mtgkey` = `matangr`.`mtgkey`');
+      $this->datatables->join('`tab_target_blnj_modal`', '`tab_target_blnj_modal`.`mtgkey` = `matangr`.`mtgkey`','LEFT');
+      $this->datatables->where('`dpa221`.`unitkey`', $unit);
+      $this->datatables->where('`dpa221`.`kdkegunit`', $kegiatan);
+      $this->datatables->where('`dpa221`.`tahun`', $thn);
+      $this->db->order_by('kdjabar','asc');
+
+        return $this->datatables->generate();
+    }
+
+    function jsonlisturaian_spesial($unit,$kegiatan,$thn){
+
+      $this->datatables->select(' dpa221.id
+    	     , matangr.kdper
+	         , CONCAT(matangr.kdper," ",dpa221.kdjabar) AS rekeningfull
+           , matangr.nmper as nmrek
+           , matangr.mtglevel
+           , matangr.type
+           , matangr.tahun
+           , mkegiatan.kdkegunit
+           , mkegiatan.nmkegunit AS nmkegunit
+           , dpa221.satuan
+           , dpa221.jumbyek
+           , dpa221.unitkey
+           , dpa221.uraian AS uraian
+           , dpa221.tarif
+           , dpa221.kdjabar ');
+      $this->datatables->from('dpa221');
+      $this->datatables->join('mkegiatan', 'dpa221.kdkegunit = mkegiatan.kdkegunit');
+      $this->datatables->join('matangr', 'dpa221.mtgkey = matangr.mtgkey');
+      $this->datatables->where('dpa221.tahun', $thn);
+      $this->datatables->where('dpa221.unitkey', $unit);
+      $this->datatables->where('mkegiatan.kdkegunit`', $kegiatan);
+      $this->datatables->like('`matangr`.`kdper`', '5.2.3.', 'both');
+      $this->datatables->add_column('action', '<a class="btn btn-social-icon btn-bitbucket tambahmodal"><i class="fa fa-plus"></i></a>' );
+      return $this->datatables->generate();
+    }
+
+    function cekmodalstat($iddpa){
+      $this->db->where('id_dpa221',$iddpa);
+      return $this->db->get('tab_modal_spesial');
+    }
+    function simpanmodalspesial($data){
+
+      $this->db->trans_start();
+      $this->db->insert('tab_modal_spesial', $data);
+      $this->db->trans_complete();
+
+      if ($this->db->trans_status() === FALSE)
+      {
+        $this->db->trans_rollback();
+        return FALSE;
+      }
+      else
+      {
+        $this->db->trans_commit();
+        return TRUE;
+      }
+
+    }
+
+
+    function cektargetfisik($unit,$kegiatan){
       $this->db->select('`angkas`.`kdkegunit` as kdkegunit
         , `matangr`.`mtgkey` as mtgkey
         , `matangr`.`kdper` as kdper
@@ -2712,12 +2856,51 @@ FROM
 
     function get_list_ppk ($idmaster){
 
-      $this->db->where('id_pptk_master', $idmaster);
-      $this->db->group_by('idpnsppk');
-      $this->db->order_by('idpnsppk','asc');
-      return $this->db->get('tab_pptk');
+             $this->db->select('
+             `tab_pptk`.`id`
+             ,`tab_pptk`.`id_pptk_master`
+             ,sum(`tab_pptk`.`nilai`) as nilai
+             ,`tab_pptk`.`status`
+             ,`tab_pptk`.`idpnsppk` as nipppk
+             , u1.nama idpnsppk');
+             $this->db->from('tab_pptk');
+             $this->db->join('tab_pns u1', 'tab_pptk.idpnsppk = u1.nip');
+             $this->db->join('tab_pptk_master', 'tab_pptk.id_pptk_master = tab_pptk_master.id');
+              $this->db->where('id_pptk_master', $idmaster);
+              $this->db->group_by('idpnsppk');
+              $this->db->order_by('`tab_pptk`.`idpnsppk`','asc');
+              return $this->db->get();
 
     }
+    function getdetlistkegiatan_semuappk($idmaster,$thn){
+
+
+       $this->db->select('
+       `mpgrm`.`IDPRGRM` as idprog
+       ,`mpgrm`.`NMPRGRM` as prog
+       ,`mkegiatan`.`kdkegunit` as kdkegunit
+       ,`mkegiatan`.`nmkegunit` as nmkegunit
+       , `tab_pptk`.`nilai`
+       , `tab_pptk`.`id`
+       , `tab_pptk`.`status`
+       ,`tab_pptk`.`idpnspptk` as nippptk
+       ,`tab_pptk`.`idpnsppk` as nipppk
+       , u2.nama idpnspptk
+       , u1.nama idpnsppk');
+         $this->db->from('tab_pptk');
+         $this->db->join('tab_pns u1', 'tab_pptk.idpnsppk = u1.nip');
+         $this->db->join('tab_pns u2', 'tab_pptk.idpnspptk = u2.nip');
+         $this->db->join('tab_pptk_master', 'tab_pptk.id_pptk_master = tab_pptk_master.id');
+         $this->db->join('daftunit', 'tab_pptk_master.unitkey = daftunit.unitkey');
+         $this->db->join('mkegiatan', 'tab_pptk.kdkegunit = mkegiatan.kdkegunit');
+         $this->db->join('mpgrm', 'mkegiatan.idprgrm = mpgrm.IDPRGRM');
+         $this->db->where('tab_pptk_master.tahun', $thn);
+         $this->db->where('tab_pptk_master.id', $idmaster);
+         $this->db->where('daftunit.tahun', $thn);
+         $this->db->where('mkegiatan.tahun', $thn);
+
+         return $this->db->get()->result_array();
+       }
 
     // batas sektretaris
 

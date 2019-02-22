@@ -15,7 +15,7 @@
         $("#dashrealopd").click(function () {
             Pace.restart();
             Pace.track(function () {
-                window.location.href = base_url + "User/dafallkeg";
+                window.location.href = base_url + "User/evaluasi-semua-sekretaris";
             });
         });
     });

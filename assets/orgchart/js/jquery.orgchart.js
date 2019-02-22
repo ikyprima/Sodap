@@ -341,7 +341,7 @@
     buildJsonDS: function ($li) {
       var that = this;
       var subObj = {
-        'name': $li.contents().eq(0).text().trim(),
+        'name': $li.contentss().eq(0).text().trim(),
         'relationship': ($li.parent().parent().is('li') ? '1': '0') + ($li.siblings('li').length ? 1: 0) + ($li.children('ul').length ? 1 : 0)
       };
       $.each($li.data(), function(key, value) {
@@ -1135,14 +1135,14 @@
           child.parentId = data.id;
         });
       }
-      // construct the content of node
+      // construct the contents of node
       var $nodeDiv = $('<div' + (opts.draggable ? ' draggable="true"' : '') + (data[opts.nodeId] ? ' id="' + data[opts.nodeId] + '"' : '') + (data.parentId ? ' data-parent="' + data.parentId + '"' : '') + '>')
         .addClass('node ' + (data.className || '') +  (level > opts.visibleLevel ? ' slide-up' : ''));
       if (opts.nodeTemplate) {
         $nodeDiv.append(opts.nodeTemplate(data));
       } else {
         $nodeDiv.append('<div class="title">' + data[opts.nodeTitle] + '</div>')
-          .append(typeof opts.nodeContent !== 'undefined' ? '<div class="content">' + (data[opts.nodeContent] || '') + '</div>' : '');
+          .append(typeof opts.nodecontents !== 'undefined' ? '<div class="contents">' + (data[opts.nodecontents] || '') + '</div>' : '');
       }
       //
       var nodeData = $.extend({}, data);
@@ -1336,9 +1336,10 @@
     },
     //
     removeNodes: function ($node) {
-      var $parent = $node.closest('table').parent();
-      var $sibs = $parent.parent().siblings();
-      if ($parent.is('td')) {
+      var isVerticalNode = $node.parents('.verticalNodes').length > 0 ? true : false
+      var $parent = isVerticalNode ? $node.parent() : $node.closest('table').parent();
+      var $sibs = isVerticalNode ? $parent.siblings() : $parent.parent().siblings();
+      if ($parent.is('td') || $parent.is('li')) {
         if (this.getNodeState($node, 'siblings').exist) {
           $sibs.eq(2).children('.topLine:lt(2)').remove();
           $sibs.slice(0, 2).children().attr('colspan', $sibs.eq(2).children().length);

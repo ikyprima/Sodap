@@ -56,24 +56,29 @@
 
   <div class="col-md-3 col-sm-6 col-xs-12">
 
+          <div class="input-group-btn">
+                  <button type="button" class="btn btn-block btn-social btn-success btn-flat dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Pilihan
+                  <i class="fa fa-external-link"></i>  </button>
+                  <ul class="dropdown-menu btn-block ">
+
+                    <li><a href="#">Ubah KAK</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#">Cetak KAK</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#">KAK Belanja Modal</a></li>
+
+                  </ul>
+                </div>
 
   </div>
 
-<div class="col-md-2 col-sm-7 col-xs-12 pull-right">
-     <a class="btn btn-danger btn-social btn-success" target="_blank" href="<?php echo base_url("User/timeschedule/").$idtab; ?>">
-                     <i class="fa fa-print"></i> Cetak Time Schedule
-    </a>
- </div>
 
-  <div class="col-md-2 col-sm-7 col-xs-12 pull-right">
-     <a class="btn btn-danger btn-social btn-success" target="_blank" href="<?php echo base_url("User/lapkak/").$idtab; ?>">
-                     <i class="fa fa-print"></i> Cetak KAK
-    </a>
- </div>
 
 
 
 </div>
+<br>
+<br>
 <br>
 <!-- Default box -->
 
@@ -256,156 +261,148 @@
          <h5 class="text-left" style="margin-left: 20px"><?php echo $list->iii_penutup ?></h5>
        </div>
       </div>
+      <br>
+      <br>
+      <div class="row">
 
+          <div class="col-md-5 col-sm-5 col-xs-12">
+        <p class="text-muted">Time Schedule Kegiatan</p>
 
-    <div class="box box-info">
-        <div class="box-header">
-          <i class="fa fa-clock-o"></i>
+         </div>
+       </div>
+       <div class="table-responsive">
+        <table class="table table-bordered tabel-schedule" style="width: 100%" id="tb-uraian">
+          <thead>
+            <tr>
 
-          <h3 class="box-title">Time Schedule Kegiatan</h3>
-          <!-- tools box -->
+              <th rowspan="2" style="vertical-align : middle;text-align:center;">#</th>
+              <th rowspan="2" class='text-center' style="vertical-align : middle;width: 19%">Nama Uraian</th>
+              <th colspan="4" class='text-center ' style="width: 4%">Januari</th>
+              <th colspan="4" class='text-center 'style="width: 4%">Februari</th>
+              <th colspan="4" class='text-center' style="width: 4%">Maret</th>
+              <th colspan="4" class='text-center' style="width: 4%">April</th>
+              <th colspan="4" class='text-center ' style="width: 4%">Mei</th>
+              <th colspan="4" class='text-center ' style="width: 4%">Juni</th>
+              <th colspan="4" class='text-center ' style="width: 4%">Juli</th>
+              <th colspan="4" class='text-center ' style="width: 4%">Agustus</th>
+              <th colspan="4" class='text-center ' style="width: 4%">September</th>
+              <th colspan="4" class='text-center ' style="width: 4%">Oktober</th>
+              <th colspan="4" class='text-center ' style="width: 4%">November</th>
+              <th colspan="4" class='text-center ' style="width: 4%">Desember</th>
 
-          <!-- /. tools -->
-        </div>
-        <div class="box-body">
-         <div class="table-responsive">
-          <table class="table table-bordered tabel-schedule" style="width: 100%" id="tb-uraian">
-            <thead>
-              <tr>
+            </tr>
+            <tr>
 
-                <th rowspan="2" style="vertical-align : middle;text-align:center;">#</th>
-                <th rowspan="2" class='text-center' style="vertical-align : middle;width: 20%">&nbsp&nbsp&nbsp&nbsp&nbspNama&nbspUraian&nbsp&nbsp&nbsp&nbsp&nbsp</th>
-                <th colspan="4" class='text-center ' style="width: 4%">Januari</th>
-                <th colspan="4" class='text-center 'style="width: 4%">Februari</th>
-                <th colspan="4" class='text-center' style="width: 4%">Maret</th>
-                <th colspan="4" class='text-center' style="width: 4%">April</th>
-                <th colspan="4" class='text-center ' style="width: 4%">Mei</th>
-                <th colspan="4" class='text-center ' style="width: 4%">Juni</th>
-                <th colspan="4" class='text-center ' style="width: 4%">Juli</th>
-                <th colspan="4" class='text-center ' style="width: 4%">Agustus</th>
-                <th colspan="4" class='text-center ' style="width: 4%">September</th>
-                <th colspan="4" class='text-center ' style="width: 4%">Oktober</th>
-                <th colspan="4" class='text-center ' style="width: 4%">November</th>
-                <th colspan="4" class='text-center ' style="width: 4%">Desember</th>
+              <th style="min-width:2px; font-size: 10px">1</th>
+              <th style="min-width:2px; font-size: 10px">2</th>
+              <th style="min-width:2px; font-size: 10px">3</th>
+              <th style="min-width:2px; font-size: 10px">4</th>
+              <th style="min-width:2px; font-size: 10px">1</th>
+              <th style="min-width:2px; font-size: 10px">2</th>
+              <th style="min-width:2px; font-size: 10px">3</th>
+              <th style="min-width:2px; font-size: 10px">4</th>
+              <th style="min-width:2px; font-size: 10px">1</th>
+              <th style="min-width:2px; font-size: 10px">2</th>
+              <th style="min-width:2px; font-size: 10px">3</th>
+              <th style="min-width:2px; font-size: 10px">4</th>
+              <th style="min-width:2px; font-size: 10px">1</th>
+              <th style="min-width:2px; font-size: 10px">2</th>
+              <th style="min-width:2px; font-size: 10px">3</th>
+              <th style="min-width:2px; font-size: 10px">4</th>
+              <th style="min-width:2px; font-size: 10px">1</th>
+              <th style="min-width:2px; font-size: 10px">2</th>
+              <th style="min-width:2px; font-size: 10px">3</th>
+              <th style="min-width:2px; font-size: 10px">4</th>
+              <th style="min-width:2px; font-size: 10px">1</th>
+              <th style="min-width:2px; font-size: 10px">2</th>
+              <th style="min-width:2px; font-size: 10px">3</th>
+              <th style="min-width:2px; font-size: 10px">4</th>
+              <th style="min-width:2px; font-size: 10px">1</th>
+              <th style="min-width:2px; font-size: 10px">2</th>
+              <th style="min-width:2px; font-size: 10px">3</th>
+              <th style="min-width:2px; font-size: 10px">4</th>
+              <th style="min-width:2px; font-size: 10px">1</th>
+              <th style="min-width:2px; font-size: 10px">2</th>
+              <th style="min-width:2px; font-size: 10px">3</th>
+              <th style="min-width:2px; font-size: 10px">4</th>
+              <th style="min-width:2px; font-size: 10px">1</th>
+              <th style="min-width:2px; font-size: 10px">2</th>
+              <th style="min-width:2px; font-size: 10px">3</th>
+              <th style="min-width:2px; font-size: 10px">4</th>
+              <th style="min-width:2px; font-size: 10px">1</th>
+              <th style="min-width:2px; font-size: 10px">2</th>
+              <th style="min-width:2px; font-size: 10px">3</th>
+              <th style="min-width:2px; font-size: 10px">4</th>
+              <th style="min-width:2px; font-size: 10px">1</th>
+              <th style="min-width:2px; font-size: 10px">2</th>
+              <th style="min-width:2px; font-size: 10px">3</th>
+              <th style="min-width:2px; font-size: 10px">4</th>
+              <th style="min-width:2px; font-size: 10px">1</th>
+              <th style="min-width:2px; font-size: 10px">2</th>
+              <th style="min-width:2px; font-size: 10px">3</th>
+              <th style="min-width:2px; font-size: 10px">4</th>
 
-              </tr>
-              <tr>
+            </tr>
+          </thead>
+          <tbody id="tbodyid">
 
-                <th style="min-width:2px; font-size: 10px">1</th>
-                <th style="min-width:2px; font-size: 10px">2</th>
-                <th style="min-width:2px; font-size: 10px">3</th>
-                <th style="min-width:2px; font-size: 10px">4</th>
-                <th style="min-width:2px; font-size: 10px">1</th>
-                <th style="min-width:2px; font-size: 10px">2</th>
-                <th style="min-width:2px; font-size: 10px">3</th>
-                <th style="min-width:2px; font-size: 10px">4</th>
-                <th style="min-width:2px; font-size: 10px">1</th>
-                <th style="min-width:2px; font-size: 10px">2</th>
-                <th style="min-width:2px; font-size: 10px">3</th>
-                <th style="min-width:2px; font-size: 10px">4</th>
-                <th style="min-width:2px; font-size: 10px">1</th>
-                <th style="min-width:2px; font-size: 10px">2</th>
-                <th style="min-width:2px; font-size: 10px">3</th>
-                <th style="min-width:2px; font-size: 10px">4</th>
-                <th style="min-width:2px; font-size: 10px">1</th>
-                <th style="min-width:2px; font-size: 10px">2</th>
-                <th style="min-width:2px; font-size: 10px">3</th>
-                <th style="min-width:2px; font-size: 10px">4</th>
-                <th style="min-width:2px; font-size: 10px">1</th>
-                <th style="min-width:2px; font-size: 10px">2</th>
-                <th style="min-width:2px; font-size: 10px">3</th>
-                <th style="min-width:2px; font-size: 10px">4</th>
-                <th style="min-width:2px; font-size: 10px">1</th>
-                <th style="min-width:2px; font-size: 10px">2</th>
-                <th style="min-width:2px; font-size: 10px">3</th>
-                <th style="min-width:2px; font-size: 10px">4</th>
-                <th style="min-width:2px; font-size: 10px">1</th>
-                <th style="min-width:2px; font-size: 10px">2</th>
-                <th style="min-width:2px; font-size: 10px">3</th>
-                <th style="min-width:2px; font-size: 10px">4</th>
-                <th style="min-width:2px; font-size: 10px">1</th>
-                <th style="min-width:2px; font-size: 10px">2</th>
-                <th style="min-width:2px; font-size: 10px">3</th>
-                <th style="min-width:2px; font-size: 10px">4</th>
-                <th style="min-width:2px; font-size: 10px">1</th>
-                <th style="min-width:2px; font-size: 10px">2</th>
-                <th style="min-width:2px; font-size: 10px">3</th>
-                <th style="min-width:2px; font-size: 10px">4</th>
-                <th style="min-width:2px; font-size: 10px">1</th>
-                <th style="min-width:2px; font-size: 10px">2</th>
-                <th style="min-width:2px; font-size: 10px">3</th>
-                <th style="min-width:2px; font-size: 10px">4</th>
-                <th style="min-width:2px; font-size: 10px">1</th>
-                <th style="min-width:2px; font-size: 10px">2</th>
-                <th style="min-width:2px; font-size: 10px">3</th>
-                <th style="min-width:2px; font-size: 10px">4</th>
+            <?php
+              $x=1;
+              foreach ($schedule as $key) {
+                ?>
+                  <tr>
+                      <td style="min-width:2px; font-size: 11px"><?php echo $x++ ?></td>
+                      <td style="min-width:2px; font-size: 11px"><?php echo $key->uraian_keg?></td>
+                      <?php
 
-              </tr>
-            </thead>
-            <tbody id="tbodyid">
+                        $bulan = array(
+                              $key->jan,
+                              $key->feb,
+                              $key->mar,
+                              $key->apr,
+                              $key->mei,
+                              $key->jun,
+                              $key->jul,
+                              $key->ags,
+                              $key->sep,
+                              $key->okt,
+                              $key->nov,
+                              $key->des
+                        );
+                        foreach ($bulan as $key ) {
+                          $arrblnke= array();
 
-              <?php
-                $x=1;
-                foreach ($schedule as $key) {
-                  ?>
-                    <tr>
-                        <td style="min-width:2px; font-size: 11px"><?php echo $x++ ?></td>
-                        <td style="min-width:2px; font-size: 11px"><?php echo $key->uraian_keg?></td>
-                        <?php
-
-                          $bulan = array(
-                                $key->jan,
-                                $key->feb,
-                                $key->mar,
-                                $key->apr,
-                                $key->mei,
-                                $key->jun,
-                                $key->jul,
-                                $key->ags,
-                                $key->sep,
-                                $key->okt,
-                                $key->nov,
-                                $key->des
-                          );
-                          foreach ($bulan as $key ) {
-                            $arrblnke= array();
-
-                            $isi = str_split($key);
-                              foreach ($isi as $dataisi) {
-                              $arrblnke[$dataisi]=$dataisi;
-                            }
-                            for($i=0;$i<4;$i++){
-                                if(array_key_exists($i+1, $arrblnke))
-                                    echo "<td class='enable highlighted' style='min-width:2px; font-size: 10px'><p hidden=''></p></td>";
-                                else
-                                  echo "<td class='enable' style='min-width:2px; font-size: 10px'><p hidden=''></p></td>";
-                            }
+                          $isi = str_split($key);
+                            foreach ($isi as $dataisi) {
+                            $arrblnke[$dataisi]=$dataisi;
                           }
+                          for($i=0;$i<4;$i++){
+                              if(array_key_exists($i+1, $arrblnke))
+                                  echo "<td class='enable highlighted' style='min-width:2px; font-size: 10px'><p hidden=''></p></td>";
+                              else
+                                echo "<td class='enable' style='min-width:2px; font-size: 10px'><p hidden=''></p></td>";
+                          }
+                        }
 
-                          // $jan =str_split($key->jan);
-                          // $arrbln=array();
+                        // $jan =str_split($key->jan);
+                        // $arrbln=array();
 
-                          // var_dump($arrjan);exit;
-                          //     for($i=0;$i<4;$i++){
+                        // var_dump($arrjan);exit;
+                        //     for($i=0;$i<4;$i++){
 
-                          //   echo "<td class='enable 7 highlighted' style='min-width:2px; font-size: 10px'><p hidden=''></p></td>";
+                        //   echo "<td class='enable 7 highlighted' style='min-width:2px; font-size: 10px'><p hidden=''></p></td>";
 
 
-                        ?>
-                    </tr>
-                  <?php
-                }
-              ?>
-            </tbody>
-          </table>
-        </div>
+                      ?>
+                  </tr>
+                <?php
+              }
+            ?>
+          </tbody>
+        </table>
+       </div>
 
-      <div class="box-footer clearfix">
 
-      </div>
-    </div>
-
-  </div>
 
 
 

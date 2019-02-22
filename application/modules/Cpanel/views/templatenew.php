@@ -75,20 +75,22 @@
   <link rel="stylesheet" href="<?php echo base_url('assets/orgchart/css/jquery.orgchart.css')?>">
   <link rel="stylesheet" href="<?php echo base_url('assets/orgchart/css/style.css')?>">
   <style type="text/css">
-  #chart-container { height: 100%; border: 2px solid #aaa; }
-  .orgchart { background: #fff; }
-  .orgchart td.left, .orgchart td.right, .orgchart td.top { border-color: #aaa; }
-  .orgchart td>.down { background-color: #aaa; }
-  .orgchart .middle-level .title { background-color: #006699; }
-  .orgchart .middle-level .content { border-color: #006699; }
-  .orgchart .product-dept .title { background-color: #009933; }
-  .orgchart .product-dept .content { border-color: #009933; }
-  .orgchart .rd-dept .title { background-color: #993366; }
-  .orgchart .rd-dept .content { border-color: #993366; }
-  .orgchart .pipeline1 .title { background-color: #996633; }
-  .orgchart .pipeline1 .content { border-color: #996633; }
-  .orgchart .frontend1 .title { background-color: #cc0066; }
-  .orgchart .frontend1 .content { border-color: #cc0066; }
+  .scaled {
+  transform: scale(1.01,1.04); /* Equal to scaleX(0.7) scaleY(0.7) */
+  /* background-color: pink; */
+  }
+  .allSides
+    {
+      /* top : -2px;
+      left: 5px; */
+
+      border: solid 1px #555;
+      background-color: #eed;
+      box-shadow:  0 0 15px  rgba(0,0,0,0.6);
+      -moz-box-shadow: 0 0 15px  rgba(0,0,0,0.6);
+      -webkit-box-shadow: 0 0 15px  rgba(0,0,0,0.6);
+      -o-box-shadow: 0 0 15px  rgba(0,0,0,0.6);
+    }
 
 
 

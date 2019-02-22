@@ -3,7 +3,7 @@
         $("#dashkeg").click(function () {
             Pace.restart();
             Pace.track(function () {
-                window.location.href = base_url + "User/kakppk";
+                window.location.href = base_url + "User/list-kegiatan-kpa";
             });
         });
         $("#dashevalpptk").click(function () {

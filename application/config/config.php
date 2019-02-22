@@ -470,6 +470,8 @@ $config['csrf_exclude_uris'] = array(
 		'User/cekkegiatan/.*+',
 		'User/cekkegiatanentri/.*+',
 		'User/jsonlistbmodal/.*+',
+		'User/jsonlistbmodal_spesial/.*+',
+		'User/jsonlisturaian_spesial/.*+',
 		'User/cektargetfisik/.*+',
 		'User/cekrealbmodal/.*+',
 		'User/json_detail_sk/.*+',

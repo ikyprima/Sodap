@@ -309,6 +309,7 @@ class User extends MX_Controller
         $idopd =$getopd->unitkey;
         $namaopd=$getopd->nmunit;
         $listprogram =  $this->User_model->ksubpro_listprogram($idopd,$this->tahunskr);
+          $prog= array();
         if(!$listprogram ){
             $prog[]=array();
         }else{
@@ -732,14 +733,21 @@ class User extends MX_Controller
         }else{
             // cari opd berdasarkan admin yang login dengan parameter NIP yang ada di username pada saat login
             $nip=$this->ion_auth->user()->row()->username;
-            $rowunit=$this->User_model->getpns($nip);
-            $idunit=$rowunit->unitkey;
-            $this->data= array(
-                'idopd'     =>  $idunit
+            // $rowunit=$this->User_model->getpns($nip);
+            // $idunit=$rowunit->unitkey;
+            $getopd = $this->User_model->getnamaopd($nip);
+            $idopd =$getopd->unitkey;
+            $namaopd=$getopd->nmunit;
 
-            );
 
-            $this->template->load('viewlama/template','v_struktur',$this->data);
+                    $this->data= array(
+                        'nmopd'     => $namaopd,
+                        'tahun'     => $this->tahunskr,
+                        'idopd'     => $idopd,
+
+                    );
+            // $this->template->load('viewlama/template','v_struktur',$this->data);
+             $this->template->load('templatenew','v_struktur',$this->data);
         }
     }
 /********AGUNG-SETIA-BUDI-AGUNG-SETIA-BUDI-AGUNG-SETIA-BUDI-AGUNG-SETIA-BUDI-AGUNG-SETIA-BUDI*/
@@ -808,7 +816,44 @@ class User extends MX_Controller
         echo $this->User_model->jsonstrukturlist_by($opd);
     }
     /*AGUNG-SETIA-BUDI-AGUNG-SETIA-BUDI-AGUNG-SETIA-BUDI-AGUNG-SETIA-BUDI-AGUNG-SETIA-BUDI*************/
+
+    function jsonstrukturedit($opd){
+
+        $items = [
+            0 => [
+                'id' => 1,
+                'parent' => 0,
+                'name' => 'Struktur',
+                'title' => 'Belum Ada'
+            ],
+
+            1 => [
+                'id' => 2,
+                'parent' => 1,
+                'name' => 'Struktur',
+                'title' => 'Belum Ada'
+            ],
+
+            2 => [
+                'id' => 3,
+                'parent' => 1,
+                'name' => 'Struktur',
+                'title' => 'Belum Ada'
+            ]
+        ];
+        $result=$this->User_model->struktur($opd);
+        if($result){
+            $arr= $this->buildTree($result);
+        }else{
+            $arr= $this->buildTree($items);
+        }
+
+        $ok[]=$arr[0];
+        header('Content-Type: application/json');
+        echo json_encode($ok);
+    }
     function jsonstruktur($opd){
+
 
         $items = [
             0 => [
@@ -954,6 +999,7 @@ class User extends MX_Controller
           if($getmastersk->num_rows()>0){
             redirect('User/listsk','refresh');
           }else{
+          //  echo json_encode($ppk);exit;
             $this->template->load('templatenew','v_entrikegiatan',$this->data);
           }
 
@@ -1214,11 +1260,32 @@ function dafkeg(){
             $peran=$struktur->peran;
             if($peran=='3'){
               $lskeg = $this->User_model->getlistkegiatan($nip,$this->tahunskr);
+                  // $this->data= array(
+                  //     'idopd'     => $idopd,
+                  //     'nmopd'     =>  $namaopd,
+                  //     'tahun'     =>  $this->tahunskr,
+                  //     'list'      =>$lskeg
+                  // );
+                  $list=array();
+                  foreach ($lskeg as $key => $value) {
+                    $kdkeg= $value['kdkegunit'];
+                    //sum ke angkas get nilai sum
+                    $getnilai =$this->User_model->sumangkas($kdkeg,$idopd,$this->tahunskr);
+                    $list[] = array(
+                      'id'        => $value['id'],
+                      'kdkegunit' => $value['kdkegunit'],
+                      'nmkegunit' => $value['nmkegunit'],
+                      'nilai'     => $getnilai['nilai'],
+                      'idpnspptk' => $value['idpnspptk'],
+                      'idpnsppk'  => $value['idpnsppk']
+
+                    );
+                  }
                   $this->data= array(
                       'idopd'     => $idopd,
-                      'nmopd'     =>  $namaopd,
-                      'tahun'     =>  $this->tahunskr,
-                      'list'      =>$lskeg
+                      'nmopd'     => $namaopd,
+                      'tahun'     => $this->tahunskr,
+                      'list'      => $list
                   );
                   $this->template->load('templatenew','v_dafkeg_pptk',$this->data);
             }else{
@@ -1243,12 +1310,29 @@ function dafkeg(){
             if($peran=='3'){
                 /*jika peran 3 maka PPTK*/
                 $lskeg = $this->User_model->getlistkegiatan($nip,$this->tahunskr);
+                $list=array();
+                foreach ($lskeg as $key => $value) {
+                  $kdkeg= $value['kdkegunit'];
+                  //sum ke angkas get nilai sum
+                  $getnilai =$this->User_model->sumangkas($kdkeg,$idopd,$this->tahunskr);
+                  $list[] = array(
+                    'id'        => $value['id'],
+                    'kdkegunit' => $value['kdkegunit'],
+                    'nmkegunit' => $value['nmkegunit'],
+                    'nilai'     => $getnilai['nilai'],
+                    'idpnspptk' => $value['idpnspptk'],
+                    'idpnsppk'  => $value['idpnsppk']
+
+                  );
+                }
                 $this->data= array(
                     'idopd'     => $idopd,
-                    'nmopd'     =>  $namaopd,
-                    'tahun'     =>  $this->tahunskr,
-                    'list'      =>$lskeg
+                    'nmopd'     => $namaopd,
+                    'tahun'     => $this->tahunskr,
+                    'list'      => $list
                 );
+
+              //  echo json_encode($this->data);exit;
                 $this->template->load('templatenew','v_dafkeg_pptk',$this->data);
 
 
@@ -1583,7 +1667,7 @@ function realisasipptk(){
 
                 /*jika peran 2 maka PPK*/
                 $encryptionMethod = "AES-256-ECB";
-                $secretHash = "aS9P0RNoKY9QcmvGDWwcZcjw6OuZKJK2VrR4Hv9UMms=";
+                $secretHash = "yqB6gHWfslCoYKWuAcOkqWbBRGqXqMA0UdNxQyqG9Iw=";
                 if(!isset($_GET['unit'], $_GET['keg'], $_GET['tab'],$_GET['pr'],$_GET['indexbl'],$_GET['bl'],$_GET['ub'])) {
                   redirect('User/dafkeg', 'refresh');
                 }else{
@@ -1939,10 +2023,10 @@ function realisasipptklama(){
 
             /*jika peran 2 maka PPK*/
             $encryptionMethod = "AES-256-ECB";
-            $secretHash = "aS9P0RNoKY9QcmvGDWwcZcjw6OuZKJK2VrR4Hv9UMms=";
+            $secretHash = "yqB6gHWfslCoYKWuAcOkqWbBRGqXqMA0UdNxQyqG9Iw=";
             if(!isset($_GET['unit'], $_GET['keg'], $_GET['tab'])) {
 
-              redirect('User/kakppk', 'refresh');
+              redirect('User/list-kegiatan-kpa', 'refresh');
           }else{
             $un=$_GET['unit'];
             $keg=$_GET['keg'];
@@ -2144,7 +2228,7 @@ function cektabrealisasi(){
                 $idkeg=$this->input->post('idkeg');
                 $unitkey=$this->input->post('unitkey');
                 $encryptionMethod = "AES-256-ECB";
-                $secretHash = "aS9P0RNoKY9QcmvGDWwcZcjw6OuZKJK2VrR4Hv9UMms=";
+                $secretHash = "yqB6gHWfslCoYKWuAcOkqWbBRGqXqMA0UdNxQyqG9Iw=";
                 $it     = openssl_encrypt($idtab, $encryptionMethod, $secretHash);
                 $un     = openssl_encrypt($unitkey, $encryptionMethod, $secretHash);
                 $kg     = openssl_encrypt($idkeg, $encryptionMethod, $secretHash);
@@ -2874,9 +2958,9 @@ function entrirealisasipptk(){
             if($peran=='3'){
             /*jika peran 3 maka PPTK*/
             $encryptionMethod = "AES-256-ECB";
-            $secretHash = "aS9P0RNoKY9QcmvGDWwcZcjw6OuZKJK2VrR4Hv9UMms=";
+            $secretHash = "yqB6gHWfslCoYKWuAcOkqWbBRGqXqMA0UdNxQyqG9Iw=";
             if(!isset($_GET['unit'], $_GET['keg'], $_GET['tab'])) {
-              redirect('User/kakppk', 'refresh');
+              redirect('User/list-kegiatan-kpa', 'refresh');
             }else{
             $un=$_GET['unit'];
             $keg=$_GET['keg'];
@@ -2897,14 +2981,14 @@ function entrirealisasipptk(){
             $namaopd=$getopd->nmunit;
             if($unit!=$idopd){
 
-                redirect('User/kakppk', 'refresh');
+                redirect('User/list-kegiatan-kpa', 'refresh');
 
             }else{
 
                 $statkak = $this->db->get_where('tab_kak',array('idtab_pptk'=>$idtab));
                     if($statkak->num_rows()>0){
                       // $ada=1; maka tidak bisa lanjut
-                     redirect('User/kakppk', 'refresh');
+                     redirect('User/list-kegiatan-kpa', 'refresh');
 
                     }else{
                       $lskeg = $this->User_model->getdetlistkegiatan_detppk($nip,$kegiatan,$this->tahunskr);
@@ -2947,7 +3031,7 @@ function entrirealisasipptk(){
 //------------------------------------------awal ppk---------------------------------------------------//
 //------------------------------------------------------------------------------------------------------//
 
-function kakppk(){
+function list_kegiatan_kpa(){
     if (!$this->ion_auth->logged_in()){
         redirect('Home/login', 'refresh');
     }elseif ($this->ion_auth->is_admin()){
@@ -2968,13 +3052,35 @@ function kakppk(){
             if($peran=='2' || $peran='6'){
                 /*jika peran 2 maka PPK jika peran 6 maka Sekretaris*/
                 $lskeg = $this->User_model->getdetlistkegiatan_ppk($nip,$this->tahunskr);
+                //
+                // $this->data= array(
+                //
+                //     'idopd'     => $idopd,
+                //     'nmopd'     => $namaopd,
+                //     'tahun'     => $this->tahunskr,
+                //     'list'      => $lskeg
+                // );
+                $list=array();
+                foreach ($lskeg as $key => $value) {
+                  $kdkeg= $value['kdkegunit'];
+                  //sum ke angkas get nilai sum
+                  $getnilai =$this->User_model->sumangkas($kdkeg,$idopd,$this->tahunskr);
+                  $list[] = array(
+                    'id'        => $value['id'],
+                    'status'    => $value['status'],
+                    'kdkegunit' => $value['kdkegunit'],
+                    'nmkegunit' => $value['nmkegunit'],
+                    'nilai'     => $getnilai['nilai'],
+                    'idpnspptk' => $value['idpnspptk'],
+                    'idpnsppk'  => $value['idpnsppk']
 
+                  );
+                }
                 $this->data= array(
-
                     'idopd'     => $idopd,
                     'nmopd'     => $namaopd,
                     'tahun'     => $this->tahunskr,
-                    'list'      => $lskeg
+                    'list'      => $list
                 );
                 $this->template->load('templatenew','v_dafkeg_ppk',$this->data);
 
@@ -3077,7 +3183,7 @@ function simpankak(){
 
 /*dari AGUNG----AGUNG----AGUNG----AGUNG----AGUNG----AGUNG----AGUNG----AGUNG*/
 
-function viewkakppk(){
+function lihat_kak_kpa(){
     if (!$this->ion_auth->logged_in()){
         redirect('Home/login', 'refresh');
     }elseif ($this->ion_auth->is_admin()){
@@ -3099,10 +3205,10 @@ function viewkakppk(){
                 /*jika peran 2 maka PPK*/
 
                 $encryptionMethod = "AES-256-ECB";
-                $secretHash = "aS9P0RNoKY9QcmvGDWwcZcjw6OuZKJK2VrR4Hv9UMms=";
+                $secretHash = "yqB6gHWfslCoYKWuAcOkqWbBRGqXqMA0UdNxQyqG9Iw=";
                 if(!isset($_GET['unit'], $_GET['keg'], $_GET['tab'])) {
 
-                  redirect('User/kakppk', 'refresh');
+                  redirect('User/list-kegiatan-kpa', 'refresh');
                 }else{
                     $un=$_GET['unit'];
                     $keg=$_GET['keg'];
@@ -3474,7 +3580,7 @@ function cekstatkak(){
                 $idkeg=$this->input->post('idkeg');
                 $unitkey=$this->input->post('unitkey');
                 $encryptionMethod = "AES-256-ECB";
-                $secretHash = "aS9P0RNoKY9QcmvGDWwcZcjw6OuZKJK2VrR4Hv9UMms=";
+                $secretHash = "yqB6gHWfslCoYKWuAcOkqWbBRGqXqMA0UdNxQyqG9Iw=";
                 $it     = openssl_encrypt($idtab, $encryptionMethod, $secretHash);
                 $un     = openssl_encrypt($unitkey, $encryptionMethod, $secretHash);
                 $kg     = openssl_encrypt($idkeg, $encryptionMethod, $secretHash);
@@ -3553,7 +3659,7 @@ function cekblnjamdal(){
                 $idkeg      =$this->input->post('idkeg');
                 $idtab      =$this->input->post('idtab');
                 $encryptionMethod = "AES-256-ECB";
-                $secretHash = "aS9P0RNoKY9QcmvGDWwcZcjw6OuZKJK2VrR4Hv9UMms=";
+                $secretHash = "yqB6gHWfslCoYKWuAcOkqWbBRGqXqMA0UdNxQyqG9Iw=";
                 $it         = openssl_encrypt($idtab, $encryptionMethod, $secretHash);
                 $un         = openssl_encrypt($unitkey, $encryptionMethod, $secretHash);
                 $kg         = openssl_encrypt($idkeg, $encryptionMethod, $secretHash);
@@ -3621,10 +3727,10 @@ function entrikak(){
         if($peran=='2' || $peran=='6'){
             /*jika peran 2 maka PPK*/
             $encryptionMethod = "AES-256-ECB";
-            $secretHash = "aS9P0RNoKY9QcmvGDWwcZcjw6OuZKJK2VrR4Hv9UMms=";
+            $secretHash = "yqB6gHWfslCoYKWuAcOkqWbBRGqXqMA0UdNxQyqG9Iw=";
             if(!isset($_GET['unit'], $_GET['keg'], $_GET['tab'])) {
 
-              redirect('User/kakppk', 'refresh');
+              redirect('User/list-kegiatan-kpa', 'refresh');
           }else{
             $un=$_GET['unit'];
             $keg=$_GET['keg'];
@@ -3645,14 +3751,14 @@ function entrikak(){
             $namaopd=$getopd->nmunit;
             if($unit!=$idopd){
 
-                redirect('User/kakppk', 'refresh');
+                redirect('User/list-kegiatan-kpa', 'refresh');
 
             }else{
 
                 $statkak = $this->db->get_where('tab_kak',array('idtab_pptk'=>$idtab));
                     if($statkak->num_rows()>0){
                       // $ada=1; maka tidak bisa lanjut
-                     redirect('User/kakppk', 'refresh');
+                     redirect('User/list-kegiatan-kpa', 'refresh');
 
                     }else{
                       $lskeg = $this->User_model->getdetlistkegiatan_detppk($nip,$kegiatan,$this->tahunskr);
@@ -3690,13 +3796,93 @@ function entrikak(){
 
 }
 
-
+// list belanja modal yang akan di entri target
 function jsonlistbmodal($unit,$kegiatan){
     header('Content-Type: application/json');
     echo $this->User_model->jsonlistbmodal($unit,$kegiatan,$this->tahunskr);
 }
 
-function entritblnjmodal(){
+function jsonlistbmodal_spesial($unit,$kegiatan){
+    header('Content-Type: application/json');
+    echo $this->User_model->jsonlistbmodal_spesial($unit,$kegiatan,$this->tahunskr);
+}
+
+function jsonlisturaian_spesial($unit,$kegiatan){
+    header('Content-Type: application/json');
+    echo $this->User_model->jsonlisturaian_spesial($unit,$kegiatan,$this->tahunskr);
+}
+//batas list belanja modal yang akan di entri target
+
+function tambahmodal(){
+
+  if (!$this->ion_auth->logged_in()){
+      redirect('Home/login', 'refresh');
+  }elseif ($this->ion_auth->is_admin()){
+      redirect('Cpanel', 'refresh');
+  }elseif ($this->ion_auth->is_kasubag()){
+     /*Dari function ini akan di cek ke tabel struktur apakah user tersebut KADIS/PPK/PPTK */
+      redirect('User/admingeneral', 'refresh');
+
+  }else{
+    $nipawal=$this->ion_auth->user()->row()->username;
+    $struktur = $this->User_model->cekstrukturpns($nipawal);
+    $getopd = $this->User_model->getnamaopd($nipawal);
+    $idopd =$getopd->unitkey;
+    $namaopd=$getopd->nmunit;
+    $stat_bmodal=$getopd->stat_kak_bmodal;
+    if($struktur ){
+      $peran=$struktur->peran;
+      $nip=$struktur->nip;
+
+      if($peran=='2' || $peran='6'){
+          if($stat_bmodal != 1){
+              redirect('User', 'refresh');
+          }else{
+            // cek ke tabel tab_modal_spesial
+            // jika sudah ada maka respon false status ada = 1
+            // jika belum ada maka insert ke tab_modal_spesial dan respon true stat ada=0
+            $iddpa= $this->input->post('iddpa');
+
+            $statmodal = $this->User_model->cekmodalstat($iddpa);
+            if($statmodal->num_rows() > 0){
+              $status= false;
+              $ada   = 1;
+            }else{
+              $adminentri     = $nip;
+              $tgl_entri      = date('Y/m/d h:i:sa');
+
+              $data=array(
+                  'id_dpa221'     => $iddpa,
+                  'adminentri'    => $nip,
+                  'tgl_entri  ' => $tgl_entri
+              );
+              $insert= $this->User_model->simpanmodalspesial($data);
+              if($insert){
+                $status = true;
+                $ada    = 0;
+              }else{
+                $status = false;
+                $ada    = 0;
+              }
+            }
+          $data['data'][]= array(
+               'status' => $status,
+               'ada'    => $ada
+           );
+           echo json_encode($data);
+
+          }
+      }else{
+        redirect('User', 'refresh');
+      }
+    }else{
+      redirect('User', 'refresh');
+    }
+  }
+
+}
+
+function entri_target_belanja_modal(){
     if (!$this->ion_auth->logged_in()){
         redirect('Home/login', 'refresh');
     }elseif ($this->ion_auth->is_admin()){
@@ -3715,10 +3901,10 @@ function entritblnjmodal(){
         if($peran=='2' || $peran=='6'){
             /*jika peran 2 maka PPK*/
             $encryptionMethod = "AES-256-ECB";
-            $secretHash = "aS9P0RNoKY9QcmvGDWwcZcjw6OuZKJK2VrR4Hv9UMms=";
+            $secretHash = "yqB6gHWfslCoYKWuAcOkqWbBRGqXqMA0UdNxQyqG9Iw=";
             if(!isset($_GET['unit'], $_GET['keg'], $_GET['tab'])) {
 
-              redirect('User/kakppk', 'refresh');
+              redirect('User/list-kegiatan-kpa', 'refresh');
           }else{
             $un=$_GET['unit'];
             $keg=$_GET['keg'];
@@ -3738,10 +3924,60 @@ function entritblnjmodal(){
             $getopd = $this->User_model->getnamaopd($nip);
             $idopd =$getopd->unitkey;
             $namaopd=$getopd->nmunit;
+            $stat_bmodal=$getopd->stat_kak_bmodal;
             if($unit!=$idopd){
-                redirect('User/kakppk', 'refresh');
+                redirect('User/list-kegiatan-kpa', 'refresh');
             }else{
+              if($stat_bmodal == 1){
+                // $stat_bmodal=1 (misal dinas PU yang bisa sesukanya entri target belanja modal)
+                  $blnjamodal =  $this->User_model->cekblnjamodal_spesial($unit,$kegiatan,$this->tahunskr);
+                  if($blnjamodal){
+                      //amankan dari copy paste link salah yang tidak ada belanja modal
+                      $statkak = $this->db->get_where('tab_kak',array('idtab_pptk'=>$idtab,'stat_draft'=>'1'));
+                      if($statkak->num_rows()>0){
+                          $lskeg = $this->User_model->getdetlistkegiatan_detppk($nip,$kegiatan,$this->tahunskr);
+                          // cari belanja modal dengan 5.2.3.
+                          $pecahawal = explode('-', $statkak->row()->ii_awal_keg);
+                          $thnawal  = $pecahawal[0];
+                          $blnawal  = $pecahawal[1];
+                          $pecahakhir = explode('-', $statkak->row()->ii_akhir_keg);
+                          $thnakhir  = $pecahakhir[0];
+                          $blnakhir  = $pecahakhir[1];
+                           if($lskeg){
+                              $this->data= array(
+                                  'idopd'     => $idopd,
+                                  'idtab'     => $idtab,
+                                  'nmopd'     => $namaopd,
+                                  'tahun'     => $this->tahunskr,
+                                  'prog'      => $lskeg->prog,
+                                  'kdkeg'     => $lskeg->kdkeg,
+                                  'keg'       => $lskeg->keg,
+                                  'nl'        => $lskeg->nl,
+                                  'pptk'      => $lskeg->pptk,
+                                  'ppk'       => $lskeg->ppk,
+                                  'awaltahun' => $thnawal,
+                                  'blnawal'   => $blnawal,
+                                  'akhirtahun' => $thnakhir,
+                                  'blnakhir'   => $blnakhir,
+                                  'blmodal'   => $blnjamodal->result_array()
+                              );
+                            //  echo json_encode($this->data);exit;
+                              $this->template->load('templatenew','v_entribmodal_ppk_spesial', $this->data);
+
+                          }else{
+                              redirect('User/list-kegiatan-kpa', 'refresh');
+                          }
+                      }else{
+                           redirect('User/list-kegiatan-kpa', 'refresh');
+                      }
+
+
+                  }else{
+                      redirect('User/list-kegiatan-kpa', 'refresh');
+                  }
+              }else{
                 $blnjamodal = $this->User_model->cekblnjamodal($unit,$kegiatan,$this->tahunskr);
+                //echo json_encode($blnjamodal->result_array());exit;
                 if($blnjamodal->num_rows()>0){
                     //amankan dari copy paste link salah yang tidak ada belanja modal
                     $statkak = $this->db->get_where('tab_kak',array('idtab_pptk'=>$idtab,'stat_draft'=>'1'));
@@ -3772,18 +4008,22 @@ function entritblnjmodal(){
                                 'blnakhir'   => $blnakhir,
                                 'blmodal'   => $blnjamodal->result_array()
                             );
+
                             $this->template->load('templatenew','v_entribmodal_ppk', $this->data);
+
                         }else{
-                            redirect('User/kakppk', 'refresh');
+                            redirect('User/list-kegiatan-kpa', 'refresh');
                         }
                     }else{
-                         redirect('User/kakppk', 'refresh');
+                         redirect('User/list-kegiatan-kpa', 'refresh');
                     }
 
 
                 }else{
-                    redirect('User/kakppk', 'refresh');
+                    redirect('User/list-kegiatan-kpa', 'refresh');
                 }
+              }
+
             }
         }
 
@@ -4027,27 +4267,32 @@ function cektargetfisik(){
                         }elseif($fixtottarfis > 100){
                             $fixtottarfis=number_format (ceil($fixtottarfis),2);
                         }
-
+                        if(isset($modelnlreal['stat_teruskan'])){
+                          $statteruskan=$modelnlreal['stat_teruskan'];
+                        }else{
+                          $statteruskan =0;
+                        }
 
                         //---------------------------------------------------------------------------------------//
                       $det[]=array(
-                        'kdkeg'     => $kdkeg,
+                        'kdkeg'       => $kdkeg,
                         'nmprgrm'     => $key['prog'],
-                        'nmkeg'     => $key['nmkegunit'],
-                        'ppk'       => $key['idpnsppk'],
-                        'nipppk'    => $key['nipppk'],
-                        'nippptk'   => $key['nippptk'],
-                        'pptk'      => $key['idpnspptk'],
-                        'nlskr'     => $nlskr,
-                        'nltskr'    => $this->template->nominal($nltotbln),
-                        'nlthn'     => $nltotthn,
-                        'prstarget' => number_format($nltotbln/$nltotthn*100,2),
-                        'realnl'    => $this->template->nominal($nlrealbln),
-                        'prsreal'   => $persenreal,
-                        'cpaian'    => $capaian,
-                        'blnarsir'  => $blnarsir,
-                        'prstarfis' => $fixtottarfis,
-                        'prsrealfis'=>number_format($bobotrealfis,2)
+                        'nmkeg'       => $key['nmkegunit'],
+                        'ppk'         => $key['idpnsppk'],
+                        'nipppk'      => $key['nipppk'],
+                        'nippptk'     => $key['nippptk'],
+                        'pptk'        => $key['idpnspptk'],
+                        'nlskr'       => $nlskr,
+                        'nltskr'      => $this->template->nominal($nltotbln),
+                        'nlthn'       => $nltotthn,
+                        'prstarget'   => number_format($nltotbln/$nltotthn*100,2),
+                        'realnl'      => $this->template->nominal($nlrealbln),
+                        'prsreal'     => $persenreal,
+                        'cpaian'      => $capaian,
+                        'blnarsir'    => $blnarsir,
+                        'prstarfis'   => $fixtottarfis,
+                        'prsrealfis'  => number_format($bobotrealfis,2),
+                        'stat_terskn' => $statteruskan
 
                       );
                     }
@@ -4303,20 +4548,22 @@ function json_cek_detail_tab_realisasi_ppk(){
   if($modelcekrealisasi->num_rows()>0){
     $status=true;
     $varstatteruskan = $modelcekrealisasi->row_array()['stat_teruskan'];
-    if($varstatteruskan!=0){
-      $statusteruskan = false;
-
-    }else{
-      $statusteruskan = true;
-    }
+    // if($varstatteruskan!=0){
+    //   $statusteruskan = false;
+    //
+    // }else{
+    //   $statusteruskan = true;
+    // }
   }else{
     $status=false;
-    $statusteruskan = false;
+  //  $statusteruskan = false;
+    $varstatteruskan = 0;
   }
 
   $data['data'][]= array(
     'status'     => $status,
-    'teruskan'   => $statusteruskan
+    // 'teruskan'   => $statusteruskan,
+    'intteruskan'=> $varstatteruskan
   );
   // jika status = true
   // cek teruskan, jika teruskan = true , muncul form Teruskan
@@ -4352,9 +4599,10 @@ function simpan_teruskan_ppk(){
         $posttahun      = $this->input->post('thn');
         $postbulan      = $this->input->post('bln');
         $postmslh       = $this->input->post('mslh');
+        $poststat       = $this->input->post('stat');
         $dataupdate=array(
                     'permasalahan'    => $postmslh,
-                    'stat_teruskan'   => 1,
+                    'stat_teruskan'   => $poststat,
                     'admin_teruskan'  => $nip
                 );
         $update = $this->User_model->update_teruskan_ppk($postidtabpptk,$posttahun,$postbulan,$dataupdate);
@@ -4652,6 +4900,11 @@ function dafevalsekretaris(){
                     }elseif($fixtottarfis > 100){
                         $fixtottarfis=number_format (ceil($fixtottarfis),2);
                     }
+                    if(isset($modelnlreal['stat_teruskan'])){
+                      $statteruskan=$modelnlreal['stat_teruskan'];
+                    }else{
+                      $statteruskan =0;
+                    }
 
 
                     //---------------------------------------------------------------------------------------//
@@ -4672,7 +4925,9 @@ function dafevalsekretaris(){
                     'cpaian'    => $capaian,
                     'blnarsir'  => $blnarsir,
                     'prstarfis' => $fixtottarfis,
-                    'prsrealfis'=>number_format($bobotrealfis,2)
+                    'prsrealfis'=>number_format($bobotrealfis,2),
+                    'stat_terskn'=> $statteruskan
+
 
                   );
                 }
@@ -4749,8 +5004,8 @@ function evaluasi_semua_sekretaris(){
           $peran=$struktur->peran;
           $nip=$struktur->nip;
 
-          if($peran=='6'){
-              /*jika peran 6 maka Sekretaris */
+          if($peran=='6' || $peran=='1' ){
+              /*jika peran 6 maka Sekretaris dan 1 Kadis */
               // select tab_pptk_master berdasarkan unitkey = $idopd dan tahun = $this->tahunskr
               // setelah dapat row() , ambil id
               // setelah dapat id , select tab_pptk berdasarkan id_pptk_master = id yang sudah di select tadi
@@ -4762,30 +5017,318 @@ function evaluasi_semua_sekretaris(){
               $modelpptkmaster= $this->User_model->get_row_pptk_master($idopd,$this->tahunskr);
               if($modelpptkmaster->num_rows() == 0){
                   $data[]=array();
+                  $datapagu [] =array(
+                    'tahun' => 0,
+                    'blnskr'=> 0,
+                    'blnsdskr'=>0
+                  );
 
 
               }else{
+                  $datapagu=$this->User_model->paguopd( $this->tahunskr,$this->bulanskr,$idopd);
                   $idtabmasterpptk=$modelpptkmaster->row_array()['id'];
-                  $modellstppk= $this->User_model->get_list_ppk($idtabmasterpptk);
+                  $modellstppk= $this->User_model->get_list_ppk($idtabmasterpptk); //ambil list ppk berdasrkan id master
                   $listppk = $modellstppk->result_array();
-                  for ($i=0; $i < count($arraybuln) ; $i++) {
 
+                  $lskegsemua  = $this->User_model->getdetlistkegiatan_semuappk($idtabmasterpptk,$this->tahunskr);
+
+                  $wherein = array(); // ini untuk where in
+                  foreach ($lskegsemua as $key => $value) {
+                      $wherein[]=$value['id'];
+                      $arrkdkegunit[]= $value['kdkegunit'];
+                  }
+                  $modelprsnreal = $this->User_model->realkeu_ppk_persen($wherein,$this->tahunskr,$this->bulanskr);
+                  $modelprsnlrealbmodal = $this->User_model->realkeu_ppk_bmodal_persen($wherein,$this->tahunskr,$this->bulanskr);
+                  $prsnreal = $modelprsnreal['nilai'] + $modelprsnlrealbmodal['nilai']; //nilai untuk mencari persen bulan sekarang
+
+                  $modelrealsd = $this->User_model->realkeu_ppk_persen($wherein,$this->tahunskr,$this->bulanskr,1);
+                  $modelrealbmodalsd = $this->User_model->realkeu_ppk_bmodal_persen($wherein,$this->tahunskr,$this->bulanskr,1);
+                  $realsd =  $modelrealsd['nilai'] + $modelrealbmodalsd['nilai'];  //nilai untuk mencari persen sampai dengan bulan sekarang
+
+
+                  $totalKeg=array();
+                  $totalreal=array();
+                  $totalrealfis=array();
+                  $tottarfis =array();
+                  for ($i=0; $i < count($arraybuln) ; $i++) {
+                    $kdbln=$i+1;
+                    // echo json_encode($totalKeg);exit;
+                    $ppk=array();
+                    foreach ($listppk as $key => $keyppk) {
+                        $rincian=array();
+
+                        $datappk = array();
+
+
+
+                        $lskegppk  = $this->User_model->getdetlistkegiatan_ppk($keyppk['nipppk'],$this->tahunskr);
+                        if(!$lskegppk ){
+                            $datappk[]=array();
+                            $datapaguppk [] =array(
+                              'tahun' => 0,
+                              'blnskr'=> 0,
+                              'blnsdskr'=>0
+                                      );
+                            $realsdppk =0;
+                            $prsnrealppk =0;
+                        }else{
+                            $arrkdkegunitppk = array(); // ini untuk where in
+                            $whereinppk = array(); // ini untuk where in
+                            foreach ($lskegppk as $key => $value) {
+                              $whereinppk[]=$value['id'];
+                              $arrkdkegunitppk[]= $value['kdkegunit'];
+                            }
+                            //nilai pagu per pptk
+                            $datapaguppk=$this->User_model->pagupptk( $this->tahunskr,$kdbln,$idopd,$arrkdkegunitppk);
+                            // output nilai Pagu ----->>> echo json_encode($datapagu[0]['tahun']);
+                            //nilai persentase
+                            // $persentase =
+                            $modelprsnrealppk = $this->User_model->realkeu_ppk_persen($whereinppk,$this->tahunskr,$kdbln);
+                            $modelprsnlrealbmodalppk = $this->User_model->realkeu_ppk_bmodal_persen($whereinppk,$this->tahunskr,$kdbln);
+                            $prsnrealppk = $modelprsnrealppk['nilai'] + $modelprsnlrealbmodalppk['nilai']; //nilai untuk mencari persen bulan sekarang
+
+                            $modelrealsdppk = $this->User_model->realkeu_ppk_persen($whereinppk,$this->tahunskr,$kdbln,1);
+                            $modelrealbmodalsdppk = $this->User_model->realkeu_ppk_bmodal_persen($whereinppk,$this->tahunskr,$kdbln,1);
+                            $realsdppk =  $modelrealsdppk['nilai'] + $modelrealbmodalsdppk['nilai'];  //nilai untuk mencari persen sampai dengan bulan sekarang
+
+                            $detppk=array();
+
+
+                            foreach ($lskegppk as $key ) {
+                              $kdkeg = $key['kdkegunit'];
+                              $idtab = $key['id'];
+
+
+
+                              //----------------------------target-----------------------------------------------------//
+                              $modeltarkeu = $this->User_model->tarkeu_ppk($idopd,$this->tahunskr,$kdbln,$kdkeg);
+                              $modeltarkeuthn = $this->User_model->tarkeu_ppk_thn($idopd,$this->tahunskr,$kdkeg);
+
+                              $nlskr    = $modeltarkeu['nilai']; //nilai kegiatan perbulan dari aliran kas
+
+                              if(!array_key_exists($kdkeg,$totalKeg)){
+                                $totalKeg[$kdkeg] = $nlskr;
+                              }else{
+                                $totalKeg[$kdkeg] += $nlskr;
+                              }
+
+                              $nltotbln = $totalKeg[$kdkeg]; //jumlah total nilai kegiatan perbulan sampai dengan bulan berjalan
+                              $nltotthn = $modeltarkeuthn['nilai']; //jumlah total nilai kegiatan pertahun
+                              //---------------------------------------------------------------------------------------//
+                              //---------------------------realisasi---------------------------------------------------//
+                              $modelnlreal = $this->User_model->realkeu_ppk($idtab,$this->tahunskr,$kdbln);
+                              $modelnlrealbmodal = $this->User_model->realkeu_ppk_bmodal($idtab,$this->tahunskr,$kdbln);
+
+                              if(isset($modelnlreal['nilai'])){
+                                $nlreal=$modelnlreal['nilai'];
+                              }else{
+                                $nlreal =0;
+                              }
+
+                              if(isset($modelnlrealbmodal['nilai'])){
+                                $nlrealbmodal=$modelnlrealbmodal['nilai'];
+                              }else{
+                                $nlrealbmodal =0;
+                              }
+
+                              $fixnlreal = $nlreal + $nlrealbmodal;
+
+                              if(!array_key_exists($kdkeg,$totalreal)){
+                                $totalreal[$kdkeg] = $fixnlreal;
+                              }else{
+                                $totalreal[$kdkeg] += $fixnlreal;
+                              }
+                                $nlrealbln = $totalreal[$kdkeg];
+                                //cari bobot realisasi fisik
+
+
+                                if(isset($modelnlreal['bobot_real'])){
+                                  $botreal=$modelnlreal['bobot_real'];
+                                }else{
+                                  $botreal =0;
+                                }
+                                if(!array_key_exists($kdkeg,$totalrealfis)){
+                                  $totalrealfis[$kdkeg] = $botreal;
+                                }else{
+                                  $totalrealfis[$kdkeg] += $botreal;
+                                }
+                                $bobotrealfis =   $totalrealfis[$kdkeg] ;
+                              //---------------------------------------------------------------------------------------//
+                                if ($nltotbln > 0) {
+                                  $capaian = number_format($nlrealbln/$nltotbln*100,2);
+                                }else{
+                                  $capaian =  number_format(0,2);
+                                }
+
+                                if ($nltotthn > 0) {
+                                  $persenreal = number_format($nlrealbln/$nltotthn*100,2);
+                                }else{
+                                  $persenreal =  number_format(0,2);
+                                }
+                                //---------------------------------fisik------------------------------------------------//
+
+                                $modelfistarget=$this->User_model->tarfis_ppk($idtab);
+                                $arsir=0;
+
+                                foreach ($modelfistarget as $fiskey => $vlfis) {
+                                  $arsir+= strlen($vlfis['jan']);
+                                  $arsir+= strlen($vlfis['feb']);
+                                  $arsir+= strlen($vlfis['mar']);
+                                  $arsir+= strlen($vlfis['apr']);
+                                  $arsir+= strlen($vlfis['mei']);
+                                  $arsir+= strlen($vlfis['jun']);
+                                  $arsir+= strlen($vlfis['jul']);
+                                  $arsir+= strlen($vlfis['ags']);
+                                  $arsir+= strlen($vlfis['sep']);
+                                  $arsir+= strlen($vlfis['okt']);
+                                  $arsir+= strlen($vlfis['nov']);
+                                  $arsir+= strlen($vlfis['des']);
+                                }
+
+                                if ($arsir > 0) {
+                                  $nilaiperarsir = number_format(100/$arsir,2);
+                                }else{
+                                  $nilaiperarsir =  number_format(0,2);
+                                }
+                                $arsirbln=0;
+
+                                foreach ($modelfistarget as $xfiskey => $xvlfis) {
+                                    if(isset($xvlfis[$arrbln[$i]])){
+                                      $arsirbln += strlen($xvlfis[$arrbln[$i]]);
+                                    }else{
+                                      $arsirbln +=0;
+                                    }
+
+                                }
+                                $blnarsir = 0;
+                                if ($arsirbln > 0) {
+                                  $blnarsir = number_format($arsirbln*$nilaiperarsir,2);
+                                }else{
+                                  $blnarsir =  number_format(0,2);
+                                }
+
+                                if(!array_key_exists($kdkeg,$tottarfis)){
+                                  $tottarfis[$kdkeg] = $arsirbln;
+                                }else{
+                                  $tottarfis[$kdkeg] += $arsirbln;
+                                }
+                                $fixtottarfis1 = $tottarfis[$kdkeg];
+                                if ($fixtottarfis1 > 0) {
+                                  $fixtottarfis = number_format($fixtottarfis1*$nilaiperarsir,2);
+                                }else{
+                                  $fixtottarfis =  number_format(0,2);
+                                }
+
+                                if($fixtottarfis > 99 && $fixtottarfis < 100  ){
+                                    $fixtottarfis=number_format (ceil($fixtottarfis),2);
+                                }elseif($fixtottarfis > 100){
+                                    $fixtottarfis=number_format (ceil($fixtottarfis),2);
+                                }
+                                if(isset($modelnlreal['stat_teruskan'])){
+                                  $statteruskan=$modelnlreal['stat_teruskan'];
+                                }else{
+                                  $statteruskan =0;
+                                }
+                                if(isset($modelnlreal['stat_teruskan'])){
+                                  $statteruskan=$modelnlreal['stat_teruskan'];
+                                }else{
+                                  $statteruskan =0;
+                                }
+                                //---------------------------------------------------------------------------------------//
+                              $detppk[]=array(
+                                'kdkeg'     => $kdkeg,
+                                'nmprgrm'     => $key['prog'],
+                                'nmkeg'     => $key['nmkegunit'],
+                                'ppk'       => $key['idpnsppk'],
+                                'nipppk'    => $key['nipppk'],
+                                'nippptk'   => $key['nippptk'],
+                                'pptk'      => $key['idpnspptk'],
+                                'nlskr'     => $nlskr,
+                                'nltskr'    => $this->template->nominal($nltotbln),
+                                'nlthn'     => $nltotthn,
+                                'prstarget' => number_format($nltotbln/$nltotthn*100,2),
+                                'realnl'    => $this->template->nominal($nlrealbln),
+                                'prsreal'   => $persenreal,
+                                'cpaian'    => $capaian,
+                                'blnarsir'  => $blnarsir,
+                                'prstarfis' => $fixtottarfis,
+                                'prsrealfis'=>number_format($bobotrealfis,2),
+                                'stat_terskn'=> $statteruskan
+
+                              );
+                            }
+
+                            // echo json_encode($totalKeg);exit;
+                            $datappk[]=array(
+                              'det'   => $detppk
+
+                            );
+
+                        }
+
+                        if($realsdppk > 0){
+                          $prsnrealsdppk= number_format($realsdppk/$datapagu[0]['blnsdskr']*100,2);
+                        }else{
+                          $prsnrealsdppk= number_format(0,2);
+                        }
+                        if($prsnrealppk > 0 ){
+                          $prsnrealskrppk = number_format($prsnrealppk/$datapagu[0]['blnskr']*100,2);
+                        }else{
+                          $prsnrealskrppk = number_format(0,2);
+                        }
+
+                        $rincian[]=array(
+                          'paguppk'      => $datapaguppk,
+                          'realsdppk'    => $realsdppk,
+                          'prsnrealsdppk'=> $prsnrealsdppk,
+                          'realbulnskrppk' => $prsnrealppk,
+                          'prsnrealskrppk'  => $prsnrealskrppk,
+                          'datappk'      => $datappk
+                        );
+
+                        $ppk[]=array(
+                          'id'        => $keyppk['id'],
+                          'idmaster'  => $keyppk['id_pptk_master'],
+                          'nipppk'    => $keyppk['nipppk'],
+                          'nmppk'     => $keyppk['idpnsppk'] ,
+                          'nilai'     => $keyppk['nilai'],
+                          'rincian'   => $rincian
+                        );
+                    }
+                    $data[]=array(
+                      'kdbln' => $kdbln,
+                      'nmbln' => $arraybuln[$i],
+                      'ppk'   => $ppk
+                    );
                   }
               }
 
 
+              if($realsd > 0){
+                $prsnrealsd= number_format($realsd/$datapagu[0]['blnsdskr']*100,2);
+              }else{
+                $prsnrealsd= number_format(0,2);
+              }
+              if($prsnreal > 0 ){
+                $prsnrealskr = number_format($prsnreal/$datapagu[0]['blnskr']*100,2);
+              }else{
+                $prsnrealskr = number_format(0,2);
+              }
               $this->data= array(
+                  'peran'     => $peran,
                   'tahun'     => $this->tahunskr,
                   'bulan'     => $this->bulanskr,
                   'idopd'     => $idopd,
                   'nmopd'     => $namaopd,
-                  'pagu'      => '',
-                  'realsd'    => '',
-                  'prsnrealsd'=> '',
-                  'realbulnskr' => '',
-                  'prsnrealskr'  => '',
-                  'data'      => ''
+                  'pagu'      => $datapagu,
+                  'realsd'    => $realsd,
+                  'prsnrealsd'=> $prsnrealsd,
+                  'realbulnskr' => $prsnreal,
+                  'prsnrealskr'  => $prsnrealskr,
+                  'data'      => $data
               );
+            // echo json_encode($this->data);exit;
+              $this->template->load('templatenew','v_eval_semua',$this->data);
 
         }else{
               /*jika tidak*/
@@ -5396,10 +5939,11 @@ function logout()
     function enckeytes(){
 
 
-        $textToEncrypt = "Risma Yunia Harnika";
+    $textToEncrypt = "Risma Yunia Harnika";
     $encryptionMethod = "AES-256-ECB";  // AES is used by the U.S. gov't to encrypt top secret documents.
-    $secretHash = "aS9P0RNoKY9QcmvGDWwcZcjw6OuZKJK2VrR4Hv9UMms=";
-
+    $secretHash = "Rizky Primadona";
+    // $secretHash = "yqB6gHWfslCoYKWuAcOkqWbBRGqXqMA0UdNxQyqG9Iw=";
+    //yqB6gHWfslCoYKWuAcOkqWbBRGqXqMA0UdNxQyqG9Iw=
     //To encrypt
     $encryptedMessage = openssl_encrypt($textToEncrypt, $encryptionMethod, $secretHash);
 
