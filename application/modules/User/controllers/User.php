@@ -3838,9 +3838,11 @@ function tambahmodal(){
           if($stat_bmodal != 1){
               redirect('User', 'refresh');
           }else{
+
             // cek ke tabel tab_modal_spesial
             // jika sudah ada maka respon false status ada = 1
             // jika belum ada maka insert ke tab_modal_spesial dan respon true stat ada=0
+
             $iddpa= $this->input->post('iddpa');
 
             $statmodal = $this->User_model->cekmodalstat($iddpa);
@@ -3929,13 +3931,66 @@ function entri_target_belanja_modal(){
                 redirect('User/list-kegiatan-kpa', 'refresh');
             }else{
               if($stat_bmodal == 1){
+                // cara pertama
                 // $stat_bmodal=1 (misal dinas PU yang bisa sesukanya entri target belanja modal)
-                  $blnjamodal =  $this->User_model->cekblnjamodal_spesial($unit,$kegiatan,$this->tahunskr);
-                  if($blnjamodal){
+                  // $blnjamodal =  $this->User_model->cekblnjamodal_spesial($unit,$kegiatan,$this->tahunskr);
+                  // if($blnjamodal){
+                  //     //amankan dari copy paste link salah yang tidak ada belanja modal
+                  //     $statkak = $this->db->get_where('tab_kak',array('idtab_pptk'=>$idtab,'stat_draft'=>'1'));
+                  //     if($statkak->num_rows()>0){
+                  //         $lskeg = $this->User_model->getdetlistkegiatan_detppk($nip,$kegiatan,$this->tahunskr);
+                  //
+                  //         // cari belanja modal dengan 5.2.3.
+                  //         $pecahawal = explode('-', $statkak->row()->ii_awal_keg);
+                  //         $thnawal  = $pecahawal[0];
+                  //         $blnawal  = $pecahawal[1];
+                  //         $pecahakhir = explode('-', $statkak->row()->ii_akhir_keg);
+                  //         $thnakhir  = $pecahakhir[0];
+                  //         $blnakhir  = $pecahakhir[1];
+                  //          if($lskeg){
+                  //             $this->data= array(
+                  //                 'idopd'     => $idopd,
+                  //                 'idtab'     => $idtab,
+                  //                 'nmopd'     => $namaopd,
+                  //                 'tahun'     => $this->tahunskr,
+                  //                 'prog'      => $lskeg->prog,
+                  //                 'kdkeg'     => $lskeg->kdkeg,
+                  //                 'keg'       => $lskeg->keg,
+                  //                 'nl'        => $lskeg->nl,
+                  //                 'pptk'      => $lskeg->pptk,
+                  //                 'ppk'       => $lskeg->ppk,
+                  //                 'awaltahun' => $thnawal,
+                  //                 'blnawal'   => $blnawal,
+                  //                 'akhirtahun' => $thnakhir,
+                  //                 'blnakhir'   => $blnakhir,
+                  //                 'blmodal'   => $blnjamodal->result_array()
+                  //             );
+                  //
+                  //            echo json_encode($this->data);exit;
+                  //             $this->template->load('templatenew','v_entribmodal_ppk_spesial', $this->data);
+                  //
+                  //         }else{
+                  //             redirect('User/list-kegiatan-kpa', 'refresh');
+                  //         }
+                  //     }else{
+                  //          redirect('User/list-kegiatan-kpa', 'refresh');
+                  //     }
+                  //
+                  //
+                  // }else{
+                  //     redirect('User/list-kegiatan-kpa', 'refresh');
+                  // }
+
+                  //cara kedua
+                  $this->User_model->cekblnjamodal_spesial_cek($unit,$kegiatan,$this->tahunskr,$nip);
+                  $blnjamodal = $this->User_model->cekblnjamodal_spesial_kedua($unit,$kegiatan,$this->tahunskr);
+
+                  // if($blnjamodal){
                       //amankan dari copy paste link salah yang tidak ada belanja modal
                       $statkak = $this->db->get_where('tab_kak',array('idtab_pptk'=>$idtab,'stat_draft'=>'1'));
                       if($statkak->num_rows()>0){
                           $lskeg = $this->User_model->getdetlistkegiatan_detppk($nip,$kegiatan,$this->tahunskr);
+
                           // cari belanja modal dengan 5.2.3.
                           $pecahawal = explode('-', $statkak->row()->ii_awal_keg);
                           $thnawal  = $pecahawal[0];
@@ -3961,8 +4016,9 @@ function entri_target_belanja_modal(){
                                   'blnakhir'   => $blnakhir,
                                   'blmodal'   => $blnjamodal->result_array()
                               );
-                            //  echo json_encode($this->data);exit;
-                              $this->template->load('templatenew','v_entribmodal_ppk_spesial', $this->data);
+
+                             //echo json_encode($this->data);exit;
+                              $this->template->load('templatenew','v_entribmodal_ppk_spesial_kedua', $this->data);
 
                           }else{
                               redirect('User/list-kegiatan-kpa', 'refresh');
@@ -3972,9 +4028,10 @@ function entri_target_belanja_modal(){
                       }
 
 
-                  }else{
-                      redirect('User/list-kegiatan-kpa', 'refresh');
-                  }
+                  // }else{
+                  //     redirect('User/list-kegiatan-kpa', 'refresh');
+                  // }
+
               }else{
                 $blnjamodal = $this->User_model->cekblnjamodal($unit,$kegiatan,$this->tahunskr);
                 //echo json_encode($blnjamodal->result_array());exit;
@@ -4038,7 +4095,19 @@ function entri_target_belanja_modal(){
 }
 
 }
+function jsonlistbmodal_spesial_kedua(){
+  
+  $result=$this->User_model->struktur($opd);
+  if($result){
+      $arr= $this->buildTree($result);
+  }else{
+      $arr= $this->buildTree($items);
+  }
 
+  $ok[]=$arr[0];
+  header('Content-Type: application/json');
+  echo json_encode($ok);
+}
 
 function cektargetfisik(){
     // '80_'

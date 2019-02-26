@@ -1859,7 +1859,79 @@ function simpanentrikak($masterkak){
         $this->db->where('`dpa221`.`tahun`', $thn);
           return $this->db->get();
     }
+    function cekblnjamodal_spesial_cek($unitkey,$idkeg,$thn,$nip){
 
+        $this->db->select('dpa221.id
+      	, matangr.mtgkey');
+        $this->db->from('dpa221');
+        $this->db->join('mkegiatan', 'dpa221.kdkegunit = mkegiatan.kdkegunit');
+        $this->db->join('matangr', 'dpa221.mtgkey = matangr.mtgkey');
+        $this->db->where('`dpa221`.`unitkey`', $unitkey);
+        $this->db->where('`dpa221`.`kdkegunit`', $idkeg);
+        $this->db->where('`dpa221`.`tahun`', $thn);
+        $this->db->group_by('`matangr`.`mtgkey`');
+        $getmtgkey=$this->db->get()->result_array();
+
+        foreach ($getmtgkey as $key => $value) {
+          // code...
+          $this->db->where('tab_target_modal_spesial.tahun',$thn);
+          $this->db->where('tab_target_modal_spesial.unitkey',$unitkey);
+          $this->db->where('tab_target_modal_spesial.kdkegunit',$idkeg);
+          $this->db->where('tab_target_modal_spesial.mtgkey',$value['mtgkey']);
+          $rowmodal = $this->db->get('tab_target_modal_spesial');
+
+          if($rowmodal->num_rows() == 0){
+            //insert tab_target_modal_spesial
+
+            $data=array(
+              'unitkey'     => $unitkey,
+              'kdkegunit'   => $idkeg,
+
+              'mtgkey'      => $value['mtgkey'],
+              'adminentri'  => $nip,
+              'tgl_entri'   => date('Y/m/d h:i:sa'),
+              'tahun'       => $thn
+            );
+            $this->db->trans_start();
+            $this->db->insert('tab_target_modal_spesial', $data);
+            $this->db->trans_complete();
+
+            if ($this->db->trans_status() === FALSE)
+            {
+              $this->db->trans_rollback();
+              return FALSE;
+            }
+            else
+            {
+              $this->db->trans_commit();
+              return TRUE;
+            }
+          }
+        }
+
+
+    }
+  function cekblnjamodal_spesial_kedua($unitkey,$idkeg,$thn){
+    $this->db->select(' `tab_target_modal_spesial`.`id`
+    , `tab_target_modal_spesial`.`unitkey`
+    , `tab_target_modal_spesial`.`kdkegunit`
+    , `tab_target_modal_spesial`.`mtgkey`
+    , `matangr`.`kdper`
+    , `matangr`.`nmper`
+    , `tab_target_modal_spesial`.`id_dpa221`
+    , `tab_target_modal_spesial`.`parent`
+    , `tab_target_modal_spesial`.`adminentri`
+    , `tab_target_modal_spesial`.`tgl_entri`
+    , `tab_target_modal_spesial`.`tahun`
+    , `tab_target_modal_spesial`.`stat_konfig`
+      ');
+    $this->db->from('tab_target_modal_spesial');
+      $this->db->join('matangr', '`tab_target_modal_spesial`.`mtgkey` = `matangr`.`mtgkey`');
+    $this->db->where('tab_target_modal_spesial.tahun',$thn);
+    $this->db->where('tab_target_modal_spesial.unitkey',$unitkey);
+    $this->db->where('tab_target_modal_spesial.kdkegunit',$idkeg);
+    return $this->db->get();
+  }
     function getnama_metode(){
       return $this->db->get('tab_metode_pelaksanaan')->result();
     }
